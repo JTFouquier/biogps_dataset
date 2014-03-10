@@ -21,7 +21,7 @@ species_map = {'Homo sapiens':'human', 'Mus musculus':'mouse', 'Rattus norvegicu
                'Caenorhabditis elegans':'nematode', 'Danio rerio':'zebrafish', 'Arabidopsis thaliana':'thale-cress',\
                'Xenopus tropicalis':'frog', 'Sus scrofa':'pig'}
 
-#E-GEOD-4006
+
 class Command(BaseCommand):
     def handle(self, *args, **options):
         try:
@@ -32,8 +32,10 @@ class Command(BaseCommand):
             return
         if type == 'exp':
             logging.info('dry run on experiment %s, no database savings'%name)
-            dataset = get_exp_sample_file(name)
+            dataset = get_exp_info(name)
+            get_exp_sample_file(name)
             data_matrix = setup_dataset(name)
+            print data_matrix
             logging.info('dry run over')
         elif type == 'file':
             with open(name, 'r') as file:
@@ -59,7 +61,8 @@ class Command(BaseCommand):
                             continue
                         except Exception:
                             pass
-                        dataset = get_exp_sample_file(e)
+                        dataset = get_exp_info(name)
+                        get_exp_sample_file(e)
                         logging.debug('setup_dataset')
                         data_matrix = setup_dataset(e)
                         #print data_matrix
@@ -73,7 +76,7 @@ class Command(BaseCommand):
                         meta = {'geo_gds_id':'', 'name':dataset['name'], 'factors':{}, 'default':False, 'display_params':{}, \
                                  'summary':dataset['summary'], 'source':"http://www.ebi.ac.uk/arrayexpress/json/v2/experiments/" + e, \
                                  'geo_gse_id':e, 'pubmed_id':dataset['pubmed_id'], 'owner':'ArrayExpress Uploader', 'geo_gpl_id':line,\
-                                 'secondaryaccession':dataset['secondaryaccession']}
+                                 'secondaryaccession':dataset['secondaryaccession'], 'factors':dataset['factors']}
                         try:
                             ds = models.BiogpsDataset.objects.get(geo_gse_id=e)
                         except ObjectDoesNotExist:                        
@@ -129,8 +132,7 @@ def get_arraytype_exps(array_type):
         return ()
     return tuple(explist)
 
-#get all data for the experiment and set up data in database
-def get_exp_sample_file(exp):
+def get_exp_info(exp):
     url = "http://www.ebi.ac.uk/arrayexpress/json/v2/experiments/" + exp
     dataset = {}
     logging.info('get experiment info from %s'%(url))
@@ -141,8 +143,60 @@ def get_exp_sample_file(exp):
     dataset['summary'] = data_json["experiments"]["experiment"]["description"]["text"]
     dataset['species'] = data_json["experiments"]["experiment"]["organism"]
     dataset['secondaryaccession'] = data_json["experiments"]["experiment"]["secondaryaccession"]
-    #dataset['pubmed_id'] = data_json["experiments"]["experiment"]["bibliography"]["accession"]
-    dataset['pubmed_id'] = ''
+    try:
+        dataset['pubmed_id'] = data_json["experiments"]["experiment"]["bibliography"]["accession"]
+    except Exception,e:
+        dataset['pubmed_id'] = ''
+    #get experiment factorsd
+    url = "http://www.ebi.ac.uk/arrayexpress/json/v2/files/" + exp
+    logging.info('get experiment file info from %s'%(url))
+    conn = urllib2.urlopen(url)
+    data = conn.read()
+    data_json = json.loads(data)
+    files = data_json["files"]["experiment"]["file"]
+    dataset['factors'] = []
+    for file in files:
+        if file["kind"] == u'sdrf':
+            logging.info('get experiment sdrf file from %s'%(file["url"]))
+            conn = urllib2.urlopen(file["url"])
+            data = conn.read()            
+            header = data.split('\n')[0]
+            filter = parse_sdrf_header(header)
+            data = data.split('\n')[1:]
+            for d in data:
+                if d == '':
+                    continue
+                factor = {'factorvalue':{}, 'comment':{}, 'characteristics': {}}
+                cel = d.split('\t')
+                for k in filter['factorvalue']:
+                    factor['factorvalue'][k] = cel[filter['factorvalue'][k]]
+                for k in filter['comment']:
+                    factor['comment'][k] = cel[filter['comment'][k]]
+                for k in filter['characteristics']:
+                    factor['characteristics'][k] = cel[filter['characteristics'][k]]
+                dataset['factors'].append({cel[0]:factor})
+    return dataset
+
+def parse_sdrf_header(header):
+    headers = header.split('\t')
+    res = {'characteristics':{}, 'comment':{}, 'factorvalue':{}}
+    i = 0
+    while i<len(headers):
+        h = headers[i]
+        if h.find('Characteristics')==0:
+            key = h.split('[')[1].split(']')[0]
+            res['characteristics'][key] = i
+        if h.find('Comment')==0:
+            key = h.split('[')[1].split(']')[0]
+            res['comment'][key] = i
+        if h.find('Factor')==0:
+            key = h.split('[')[1].split(']')[0]
+            res['factorvalue'][key] = i
+        i += 1
+    return res
+
+#get all data for the experiment and set up data in database
+def get_exp_sample_file(exp):
 
     url = "http://www.ebi.ac.uk/arrayexpress/json/v2/files/" + exp
     logging.info('get experiment file info from %s'%(url))
@@ -163,14 +217,9 @@ def get_exp_sample_file(exp):
                 unzip_file("tmp/sample/" + file["name"], "tmp/unzip_sample/" + exp)
             else:                
                 logging.info('sample file exists')
-        elif file["kind"] == u'sdrf':
-            conn = urllib2.urlopen(file["url"])
-            data = conn.read()
-            data = data.split('\n')[1:]
             #setup_dataset(exp) 
     logging.debug('leave get_exp_sample_file')
-    return dataset
-    
+
 #setup data from file downloaded
 def setup_dataset(exp):  
     path = 'tmp/unzip_sample/' + exp
@@ -180,31 +229,36 @@ def setup_dataset(exp):
     for f in dir:
         with open(path+'/'+f, 'r') as file:
             line = file.readline().strip()
-            first_line = True        
+            first_line = True
+            ending = len(line.split('\t'))
             while line != '':
-                splited = line.split("\t")
+                splited = line.split('\t')
                 #check format, and skip first line
                 if first_line:                    
                     first_line = False
                     line = file.readline().strip()
+                    #E-GEOD-4006 style, skp 2 lines
+                    if splited[0] == 'Scan REF':
+                        line = file.readline().strip()
+                    #E-GEOD-26688 style, skip last 2 columns
+                    elif len(splited)==4 and splited[2] == 'ABS_CALL':
+                        ending = 2
                     continue
                 #make sure data is digital
                 i = 1
-                while i<len(splited):
+                while i<ending:
                     try:
                         splited[i] = float(splited[i])
                         i += 1
                     except ValueError, e:
-                        raise Exception, 'file format wrong'
+                        raise Exception, 'file format wrong, check columns of file:%s'%(path+'/'+f)
                 reporter = splited[0]
                 if reporter in data_matrix:
-                    data_matrix[reporter].extend(splited[1:])
+                    data_matrix[reporter].extend(splited[1:ending])
                 else:
-                    data_matrix[reporter] = splited[1:]
+                    data_matrix[reporter] = splited[1:ending]
                 line = file.readline().strip()
     return data_matrix
-
-            
 
 
 def unzip_file(zipfilename, unziptodir):
