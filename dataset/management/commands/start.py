@@ -21,6 +21,9 @@ species_map = {'Homo sapiens':'human', 'Mus musculus':'mouse', 'Rattus norvegicu
                'Caenorhabditis elegans':'nematode', 'Danio rerio':'zebrafish', 'Arabidopsis thaliana':'thale-cress',\
                'Xenopus tropicalis':'frog', 'Sus scrofa':'pig'}
 
+def help_message():
+    return 'Usage: python manage.py start file <path-to-array-type-file> [skip <path-to-experiments-file>]\
+ or python manage.py start exp <experiment-id>'
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
@@ -28,8 +31,15 @@ class Command(BaseCommand):
             type = args[0]
             name = args[1]
         except Exception:
-            print 'Usage: python manage.py start file <path-to-array-type-file> or python manage.py start exp <experiment-id>'
+            print help_message()
             return
+        try:
+            skipcmd = args[2]
+            skipname = args[3]
+            skip = True
+        except Exception:
+            skip = False
+
         if type == 'exp':
             logging.info('dry run on experiment %s, no database savings'%name)
             dataset = get_exp_info(name)
@@ -38,6 +48,10 @@ class Command(BaseCommand):
             print data_matrix
             logging.info('dry run over')
         elif type == 'file':
+            if skip:
+                skip_exps = []
+                with open(skipname, 'r') as skipfile:
+                    skip_exps = skipfile.readlines()
             with open(name, 'r') as file:
                 line = file.readline().strip()
                 while line != '':
@@ -54,6 +68,9 @@ class Command(BaseCommand):
                         os.makedirs('tmp/unzip_sample/')
                     #process each exps for this array type
                     for e in exps:
+                        if skip and e+'\n' in skip_exps:
+                            logging.info('-skip experiment %s, it\'s in skip file-'%e)
+                            continue
                         logging.info('-process experiment %s-'%e)
                         try:
                             models.BiogpsDatasetGeoLoaded.objects.get(geo_type=e, with_platform=line)
@@ -112,7 +129,7 @@ class Command(BaseCommand):
                         models.BiogpsDatasetGeoLoaded.objects.create(geo_type=e, with_platform=line, dataset=ds)
                     line = file.readline().strip()
         else:
-            print 'Usage: python manage.py start file <path-to-array-type-file> or python manage.py start exp <experiment-id>'
+            print help_message()
 #from array type, get its experiment set
 def get_arraytype_exps(array_type):    
     url = "http://www.ebi.ac.uk/arrayexpress/json/v2/files?array=" + array_type
@@ -258,6 +275,7 @@ def setup_dataset(exp):
                 else:
                     data_matrix[reporter] = splited[1:ending]
                 line = file.readline().strip()
+            return data_matrix
     return data_matrix
 
 
