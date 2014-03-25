@@ -78,7 +78,7 @@ class Command(BaseCommand):
                             continue
                         except Exception:
                             pass
-                        dataset = get_exp_info(name)
+                        dataset = get_exp_info(e)
                         get_exp_sample_file(e)
                         logging.debug('setup_dataset')
                         data_matrix = setup_dataset(e)
@@ -96,22 +96,18 @@ class Command(BaseCommand):
                                  'secondaryaccession':dataset['secondaryaccession'], 'factors':dataset['factors']}
                         try:
                             ds = models.BiogpsDataset.objects.get(geo_gse_id=e)
-                        except ObjectDoesNotExist:                        
-                            ds = models.BiogpsDataset.objects.create(name=dataset['name'], 
-                                                                 summary=dataset['summary'],
-                                                                 ownerprofile_id='arrayexpress_sid',
-                                                                 platform=pf,
-                                                                 geo_gds_id='',
-                                                                 geo_gse_id=e,
-                                                                 geo_id_plat=e+'_'+line,
-                                                                 metadata=meta,
-                                                                 species=species_map[dataset['species']])
-                        #clear trash might existed
-                        ds.dataset_data.all().delete()
-                        try:
-                            ds.dataset_matrix.delete()
+                            ds.delete()
                         except ObjectDoesNotExist:
-                            pass
+                            pass                 
+                        ds = models.BiogpsDataset.objects.create(name=dataset['name'], 
+                                                             summary=dataset['summary'],
+                                                             ownerprofile_id='arrayexpress_sid',
+                                                             platform=pf,
+                                                             geo_gds_id='',
+                                                             geo_gse_id=e,
+                                                             geo_id_plat=e+'_'+line,
+                                                             metadata=meta,
+                                                             species=species_map[dataset['species']])
                         #dataset data
                         datasetdata = []
                         for reporter in data_matrix:                        
