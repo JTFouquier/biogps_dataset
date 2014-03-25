@@ -254,7 +254,7 @@ def setup_dataset(exp):
                     if splited[0] == 'Scan REF':
                         line = file.readline().strip()
                     #E-GEOD-26688 style, skip last 2 columns
-                    elif len(splited)==4 and splited[2] == 'ABS_CALL':
+                    elif len(splited)>2 and splited[2] == 'ABS_CALL':
                         ending = 2
                     continue
                 #make sure data is digital
@@ -264,6 +264,7 @@ def setup_dataset(exp):
                         splited[i] = float(splited[i])
                         i += 1
                     except ValueError, e:
+                        print splited
                         raise Exception, 'file format wrong, check columns of file:%s'%(path+'/'+f)
                 reporter = splited[0]
                 if reporter in data_matrix:
