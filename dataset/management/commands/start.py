@@ -45,7 +45,7 @@ class Command(BaseCommand):
             dataset = get_exp_info(name)
             get_exp_sample_file(name)
             data_matrix = setup_dataset(name)
-            print data_matrix
+            #print data_matrix
             logging.info('dry run over')
         elif type == 'file':
             if skip:
@@ -155,7 +155,11 @@ def get_exp_info(exp):
     dataset['name'] = data_json["experiments"]["experiment"]["name"]
     dataset['summary'] = data_json["experiments"]["experiment"]["description"]["text"]
     dataset['species'] = data_json["experiments"]["experiment"]["organism"]
-    dataset['secondaryaccession'] = data_json["experiments"]["experiment"]["secondaryaccession"]
+    try:
+        dataset['secondaryaccession'] = data_json["experiments"]["experiment"]["secondaryaccession"]
+    except Exception,e:
+        dataset['secondaryaccession'] = ''
+    
     try:
         dataset['pubmed_id'] = data_json["experiments"]["experiment"]["bibliography"]["accession"]
     except Exception,e:
@@ -252,10 +256,13 @@ def setup_dataset(exp):
                     line = file.readline().strip()
                     #E-GEOD-4006 style, skp 2 lines
                     if splited[0] == 'Scan REF':
-                        line = file.readline().strip()
-                    #E-GEOD-26688 style, skip last 2 columns
+                        line = file.readline()
+                    #E-MTAB-1169 style, skp 2 lines
+                    elif splited[0] == 'Hybridization REF':
+                        line = file.readline()
+                    #E-GEOD-26688 style, skip columns after first 2
                     elif len(splited)>2 and splited[2] == 'ABS_CALL':
-                        ending = 2
+                        ending = 2                    
                     continue
                 #make sure data is digital
                 i = 1
@@ -264,7 +271,6 @@ def setup_dataset(exp):
                         splited[i] = float(splited[i])
                         i += 1
                     except ValueError, e:
-                        print splited
                         raise Exception, 'file format wrong, check columns of file:%s'%(path+'/'+f)
                 reporter = splited[0]
                 if reporter in data_matrix:
