@@ -9,6 +9,7 @@ import logging
 import numpy as np
 from StringIO import StringIO
 from dataset import models
+import requests, requests_cache
 from django.core.exceptions import ObjectDoesNotExist
 
 
@@ -20,6 +21,8 @@ logging.basicConfig(
 species_map = {'Homo sapiens':'human', 'Mus musculus':'mouse', 'Rattus norvegicus':'rat','Drosophila melanogaster':'fruitfly', \
                'Caenorhabditis elegans':'nematode', 'Danio rerio':'zebrafish', 'Arabidopsis thaliana':'thale-cress',\
                'Xenopus tropicalis':'frog', 'Sus scrofa':'pig'}
+
+requests_cache.install_cache('arrayexpress_cache')
 
 def help_message():
     return 'Usage: python manage.py start file <path-to-array-type-file> [skip <path-to-experiments-file>]\
@@ -132,9 +135,11 @@ def get_arraytype_exps(array_type):
     explist = []
     logging.info('get all experiment IDs')
     logging.info('connect to %s'%(url))
-    conn = urllib2.urlopen(url)
-    data = conn.read()
-    data_json = json.loads(data)
+#     conn = urllib2.urlopen(url)
+#     data = conn.read()
+#     data_json = json.loads(data)
+    res = requests.get(url)
+    data_json = res.json()
         
     if data_json["files"]["total-experiments"] > 0:
         experiments = data_json["files"]["experiment"]
@@ -149,9 +154,11 @@ def get_exp_info(exp):
     url = "http://www.ebi.ac.uk/arrayexpress/json/v2/experiments/" + exp
     dataset = {}
     logging.info('get experiment info from %s'%(url))
-    conn = urllib2.urlopen(url)
-    data = conn.read()
-    data_json = json.loads(data)
+#     conn = urllib2.urlopen(url)
+#     data = conn.read()
+#     data_json = json.loads(data)
+    res = requests.get(url)
+    data_json = res.json()
     dataset['name'] = data_json["experiments"]["experiment"]["name"]
     dataset['summary'] = data_json["experiments"]["experiment"]["description"]["text"]
     dataset['species'] = data_json["experiments"]["experiment"]["organism"]
@@ -167,16 +174,20 @@ def get_exp_info(exp):
     #get experiment factorsd
     url = "http://www.ebi.ac.uk/arrayexpress/json/v2/files/" + exp
     logging.info('get experiment file info from %s'%(url))
-    conn = urllib2.urlopen(url)
-    data = conn.read()
-    data_json = json.loads(data)
+#     conn = urllib2.urlopen(url)
+#     data = conn.read()
+#     data_json = json.loads(data)
+    res = requests.get(url)
+    data_json = res.json()
     files = data_json["files"]["experiment"]["file"]
     dataset['factors'] = []
     for file in files:
         if file["kind"] == u'sdrf':
             logging.info('get experiment sdrf file from %s'%(file["url"]))
-            conn = urllib2.urlopen(file["url"])
-            data = conn.read()            
+#             conn = urllib2.urlopen(file["url"])
+#             data = conn.read()
+            res = requests.get(url)
+            data = res.text
             header = data.split('\n')[0]
             filter = parse_sdrf_header(header)
             data = data.split('\n')[1:]
@@ -217,9 +228,11 @@ def get_exp_sample_file(exp):
 
     url = "http://www.ebi.ac.uk/arrayexpress/json/v2/files/" + exp
     logging.info('get experiment file info from %s'%(url))
-    conn = urllib2.urlopen(url)
-    data = conn.read()
-    data_json = json.loads(data)
+#     conn = urllib2.urlopen(url)
+#     data = conn.read()
+#     data_json = json.loads(data)
+    res = requests.get(url)
+    data_json = res.json()
     experiment = data_json["files"]["experiment"]
     if isinstance(experiment, list):
         files = experiment[0]["file"]
@@ -263,6 +276,9 @@ def setup_dataset(exp):
                     #E-GEOD-26688 style, skip columns after first 2
                     elif len(splited)>2 and splited[2] == 'ABS_CALL':
                         ending = 2                    
+                    continue
+                if len(splited)<=1:
+                    line = file.readline().strip()
                     continue
                 #make sure data is digital
                 i = 1
