@@ -54,7 +54,12 @@ class Command(BaseCommand):
             if skip:
                 skip_exps = []
                 with open(skipname, 'r') as skipfile:
-                    skip_exps = skipfile.readlines()
+                    raw = skipfile.readlines()
+                    skip_exps = []
+                    for s in raw:
+                        str = s.split('#')[0].strip()
+                        if str != '':
+                            skip_exps.append(str)
             with open(name, 'r') as file:
                 line = file.readline().strip()
                 while line != '':

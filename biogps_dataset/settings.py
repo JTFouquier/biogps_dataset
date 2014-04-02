@@ -37,7 +37,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'dataset',
 
-    'grappelli',
+    #'grappelli',
     'django.contrib.admin',
     'django_extensions',
 )
