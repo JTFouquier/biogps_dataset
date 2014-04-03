@@ -76,7 +76,7 @@ class Command(BaseCommand):
                         os.makedirs('tmp/unzip_sample/')
                     #process each exps for this array type
                     for e in exps:
-                        if skip and e+'\n' in skip_exps:
+                        if skip and e in skip_exps:
                             logging.info('-skip experiment %s, it\'s in skip file-'%e)
                             continue
                         logging.info('-process experiment %s-'%e)
