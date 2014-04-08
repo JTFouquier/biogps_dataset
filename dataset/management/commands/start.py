@@ -11,6 +11,7 @@ from StringIO import StringIO
 from dataset import models
 import requests, requests_cache
 from django.core.exceptions import ObjectDoesNotExist
+from optparse import make_option
 
 
 logging.basicConfig(  
@@ -29,38 +30,84 @@ def help_message():
  or python manage.py start exp <experiment-id>'
 
 class Command(BaseCommand):
-    def handle(self, *args, **options):
-        try:
-            type = args[0]
-            name = args[1]
-        except Exception:
-            print help_message()
-            return
-        try:
-            skipcmd = args[2]
-            skipname = args[3]
-            skip = True
-        except Exception:
-            skip = False
 
-        if type == 'exp':
-            logging.info('dry run on experiment %s, no database savings'%name)
-            dataset = get_exp_info(name)
-            get_exp_sample_file(name)
-            data_matrix = setup_dataset(name)
+    option_list = BaseCommand.option_list+(make_option("-a", "--arrays", action="store", type="string", dest="array_file", help='Specify file containing array types.',),)
+    option_list = option_list+(make_option("-s", "--skip", action="store", type="string", dest="skip_file", help='Specify file containing array types to skip, only effect with -a',),)
+    option_list = option_list+(make_option("-t", "--test", action="store", type="string", dest="test", help='Test the specified experiment. No database writing.',),)
+    option_list = option_list+(make_option("-e", "--exp", action="store", type="string", dest="exp", help='Load the specified experiment.',),)
+    
+    def load_experiment(self, e, line):
+        dataset = get_exp_info(e)
+        get_exp_sample_file(e)
+        logging.debug('setup_dataset')
+        data_matrix = setup_dataset(e)
+        #print data_matrix
+        logging.info('write database')
+        #platform
+        try:
+            pf = models.BiogpsDatasetPlatform.objects.get(platform=line)
+        except ObjectDoesNotExist:
+            pf = models.BiogpsDatasetPlatform.objects.create(platform=line, reporters=data_matrix.keys())
+        #dataset
+        meta = {'geo_gds_id':'', 'name':dataset['name'], 'factors':{}, 'default':False, 'display_params':{}, \
+                 'summary':dataset['summary'], 'source':"http://www.ebi.ac.uk/arrayexpress/json/v2/experiments/" + e, \
+                 'geo_gse_id':e, 'pubmed_id':dataset['pubmed_id'], 'owner':'ArrayExpress Uploader', 'geo_gpl_id':line,\
+                 'secondaryaccession':dataset['secondaryaccession'], 'factors':dataset['factors']}
+        try:
+            ds = models.BiogpsDataset.objects.get(geo_gse_id=e)
+            ds.delete()
+        except ObjectDoesNotExist:
+            pass                 
+        ds = models.BiogpsDataset.objects.create(name=dataset['name'], 
+                                             summary=dataset['summary'],
+                                             ownerprofile_id='arrayexpress_sid',
+                                             platform=pf,
+                                             geo_gds_id='',
+                                             geo_gse_id=e,
+                                             geo_id_plat=e+'_'+line,
+                                             metadata=meta,
+                                             species=species_map[dataset['species']])
+        #dataset data
+        datasetdata = []
+        for reporter in data_matrix:                        
+            datasetdata.append(models.BiogpsDatasetData(dataset=ds, reporter=reporter, data=data_matrix[reporter]))
+        models.BiogpsDatasetData.objects.bulk_create(datasetdata)
+        ds_matrix = np.array(data_matrix.values(), np.float32)
+        #tmp file
+        s = StringIO()
+        np.save(s, ds_matrix)
+        s.seek(0)
+        #dataset matrix
+        mat = models.BiogpsDatasetMatrix(dataset=ds, reporters=data_matrix.keys(), matrix=s.read())
+        mat.save()
+        #finish, mark as loaded
+        models.BiogpsDatasetGeoLoaded.objects.create(geo_type=e, with_platform=line, dataset=ds)
+
+    def handle(self, *args, **options):
+        
+        #create directory for download and parse usage
+        if not os.path.exists('tmp/'):
+            os.makedirs('tmp/')
+            os.makedirs('tmp/sample/')
+            os.makedirs('tmp/unzip_sample/')
+
+        if options['test'] is not None:
+            logging.info('test experiment %s ...'%options['test'])
+            dataset = get_exp_info(options['test'])
+            get_exp_sample_file(options['test'])
+            data_matrix = setup_dataset(options['test'])
             #print data_matrix
-            logging.info('dry run over')
-        elif type == 'file':
-            if skip:
-                skip_exps = []
-                with open(skipname, 'r') as skipfile:
+            logging.info('test over')
+        elif options['array_file'] is not None:
+            skip_exps = []
+            if options['skip_file'] is not None:
+                with open(options['skip_file'], 'r') as skipfile:
                     raw = skipfile.readlines()
-                    skip_exps = []
                     for s in raw:
                         str = s.split('#')[0].strip()
                         if str != '':
                             skip_exps.append(str)
-            with open(name, 'r') as file:
+            with open(options['array_file'], 'r') as file:
                 line = file.readline().strip()
                 while line != '':
                     logging.info('---process Array type: %s ---'%(line))
@@ -69,14 +116,9 @@ class Command(BaseCommand):
                     logging.info('%d experiments in total'%(len(exps)))
                     if not len(exps)>0:
                         raise Exception, 'no experiment for this array type'
-                    #create directory for download and parse usage
-                    if not os.path.exists('tmp/'):
-                        os.makedirs('tmp/')
-                        os.makedirs('tmp/sample/')
-                        os.makedirs('tmp/unzip_sample/')
                     #process each exps for this array type
                     for e in exps:
-                        if skip and e in skip_exps:
+                        if e in skip_exps:
                             logging.info('-skip experiment %s, it\'s in skip file-'%e)
                             continue
                         logging.info('-process experiment %s-'%e)
@@ -86,54 +128,13 @@ class Command(BaseCommand):
                             continue
                         except Exception:
                             pass
-                        dataset = get_exp_info(e)
-                        get_exp_sample_file(e)
-                        logging.debug('setup_dataset')
-                        data_matrix = setup_dataset(e)
-                        #print data_matrix
-                        logging.info('write database')
-                        #platform
-                        try:
-                            pf = models.BiogpsDatasetPlatform.objects.get(platform=line)
-                        except ObjectDoesNotExist:
-                            pf = models.BiogpsDatasetPlatform.objects.create(platform=line, reporters=data_matrix.keys())
-                        #dataset
-                        meta = {'geo_gds_id':'', 'name':dataset['name'], 'factors':{}, 'default':False, 'display_params':{}, \
-                                 'summary':dataset['summary'], 'source':"http://www.ebi.ac.uk/arrayexpress/json/v2/experiments/" + e, \
-                                 'geo_gse_id':e, 'pubmed_id':dataset['pubmed_id'], 'owner':'ArrayExpress Uploader', 'geo_gpl_id':line,\
-                                 'secondaryaccession':dataset['secondaryaccession'], 'factors':dataset['factors']}
-                        try:
-                            ds = models.BiogpsDataset.objects.get(geo_gse_id=e)
-                            ds.delete()
-                        except ObjectDoesNotExist:
-                            pass                 
-                        ds = models.BiogpsDataset.objects.create(name=dataset['name'], 
-                                                             summary=dataset['summary'],
-                                                             ownerprofile_id='arrayexpress_sid',
-                                                             platform=pf,
-                                                             geo_gds_id='',
-                                                             geo_gse_id=e,
-                                                             geo_id_plat=e+'_'+line,
-                                                             metadata=meta,
-                                                             species=species_map[dataset['species']])
-                        #dataset data
-                        datasetdata = []
-                        for reporter in data_matrix:                        
-                            datasetdata.append(models.BiogpsDatasetData(dataset=ds, reporter=reporter, data=data_matrix[reporter]))
-                        models.BiogpsDatasetData.objects.bulk_create(datasetdata)
-                        ds_matrix = np.array(data_matrix.values(), np.float32)
-                        #tmp file
-                        s = StringIO()
-                        np.save(s, ds_matrix)
-                        s.seek(0)
-                        #dataset matrix
-                        mat = models.BiogpsDatasetMatrix(dataset=ds, reporters=data_matrix.keys(), matrix=s.read())
-                        mat.save()
-                        #finish, mark as loaded
-                        models.BiogpsDatasetGeoLoaded.objects.create(geo_type=e, with_platform=line, dataset=ds)
+                        self.load_experiment(e, line)
                     line = file.readline().strip()
-        else:
-            print help_message()
+        elif options['exp'] is not None:
+            print 'NOT implemented'
+            return
+            self.load_experiment(options['exp'], 'aaa')
+
 #from array type, get its experiment set
 def get_arraytype_exps(array_type):    
     url = "http://www.ebi.ac.uk/arrayexpress/json/v2/files?array=" + array_type
