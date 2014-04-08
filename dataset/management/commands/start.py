@@ -22,12 +22,9 @@ logging.basicConfig(
 species_map = {'Homo sapiens':'human', 'Mus musculus':'mouse', 'Rattus norvegicus':'rat','Drosophila melanogaster':'fruitfly', \
                'Caenorhabditis elegans':'nematode', 'Danio rerio':'zebrafish', 'Arabidopsis thaliana':'thale-cress',\
                'Xenopus tropicalis':'frog', 'Sus scrofa':'pig'}
-
+work_dir = {'base':'tmp/', 'sample':'tmp/sample/', 'unzip':'tmp/unzip_sample/'}
+base_url = "http://www.ebi.ac.uk/arrayexpress/json/v2/"
 requests_cache.install_cache('arrayexpress_cache')
-
-def help_message():
-    return 'Usage: python manage.py start file <path-to-array-type-file> [skip <path-to-experiments-file>]\
- or python manage.py start exp <experiment-id>'
 
 class Command(BaseCommand):
 
@@ -35,7 +32,7 @@ class Command(BaseCommand):
     option_list = option_list+(make_option("-s", "--skip", action="store", type="string", dest="skip_file", help='Specify file containing array types to skip, only effect with -a',),)
     option_list = option_list+(make_option("-t", "--test", action="store", type="string", dest="test", help='Test the specified experiment. No database writing.',),)
     option_list = option_list+(make_option("-e", "--exp", action="store", type="string", dest="exp", help='Load the specified experiment.',),)
-    
+
     def load_experiment(self, e, line):
         dataset = get_exp_info(e)
         get_exp_sample_file(e)
@@ -50,7 +47,7 @@ class Command(BaseCommand):
             pf = models.BiogpsDatasetPlatform.objects.create(platform=line, reporters=data_matrix.keys())
         #dataset
         meta = {'geo_gds_id':'', 'name':dataset['name'], 'factors':{}, 'default':False, 'display_params':{}, \
-                 'summary':dataset['summary'], 'source':"http://www.ebi.ac.uk/arrayexpress/json/v2/experiments/" + e, \
+                 'summary':dataset['summary'], 'source':base_url+"experiments/" + e, \
                  'geo_gse_id':e, 'pubmed_id':dataset['pubmed_id'], 'owner':'ArrayExpress Uploader', 'geo_gpl_id':line,\
                  'secondaryaccession':dataset['secondaryaccession'], 'factors':dataset['factors']}
         try:
@@ -86,10 +83,10 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         
         #create directory for download and parse usage
-        if not os.path.exists('tmp/'):
-            os.makedirs('tmp/')
-            os.makedirs('tmp/sample/')
-            os.makedirs('tmp/unzip_sample/')
+        if not os.path.exists(work_dir['base']):
+            os.makedirs(work_dir['base'])
+            os.makedirs(work_dir['sample'])
+            os.makedirs(work_dir['unzip'])
 
         if options['test'] is not None:
             logging.info('test experiment %s ...'%options['test'])
@@ -137,7 +134,7 @@ class Command(BaseCommand):
 
 #from array type, get its experiment set
 def get_arraytype_exps(array_type):    
-    url = "http://www.ebi.ac.uk/arrayexpress/json/v2/files?array=" + array_type
+    url = base_url+"files?array=" + array_type
     explist = []
     logging.info('get all experiment IDs')
     logging.info('connect to %s'%(url))
@@ -157,7 +154,7 @@ def get_arraytype_exps(array_type):
     return tuple(explist)
 
 def get_exp_info(exp):
-    url = "http://www.ebi.ac.uk/arrayexpress/json/v2/experiments/" + exp
+    url = base_url+"experiments/" + exp
     dataset = {}
     logging.info('get experiment info from %s'%(url))
 #     conn = urllib2.urlopen(url)
@@ -178,7 +175,7 @@ def get_exp_info(exp):
     except Exception,e:
         dataset['pubmed_id'] = ''
     #get experiment factorsd
-    url = "http://www.ebi.ac.uk/arrayexpress/json/v2/files/" + exp
+    url = base_url+"files/" + exp
     logging.info('get experiment file info from %s'%(url))
 #     conn = urllib2.urlopen(url)
 #     data = conn.read()
@@ -232,7 +229,7 @@ def parse_sdrf_header(header):
 #get all data for the experiment and set up data in database
 def get_exp_sample_file(exp):
 
-    url = "http://www.ebi.ac.uk/arrayexpress/json/v2/files/" + exp
+    url = base_url+"files/" + exp
     logging.info('get experiment file info from %s'%(url))
 #     conn = urllib2.urlopen(url)
 #     data = conn.read()
