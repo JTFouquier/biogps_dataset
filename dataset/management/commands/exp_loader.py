@@ -5,9 +5,9 @@ import requests, requests_cache
 import urllib
 import zipfile
 
-work_dir = {'base':'exp_loader/','downloading':'exp_loader/downloading'}
+WORK_DIR = {'base':'exp_loader/','downloading':'exp_loader/downloading'}
 
-base_url = "http://www.ebi.ac.uk/arrayexpress/json/v2/"
+BASE_URL = "http://www.ebi.ac.uk/arrayexpress/json/v2/"
 
 logging.basicConfig(  
     level = logging.INFO,
@@ -40,15 +40,15 @@ def unzip_file(zipfilename, unziptodir):
             i += 1
             
 def get_exp_dir(exp):
-    return work_dir['base']+exp+'/'
+    return WORK_DIR['base']+exp+'/'
 
 def download_exp(exp):
-    logging.info('---download experiment %s---'%(exp))
+    logging.info('--- download experiment %s ---'%(exp))
     #create directory for download and parse usage
-    if not os.path.exists(work_dir['base']):
-        os.makedirs(work_dir['base'])
+    if not os.path.exists(WORK_DIR['base']):
+        os.makedirs(WORK_DIR['base'])
     #get experiment infomation
-    url = base_url+"experiments/" + exp
+    url = BASE_URL+"experiments/" + exp
     logging.info('get experiment INFO from %s'%(url))
     res = requests.get(url)
     data_json = res.json()
@@ -57,7 +57,7 @@ def download_exp(exp):
         logging.error('can NOT find experiment: %s'%(exp))
         return False
     #initial an empty folder for this experiment
-    exp_folder = work_dir['base']+exp+'/'
+    exp_folder = WORK_DIR['base']+exp+'/'
     if os.path.exists(exp_folder):
         delete_file_in_folder(exp_folder)
     else:
@@ -65,7 +65,7 @@ def download_exp(exp):
     with codecs.open(exp_folder+'experiment', 'w', 'utf-8') as file:
         file.write(res.text)
     #get experiment related file address
-    url = base_url+"files/" + exp
+    url = BASE_URL+"files/" + exp
     logging.info('get experiment FILE ADDRESS from %s'%(url))
     res = requests.get(url)
     data_json = res.json()
@@ -80,21 +80,21 @@ def download_exp(exp):
         #download processed file to fs
         elif file["kind"] == 'processed':
             logging.info('get experiment PROCESSED FILE from %s'%(file["url"]))
-            if os.path.exists(work_dir['downloading']):
-                os.remove(work_dir['downloading'])
+            if os.path.exists(WORK_DIR['downloading']):
+                os.remove(WORK_DIR['downloading'])
             #urllib.urlretrieve(file["url"], work_dir['downloading'])
             res = requests.get(file["url"])
             with codecs.open(exp_folder+'processed.zip', 'w') as file:
                 file.write(res.content)
             #os.rename(work_dir['downloading'], exp_folder+'processed.zip')
             unzip_file(exp_folder+'processed.zip', exp_folder)
-    logging.info('---download success---')
+    logging.info('--- download success ---')
     return True
 
 
 #from array type, get its experiment set
 def get_arraytype_exps(array_type):    
-    url = base_url+"files?array=" + array_type
+    url = BASE_URL+"files?array=" + array_type
     explist = []
     logging.info('get all experiment IDs')
     logging.info('connect to %s'%(url))

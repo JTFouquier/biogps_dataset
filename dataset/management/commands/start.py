@@ -9,11 +9,9 @@ import logging
 import numpy as np
 from StringIO import StringIO
 from dataset import models
-import requests, requests_cache
 from django.core.exceptions import ObjectDoesNotExist
 from optparse import make_option
 from exp_loader import download_exp
-#from exp_checker import check_exp
 from exp_save import save_exp
 from dataset.management.commands.exp_checker import check_exp
 from dataset.management.commands.exp_loader import get_arraytype_exps
@@ -23,12 +21,6 @@ logging.basicConfig(
     format = '[%(levelname)s, %(filename), L:%(lineno)d] %(message)s',
 )  
 
-species_map = {'Homo sapiens':'human', 'Mus musculus':'mouse', 'Rattus norvegicus':'rat','Drosophila melanogaster':'fruitfly', \
-               'Caenorhabditis elegans':'nematode', 'Danio rerio':'zebrafish', 'Arabidopsis thaliana':'thale-cress',\
-               'Xenopus tropicalis':'frog', 'Sus scrofa':'pig'}
-work_dir = {'base':'tmp/', 'sample':'tmp/sample/', 'unzip':'tmp/unzip_sample/'}
-base_url = "http://www.ebi.ac.uk/arrayexpress/json/v2/"
-requests_cache.install_cache('arrayexpress_cache')
 
 class Command(BaseCommand):
 

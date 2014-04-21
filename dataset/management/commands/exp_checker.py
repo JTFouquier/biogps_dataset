@@ -79,7 +79,7 @@ def check_exp_info(exp):
     
 
 def check_exp(exp):
-    logging.info('---check experiment %s---'%(exp))
+    logging.info('--- check experiment %s ---'%(exp))
     result = {}
     result['exp_info'] = check_exp_info(exp)
     result['processed'] = check_processed(exp)
@@ -87,5 +87,5 @@ def check_exp(exp):
         result['result'] = True
     else:
         result['result'] = False
-    logging.info('---check experiment over---')
+    logging.info('--- check experiment over ---')
     return result
