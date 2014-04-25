@@ -25,6 +25,13 @@ def save_exp(exp):
     logging.info('--- save experiment %s ---'%(exp))
     dataset = get_exp_info(exp)
     data_matrix = get_exp_data(exp, check_res['processed'])
+    #remove length incorrect lines in matrix
+    invalids = []
+    for k in data_matrix:
+        if len(data_matrix[k]) != check_res['processed']['column_total']:
+            invalids.append(k)
+    for k in invalids:
+        del data_matrix[k]
     arraytype = dataset['arraytype']['accession']
     #platform
     try:
@@ -92,6 +99,14 @@ def get_exp_data(exp, precheked):
                         data_matrix[reporter].extend(splited[1:column_count])
                     else:
                         data_matrix[reporter] = splited[1:column_count]
+                    for e in data_matrix[reporter]:
+                        #skip lines with invalid(can't convert to float)
+                        try:
+                            tmp = float(e)
+                        except Exception:
+                            del data_matrix[reporter]
+                            break
+                            
     return data_matrix
 
 def get_exp_info(exp):

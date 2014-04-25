@@ -9,11 +9,45 @@ logging.basicConfig(
 )
 
 
-
+def check_processed_file_header(header):
+    splited = header.split('\t')
+    result = {}
+    #E-GEOD-4006 style, skp 2 lines
+    if splited[0] == 'Scan REF':
+        logging.info('2 lines header')
+        result['row_skip'] = 2
+        result['column_count'] = len(splited)
+    #E-MTAB-1169 style, skp 2 lines
+    elif splited[0] == 'Hybridization REF':
+        logging.info('2 lines header')
+        result['row_skip'] = 2
+        result['column_count'] = len(splited)
+    elif splited[0] == 'ID_REF':
+        #E-GEOD-26688 style, skip columns after first 2
+        if len(splited)>2 and splited[2] == 'ABS_CALL':
+            logging.info('1 line header, junk from 3rd column')
+            result['row_skip'] = 1
+            result['column_count'] = 2
+        #most common cases E-GEOD-15568
+        else:
+            logging.info('1 line header')
+            result['row_skip'] = 1
+            result['column_count'] = len(splited)
+    #E-MEXP-3476 style, skp 2 lines
+    elif splited[0] == 'CompositeSequence Identifier':
+        logging.info('1 lines header')
+        result['row_skip'] = 1
+        result['column_count'] = 2
+    else:
+        logging.error('can NOT recognize processed data format')
+        result['error'] = 'can not recognize processed data format'
+    return result
 
 def check_processed(exp):
     result = {'result':True}
     exp_dir = get_exp_dir(exp)
+    header_parsed = False
+    column_total = 0
     if not os.path.exists(exp_dir):
         logging.error('can NOT find %s'%(exp_dir))
         result['result'] = False
@@ -21,42 +55,20 @@ def check_processed(exp):
         return result
     for f in os.listdir(exp_dir):
         if f.find('processed_') == 0:
-            with open(exp_dir+f, 'r') as file:
-                line = file.readline().strip()
-                splited = line.split('\t')
-                #E-GEOD-4006 style, skp 2 lines
-                if splited[0] == 'Scan REF':
-                    logging.info('2 lines header')
-                    result['row_skip'] = 2
-                    result['column_count'] = len(splited)
-                    return result
-                #E-MTAB-1169 style, skp 2 lines
-                elif splited[0] == 'Hybridization REF':
-                    logging.info('2 lines header')
-                    result['row_skip'] = 2
-                    result['column_count'] = len(splited)
-                    return result
-                elif splited[0] == 'ID_REF':
-                    #E-GEOD-26688 style, skip columns after first 2
-                    if len(splited)>2 and splited[2] == 'ABS_CALL':
-                        logging.info('1 line header, junk from 3rd column')
-                        result['row_skip'] = 1
-                        result['column_count'] = 2
+            #logging.info('check processed file %s'%f)
+            if not header_parsed:
+                with open(exp_dir+f, 'r') as file:
+                    data = file.read()
+                    #parse header
+                    res = check_processed_file_header(data.split('\n')[0])
+                    if 'error' in res:
+                        result['result'] = False
+                        result['error'] = res['error']
                         return result
-                    #most common cases E-GEOD-15568
-                    else:
-                        logging.info('1 line header')
-                        result['row_skip'] = 1
-                        result['column_count'] = len(splited)
-                        return result
-                else:
-                    logging.error('can NOT recognize processed data format')
-                    logging.error('%s',line)
-                    result['result'] = False
-                    result['error'] = 'can not recognize processed data format'
-                    return result
-    result['result'] = False
-    result['error'] = 'can not find processed files'
+                    result.update(res)
+                    header_parsed = True
+            column_total = column_total + result['column_count'] -1
+    result['column_total'] = column_total
     return result
 
 
@@ -71,10 +83,16 @@ def check_exp_info(exp):
     with open(exp_dir+'experiment', 'r') as file:
         text = file.read()
         parsed = json.loads(text)
-        if type(parsed['experiments']['experiment']['arraydesign']) is not dict:
+        if parsed['experiments']['total'] > 1:
+            for e in parsed['experiments']['experiment']:
+                if e['accession'] == exp:
+                    experiment = e
+        else:
+            experiment = parsed['experiments']['experiment']
+        if type(experiment['arraydesign']) is not dict:
             result['result'] = False
             result['error'] = 'experiment has more than one array type'
-            return 
+            return result
     return result
     
 

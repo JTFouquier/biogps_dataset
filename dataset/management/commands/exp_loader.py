@@ -69,7 +69,13 @@ def download_exp(exp):
     logging.info('get experiment FILE ADDRESS from %s'%(url))
     res = requests.get(url)
     data_json = res.json()
-    files = data_json["files"]["experiment"]["file"]
+    files = []
+    if type(data_json["files"]["experiment"])==list:
+        for e in data_json["files"]["experiment"]:
+            if e["accession"] == exp:
+                files = e["file"]
+    else:
+        files = data_json["files"]["experiment"]["file"]
     for file in files:
         #download sdrf file to db
         if file["kind"] == 'sdrf':
