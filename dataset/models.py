@@ -4,9 +4,9 @@ Models for datasets loaded from ArrayExpress
 import base64
 import types
 import textwrap
-
+from six import u
 from django.db import models
-from django.utils.encoding import smart_unicode
+#from django.utils.encoding import smart_unicode
 from django.template.defaultfilters import slugify
 from django_extensions.db.fields import AutoSlugField
 from jsonfield import JSONField   # https://github.com/bradjasper/django-jsonfield
@@ -65,26 +65,26 @@ class BiogpsDataset(models.Model):
     slug = AutoSlugField(max_length=50, populate_from='name')
     species = models.CharField(max_length=200)
 
-    @property
-    def factors_text(self):
-        def format_factor(factor):
-            """ Remove commas, split on spaces for indexing """
-            uf = smart_unicode(factor)
-            formatted = set()
-            facs = uf.replace(',', '').split(' ')
-            for f in facs:
-                formatted.add(f)
-            return formatted
-
-        _fac_txt = set()
-        for fac_dict in self.metadata['factors']:
-            for sample in fac_dict.values():
-                for key, val in sample.iteritems():
-                    for k in format_factor(key):
-                        _fac_txt.add(k)
-                    for v in format_factor(val):
-                        _fac_txt.add(v)
-        return ' '.join(_fac_txt)
+#     @property
+#     def factors_text(self):
+#         def format_factor(factor):
+#             """ Remove commas, split on spaces for indexing """
+#             uf = smart_unicode(factor)
+#             formatted = set()
+#             facs = uf.replace(',', '').split(' ')
+#             for f in facs:
+#                 formatted.add(f)
+#             return formatted
+# 
+#         _fac_txt = set()
+#         for fac_dict in self.metadata['factors']:
+#             for sample in fac_dict.values():
+#                 for key, val in sample.iteritems():
+#                     for k in format_factor(key):
+#                         _fac_txt.add(k)
+#                     for v in format_factor(val):
+#                         _fac_txt.add(v)
+#         return ' '.join(_fac_txt)
 
     @property
     def name_wrapped(self):
@@ -126,7 +126,7 @@ class BiogpsDataset(models.Model):
         get_latest_by = 'lastmodified'
 
     def __unicode__(self):
-        return u'"%s" by "%s"' % (self.name, self.ownerprofile_id)
+        return u('"%s" by "%s"' % (self.name, self.ownerprofile_id))
 
     @models.permalink
     def get_absolute_url(self):
@@ -203,7 +203,7 @@ class BiogpsDatasetMatrix(models.Model):
         return base64.decodestring(self._matrix)
 
     def set_data(self, matrix):
-        self._matrix = base64.encodestring(matrix)
+        self._matrix = base64.encodebytes(matrix)
 
     matrix = property(get_data, set_data)
 

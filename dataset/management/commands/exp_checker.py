@@ -1,7 +1,7 @@
 import logging
 import os
 import json
-from exp_loader import get_exp_dir
+from .exp_loader import get_exp_dir
 
 logging.basicConfig(  
     level = logging.INFO,
@@ -24,7 +24,7 @@ def check_processed_file_header(header):
         result['column_count'] = len(splited)
     elif splited[0] == 'ID_REF':
         #E-GEOD-26688 style, skip columns after first 2
-        if len(splited)>2 and splited[2] == 'ABS_CALL':
+        if len(splited)>2 and (splited[2] in ['ABS_CALL','4w50nM-3 call']):
             logging.info('1 line header, junk from 3rd column')
             result['row_skip'] = 1
             result['column_count'] = 2

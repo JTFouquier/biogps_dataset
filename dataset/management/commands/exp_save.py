@@ -3,10 +3,10 @@ import json
 import os
 import numpy as np
 from dataset import models
-from exp_checker import check_exp
-from exp_loader import get_exp_dir, BASE_URL
+from .exp_checker import check_exp
+from .exp_loader import get_exp_dir, BASE_URL
 from django.core.exceptions import ObjectDoesNotExist
-from pkg_resources import StringIO
+from six import BytesIO
 
 logging.basicConfig(  
     level = logging.INFO,
@@ -62,15 +62,15 @@ def save_exp(exp):
     for reporter in data_matrix:                        
         datasetdata.append(models.BiogpsDatasetData(dataset=ds, reporter=reporter, data=data_matrix[reporter]))
     models.BiogpsDatasetData.objects.bulk_create(datasetdata)
-    with open('matrix1', 'w') as file:
-        file.write(str(data_matrix))
-    ds_matrix = np.array(data_matrix.values(), np.float32)
+#     with open('matrix1', 'w') as file:
+#         file.write(str(list(data_matrix.values())))
+    ds_matrix = np.array(list(data_matrix.values()), np.float32)
     #tmp file
-    s = StringIO()
+    s = BytesIO()
     np.save(s, ds_matrix)
     s.seek(0)
     #dataset matrix
-    mat = models.BiogpsDatasetMatrix(dataset=ds, reporters=data_matrix.keys(), matrix=s.read())
+    mat = models.BiogpsDatasetMatrix(dataset=ds, reporters=list(data_matrix.keys()), matrix=s.read())
     mat.save()
     #finish, mark as loaded
     models.BiogpsDatasetGeoLoaded.objects.create(geo_type=exp, with_platform=arraytype, dataset=ds)
@@ -121,11 +121,11 @@ def get_exp_info(exp):
         dataset['arraytype'] = data_json["experiments"]["experiment"]["arraydesign"]
         try:
             dataset['secondaryaccession'] = data_json["experiments"]["experiment"]["secondaryaccession"]
-        except Exception,e:
+        except Exception:
             dataset['secondaryaccession'] = ''
         try:
             dataset['pubmed_id'] = data_json["experiments"]["experiment"]["bibliography"]["accession"]
-        except Exception,e:
+        except Exception:
             dataset['pubmed_id'] = ''
     dataset['factors'] = []
     with open(exp_dir+'sdrf', 'r') as file:

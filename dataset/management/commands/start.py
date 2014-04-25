@@ -1,18 +1,17 @@
 from django.core.management.base import BaseCommand
 import urllib
-import urllib2
 import json
 import os
 import os.path
 import zipfile
 import logging
 import numpy as np
-from StringIO import StringIO
+from six import StringIO
 from dataset import models
 from django.core.exceptions import ObjectDoesNotExist
 from optparse import make_option
-from exp_loader import download_exp
-from exp_save import save_exp
+from .exp_loader import download_exp
+from .exp_save import save_exp
 from dataset.management.commands.exp_checker import check_exp
 from dataset.management.commands.exp_loader import get_arraytype_exps
 
@@ -53,7 +52,8 @@ class Command(BaseCommand):
                     exps = get_arraytype_exps(line)
                     logging.info('%d experiments in total'%(len(exps)))
                     if not len(exps)>0:
-                        raise Exception, 'no experiment for this array type'
+                        logging.error('no experiment for this array type')
+                        return
                     #process each exps for this array type
                     for e in exps:
                         if e in skip_exps:

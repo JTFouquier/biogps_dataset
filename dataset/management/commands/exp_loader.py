@@ -14,7 +14,7 @@ logging.basicConfig(
     format = '[%(levelname)s, L:%(lineno)d] %(message)s',
 )
 
-requests_cache.install_cache('arrayexpress_cache')
+requests_cache.install_cache('arrayexpress_cache_test')
 
 def delete_file_in_folder(src):
     for item in os.listdir(src):
@@ -23,7 +23,7 @@ def delete_file_in_folder(src):
 
 def unzip_file(zipfilename, unziptodir):
     if not os.path.exists(unziptodir):
-        os.mkdir(unziptodir, 0777)
+        os.mkdir(unziptodir, 0o777)
     zfobj = zipfile.ZipFile(zipfilename)
     i = 0
     for name in zfobj.namelist():
@@ -34,7 +34,7 @@ def unzip_file(zipfilename, unziptodir):
             ext_filename = os.path.join(unziptodir, 'processed_'+str(i))
             ext_dir = os.path.dirname(ext_filename)
             if not os.path.exists(ext_dir):
-                os.mkdir(ext_dir, 0777)
+                os.mkdir(ext_dir, 0o777)
             with open(ext_filename, 'wb') as file:
                 file.write(zfobj.read(name))
             i += 1
@@ -90,7 +90,7 @@ def download_exp(exp):
                 os.remove(WORK_DIR['downloading'])
             #urllib.urlretrieve(file["url"], work_dir['downloading'])
             res = requests.get(file["url"])
-            with codecs.open(exp_folder+'processed.zip', 'w') as file:
+            with codecs.open(exp_folder+'processed.zip', 'wb') as file:
                 file.write(res.content)
             #os.rename(work_dir['downloading'], exp_folder+'processed.zip')
             unzip_file(exp_folder+'processed.zip', exp_folder)
