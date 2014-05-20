@@ -9,6 +9,7 @@ import numpy as np
 from six import StringIO
 from dataset import models
 from django.core.exceptions import ObjectDoesNotExist
+from datetime import datetime
 from optparse import make_option
 from .exp_loader import download_exp
 from .exp_save import save_exp
@@ -18,7 +19,8 @@ from dataset.management.commands.exp_loader import get_arraytype_exps
 logging.basicConfig(  
     level = logging.INFO,
     format = '[%(levelname)s, %(filename), L:%(lineno)d] %(message)s',
-)  
+)
+ERROR_FILE = 'exp_error.txt'
 
 
 class Command(BaseCommand):
@@ -44,6 +46,8 @@ class Command(BaseCommand):
                         str = s.split('#')[0].strip()
                         if str != '':
                             skip_exps.append(str)
+            with open(ERROR_FILE, 'w') as err_file:
+                pass
             with open(options['array_file'], 'r') as file:
                 line = file.readline().strip()
                 while line != '':
@@ -66,8 +70,12 @@ class Command(BaseCommand):
                             continue
                         except Exception:
                             pass
-                        download_exp(e)
-                        save_exp(e)
+                        try:
+                            download_exp(e)
+                            save_exp(e)
+                        except Exception, excep:
+                            with open(ERROR_FILE, 'a') as err_file:
+                                err_file.write('%s %s\n'%(e,excep))
                     line = file.readline().strip()
         elif options['exp'] is not None:
             download_exp(options['exp'])
