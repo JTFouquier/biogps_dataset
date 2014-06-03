@@ -14,7 +14,7 @@ logging.basicConfig(
     format = '[%(levelname)s, L:%(lineno)d] %(message)s',
 )
 
-requests_cache.install_cache('arrayexpress_cache')
+#requests_cache.install_cache('arrayexpress_cache')
 
 def delete_file_in_folder(src):
     for item in os.listdir(src):

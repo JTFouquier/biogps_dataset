@@ -125,8 +125,8 @@ class BiogpsDataset(models.Model):
         ordering = ("name",)
         get_latest_by = 'lastmodified'
 
-    def __unicode__(self):
-        return u('"%s" by "%s"' % (self.name, self.ownerprofile_id))
+#     def __unicode__(self):
+#         return u('"%s" by "%s"' % (self.name, self.ownerprofile_id))
 
     @models.permalink
     def get_absolute_url(self):
