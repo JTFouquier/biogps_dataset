@@ -15,6 +15,7 @@ from .exp_loader import download_exp
 from .exp_save import save_exp
 from dataset.management.commands.exp_checker import check_exp
 from dataset.management.commands.exp_loader import get_arraytype_exps
+from datetime import datetime
 
 logging.basicConfig(  
     level = logging.INFO,
@@ -33,7 +34,9 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         if options['test'] is not None:
             logging.info('test experiment %s ...'%options['test'])
-            download_exp(options['test'])
+            if not download_exp(options['test']):
+                logging.info('download experiment fail')
+                return
             res = check_exp(options['test'])
             logging.info('test over, test result:')
             logging.info('%s'%res)
@@ -63,20 +66,26 @@ class Command(BaseCommand):
                         if e in skip_exps:
                             logging.info('-skip experiment %s, it\'s in skip file-'%e)
                             continue
-                        logging.info('-process experiment %s-'%e)
+                        logging.info('\n\n-process experiment %s (%s)-'%(e, datetime.now().strftime("%m-%d %H:%M")))
                         try:
                             models.BiogpsDatasetGeoLoaded.objects.get(geo_type=e, with_platform=line)
                             logging.info('already loaded, skip')
                             continue
                         except Exception:
                             pass
+                        if not download_exp(e):
+                            logging.info('download experiment fail')
+                            with open(ERROR_FILE, 'a') as err_file:
+                                err_file.write('%s %s\n'%(e, 'download experiment fail'))
+                                continue
                         try:
-                            download_exp(e)
                             save_exp(e)
                         except Exception, excep:
                             with open(ERROR_FILE, 'a') as err_file:
-                                err_file.write('%s %s\n'%(e,excep))
+                                err_file.write('%s (%s)\n'%(e,excep))
                     line = file.readline().strip()
         elif options['exp'] is not None:
-            download_exp(options['exp'])
+            if not download_exp(options['exp']):
+                logging.info('download experiment fail')
+                return
             save_exp(options['exp'])

@@ -76,6 +76,9 @@ def download_exp(exp):
                 files = e["file"]
     else:
         files = data_json["files"]["experiment"]["file"]
+
+    sdrf_done = False
+    processed_done = False
     for file in files:
         #download sdrf file to db
         if file["kind"] == 'sdrf':
@@ -83,6 +86,7 @@ def download_exp(exp):
             res = requests.get(file["url"])
             with codecs.open(exp_folder+'sdrf', 'w', 'utf-8') as file:
                 file.write(res.text)
+                sdrf_done = True
         #download processed file to fs
         elif file["kind"] == 'processed':
             logging.info('get experiment PROCESSED FILE from %s'%(file["url"]))
@@ -94,6 +98,9 @@ def download_exp(exp):
                 file.write(res.content)
             #os.rename(work_dir['downloading'], exp_folder+'processed.zip')
             unzip_file(exp_folder+'processed.zip', exp_folder)
+            processed_done = True
+    if not processed_done or not sdrf_done:
+        return False
     logging.info('--- download success ---')
     return True
 

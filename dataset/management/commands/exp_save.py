@@ -6,7 +6,7 @@ from dataset import models
 from .exp_checker import check_exp
 from .exp_loader import get_exp_dir, BASE_URL
 from django.core.exceptions import ObjectDoesNotExist
-from six import BytesIO
+from six import StringIO
 
 logging.basicConfig(  
     level = logging.INFO,
@@ -19,9 +19,9 @@ SPECIES_MAP = {'Homo sapiens':'human', 'Mus musculus':'mouse', 'Rattus norvegicu
 
 def save_exp(exp):
     check_res = check_exp(exp)
-    if check_res['result']==False:
+    if check_res['result']==True:
         logging.error('experiment check FAIL')
-        return
+        raise Exception('experiment check failed')
     logging.info('--- save experiment %s ---'%(exp))
     dataset = get_exp_info(exp)
     data_matrix = get_exp_data(exp, check_res['processed'])
@@ -47,7 +47,7 @@ def save_exp(exp):
         ds = models.BiogpsDataset.objects.get(geo_gse_id=exp)
         ds.delete()
     except ObjectDoesNotExist:
-        pass                 
+        pass
     ds = models.BiogpsDataset.objects.create(name=dataset['name'], 
                                          summary=dataset['summary'],
                                          ownerprofile_id='arrayexpress_sid',
@@ -62,15 +62,13 @@ def save_exp(exp):
     for reporter in data_matrix:                        
         datasetdata.append(models.BiogpsDatasetData(dataset=ds, reporter=reporter, data=data_matrix[reporter]))
     models.BiogpsDatasetData.objects.bulk_create(datasetdata)
-#     with open('matrix1', 'w') as file:
-#         file.write(str(list(data_matrix.values())))
     ds_matrix = np.array(list(data_matrix.values()), np.float32)
     #tmp file
-    s = BytesIO()
-    np.save(s, ds_matrix)
+    s = StringIO()
+    np.savetxt(s, ds_matrix)
     s.seek(0)
-    #dataset matrix
-    mat = models.BiogpsDatasetMatrix(dataset=ds, reporters=list(data_matrix.keys()), matrix=s.read())
+    str = s.read()
+    mat = models.BiogpsDatasetMatrix(dataset=ds, reporters=list(data_matrix.keys()), _matrix=str)
     mat.save()
     #finish, mark as loaded
     models.BiogpsDatasetGeoLoaded.objects.create(geo_type=exp, with_platform=arraytype, dataset=ds)
