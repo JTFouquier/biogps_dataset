@@ -199,13 +199,14 @@ class BiogpsDatasetMatrix(models.Model):
     reporters = JSONField(blank=False, editable=True)
     _matrix = models.TextField(db_column='matrix')
 
-#     def get_data(self):
-#         return base64.decodestring(self._matrix)
-# 
-#     def set_data(self, matrix):
-#         self._matrix = base64.encodebytes(matrix)
-# 
-#     matrix = property(get_data, set_data)
+    def get_data(self):
+        return base64.decodestring(self._matrix)
+ 
+    def set_data(self, matrix):
+        print '****set matrix data****'
+        self._matrix = base64.encodebytes(matrix)
+ 
+    matrix = property(get_data, set_data)
 
 
 class BiogpsDatasetPlatform(models.Model):

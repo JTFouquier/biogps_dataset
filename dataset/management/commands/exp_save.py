@@ -65,10 +65,11 @@ def save_exp(exp):
     ds_matrix = np.array(list(data_matrix.values()), np.float32)
     #tmp file
     s = StringIO()
-    np.savetxt(s, ds_matrix)
+    np.save(s, ds_matrix)
     s.seek(0)
     str = s.read()
-    mat = models.BiogpsDatasetMatrix(dataset=ds, reporters=list(data_matrix.keys()), _matrix=str)
+    print '*****save matrix*****'
+    mat = models.BiogpsDatasetMatrix(dataset=ds, reporters=list(data_matrix.keys()), matrix=str)
     mat.save()
     #finish, mark as loaded
     models.BiogpsDatasetGeoLoaded.objects.create(geo_type=exp, with_platform=arraytype, dataset=ds)
