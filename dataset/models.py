@@ -203,8 +203,8 @@ class BiogpsDatasetMatrix(models.Model):
         return base64.decodestring(self._matrix)
  
     def set_data(self, matrix):
-        print '****set matrix data****'
-        self._matrix = base64.encodebytes(matrix)
+        print '***set matrix data****'
+        self._matrix = base64.encodestring(matrix)
  
     matrix = property(get_data, set_data)
 
