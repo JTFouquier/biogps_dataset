@@ -16,7 +16,10 @@ FOOTPRINT = False
 def delete_file_in_folder(src):
     for item in os.listdir(src):
         itemsrc=os.path.join(src,item)
-        os.remove(itemsrc)
+        if os.path.isfile(f):
+            os.remove(itemsrc)
+        else:
+            shutil.rmtree(itemsrc)
 
 def unzip_file(zipfilename, unziptodir):
     if not os.path.exists(unziptodir):
@@ -44,6 +47,8 @@ def download_exp(exp):
     #create directory for download and parse usage
     if not os.path.exists(WORK_DIR['base']):
         os.makedirs(WORK_DIR['base'])
+    if not FOOTPRINT:
+        delete_file_in_folder(WORK_DIR['base'])
     #get experiment infomation
     url = BASE_URL+"experiments/" + exp
     logging.info('get experiment INFO from %s'%(url))
@@ -54,10 +59,7 @@ def download_exp(exp):
         logging.error('can NOT find experiment: %s'%(exp))
         return False
     #initial an empty folder for experiment
-    if FOOTPRINT:
-        exp_folder = WORK_DIR['base']+exp+'/'
-    else:
-        exp_folder = WORK_DIR['base']+'current/'
+    exp_folder = WORK_DIR['base']+exp+'/'
     if os.path.exists(exp_folder):
         delete_file_in_folder(exp_folder)
     else:
