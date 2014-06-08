@@ -68,7 +68,7 @@ def save_exp(exp):
     mat.save()
     #finish, mark as loaded
     models.BiogpsDatasetGeoLoaded.objects.create(geo_type=exp, with_platform=arraytype, dataset=ds)
-    logging.info('--- save experiment success \n\n---')
+    logging.info('--- save experiment success ---')
     return
 
 #setup data from file downloaded

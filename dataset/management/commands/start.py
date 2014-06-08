@@ -67,6 +67,7 @@ class Command(BaseCommand):
                         if e in skip_exps:
                             logging.info('-skip experiment %s, it\'s in skip file-'%e)
                             continue
+                        logging.info('-------------------------------------------------------------------------------')
                         logging.info('-process experiment %s-'%e)
                         try:
                             models.BiogpsDatasetGeoLoaded.objects.get(geo_type=e, with_platform=line)
