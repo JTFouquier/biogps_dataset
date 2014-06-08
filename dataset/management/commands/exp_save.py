@@ -15,7 +15,7 @@ SPECIES_MAP = {'Homo sapiens':'human', 'Mus musculus':'mouse', 'Rattus norvegicu
 
 def save_exp(exp):
     check_res = check_exp(exp)
-    if check_res['result']==True:
+    if check_res['result']==False:
         logging.error('experiment check FAIL')
         raise Exception('experiment check failed')
     logging.info('--- save experiment %s ---'%(exp))
