@@ -3,11 +3,6 @@ import os
 import json
 from .exp_loader import get_exp_dir
 
-logging.basicConfig(  
-    level = logging.INFO,
-    format = '[%(levelname)s, %(filename), L:%(lineno)d] %(message)s',
-)
-
 
 def check_processed_file_header(header):
     splited = header.split('\t')

@@ -19,7 +19,8 @@ from datetime import datetime
 
 logging.basicConfig(  
     level = logging.INFO,
-    format = '[%(levelname)s, %(filename), L:%(lineno)d] %(message)s',
+    format = '[%(asctime)s, %(levelname)s, %(filename)s, L%(lineno)d] %(message)s',
+    datefmt='%d-%b %H:%M',
 )
 ERROR_FILE = 'exp_error.txt'
 
@@ -66,7 +67,7 @@ class Command(BaseCommand):
                         if e in skip_exps:
                             logging.info('-skip experiment %s, it\'s in skip file-'%e)
                             continue
-                        logging.info('\n\n-process experiment %s (%s)-'%(e, datetime.now().strftime("%m-%d %H:%M")))
+                        logging.info('-process experiment %s-'%e)
                         try:
                             models.BiogpsDatasetGeoLoaded.objects.get(geo_type=e, with_platform=line)
                             logging.info('already loaded, skip')

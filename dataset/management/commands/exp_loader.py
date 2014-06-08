@@ -9,10 +9,6 @@ WORK_DIR = {'base':'exp_loader/','downloading':'exp_loader/downloading'}
 
 BASE_URL = "http://www.ebi.ac.uk/arrayexpress/json/v2/"
 
-logging.basicConfig(  
-    level = logging.INFO,
-    format = '[%(levelname)s, L:%(lineno)d] %(message)s',
-)
 
 #requests_cache.install_cache('arrayexpress_cache')
 

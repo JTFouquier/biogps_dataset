@@ -8,10 +8,6 @@ from .exp_loader import get_exp_dir, BASE_URL
 from django.core.exceptions import ObjectDoesNotExist
 from six import StringIO
 
-logging.basicConfig(  
-    level = logging.INFO,
-    format = '[%(levelname)s, L:%(lineno)d] %(message)s',
-)
 
 SPECIES_MAP = {'Homo sapiens':'human', 'Mus musculus':'mouse', 'Rattus norvegicus':'rat','Drosophila melanogaster':'fruitfly', \
                'Caenorhabditis elegans':'nematode', 'Danio rerio':'zebrafish', 'Arabidopsis thaliana':'thale-cress',\
@@ -68,12 +64,11 @@ def save_exp(exp):
     np.save(s, ds_matrix)
     s.seek(0)
     str = s.read()
-    print '*****save matrix*****'
     mat = models.BiogpsDatasetMatrix(dataset=ds, reporters=list(data_matrix.keys()), matrix=str)
     mat.save()
     #finish, mark as loaded
     models.BiogpsDatasetGeoLoaded.objects.create(geo_type=exp, with_platform=arraytype, dataset=ds)
-    logging.info('--- save experiment success ---')
+    logging.info('--- save experiment success \n\n---')
     return
 
 #setup data from file downloaded
