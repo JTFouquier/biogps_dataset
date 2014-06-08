@@ -4,10 +4,11 @@ import codecs
 import requests, requests_cache
 import urllib
 import zipfile
+import shutil
 
 WORK_DIR = {'base':'exp_loader/','downloading':'exp_loader/downloading'}
-
 BASE_URL = "http://www.ebi.ac.uk/arrayexpress/json/v2/"
+FOOTPRINT = False
 
 
 #requests_cache.install_cache('arrayexpress_cache')
@@ -52,8 +53,11 @@ def download_exp(exp):
     if data_json['experiments']['total'] == 0:
         logging.error('can NOT find experiment: %s'%(exp))
         return False
-    #initial an empty folder for this experiment
-    exp_folder = WORK_DIR['base']+exp+'/'
+    #initial an empty folder for experiment
+    if FOOTPRINT:
+        exp_folder = WORK_DIR['base']+exp+'/'
+    else:
+        exp_folder = WORK_DIR['base']+'current/'
     if os.path.exists(exp_folder):
         delete_file_in_folder(exp_folder)
     else:
