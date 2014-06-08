@@ -16,7 +16,7 @@ FOOTPRINT = False
 def delete_file_in_folder(src):
     for item in os.listdir(src):
         itemsrc=os.path.join(src,item)
-        if os.path.isfile(f):
+        if os.path.isfile(itemsrc):
             os.remove(itemsrc)
         else:
             shutil.rmtree(itemsrc)
