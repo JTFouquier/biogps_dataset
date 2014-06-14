@@ -5,6 +5,7 @@ from .exp_loader import get_exp_dir
 
 
 def check_processed_file_header(header):
+    print header
     splited = header.split('\t')
     result = {}
     #E-GEOD-4006 style, skp 2 lines
@@ -53,9 +54,9 @@ def check_processed(exp):
             #logging.info('check processed file %s'%f)
             if not header_parsed:
                 with open(exp_dir+f, 'r') as file:
-                    data = file.read()
+                    data = file.readline()
                     #parse header
-                    res = check_processed_file_header(data.split('\n')[0])
+                    res = check_processed_file_header(data)
                     if 'error' in res:
                         result['result'] = False
                         result['error'] = res['error']
