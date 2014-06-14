@@ -8,10 +8,10 @@ import shutil
 
 WORK_DIR = {'base':'exp_loader/','downloading':'exp_loader/downloading'}
 BASE_URL = "http://www.ebi.ac.uk/arrayexpress/json/v2/"
-FOOTPRINT = True
+FOOTPRINT = False
 
 
-requests_cache.install_cache('arrayexpress_cache')
+#requests_cache.install_cache('arrayexpress_cache')
 
 def delete_file_in_folder(src):
     for item in os.listdir(src):

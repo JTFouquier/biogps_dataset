@@ -5,7 +5,6 @@ from .exp_loader import get_exp_dir
 
 
 def check_processed_file_header(header):
-    print header
     splited = header.split('\t')
     result = {}
     #E-GEOD-4006 style, skp 2 lines
@@ -51,7 +50,6 @@ def check_processed(exp):
         result['error'] = 'can not locate experiment directory'
         return result
     for f in os.listdir(exp_dir):
-        print f
         if f.find('processed_') == 0:
             #logging.info('check processed file %s'%f)
             with open(exp_dir+f, 'r') as file:

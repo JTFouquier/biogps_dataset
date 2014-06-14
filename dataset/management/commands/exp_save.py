@@ -12,6 +12,7 @@ from six import StringIO
 SPECIES_MAP = {'Homo sapiens':'human', 'Mus musculus':'mouse', 'Rattus norvegicus':'rat','Drosophila melanogaster':'fruitfly', \
                'Caenorhabditis elegans':'nematode', 'Danio rerio':'zebrafish', 'Arabidopsis thaliana':'thale-cress',\
                'Xenopus tropicalis':'frog', 'Sus scrofa':'pig'}
+MAX_SAMPLES = 200
 
 def save_exp(exp):
     check_res = check_exp(exp)
@@ -19,6 +20,9 @@ def save_exp(exp):
         logging.error('experiment check FAIL')
         raise Exception('experiment check failed')
     logging.info('--- save experiment %s ---'%(exp))
+    logging.info('--- %d column data in total ---'%(check_res['processed']['column_total']))
+    if check_res['processed']['column_total']>MAX_SAMPLES:
+        raise Exception('more sample that we can accept')
     dataset = get_exp_info(exp)
     data_matrix = get_exp_data(exp, check_res['processed'])
     #remove length incorrect lines in matrix
