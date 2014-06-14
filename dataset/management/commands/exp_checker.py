@@ -44,17 +44,26 @@ def check_processed(exp):
     exp_dir = get_exp_dir(exp)
     header_parsed = False
     column_total = 0
+    header_line = None
     if not os.path.exists(exp_dir):
         logging.error('can NOT find %s'%(exp_dir))
         result['result'] = False
         result['error'] = 'can not locate experiment directory'
         return result
     for f in os.listdir(exp_dir):
+        print f
         if f.find('processed_') == 0:
             #logging.info('check processed file %s'%f)
-            if not header_parsed:
-                with open(exp_dir+f, 'r') as file:
-                    data = file.readline()
+            with open(exp_dir+f, 'r') as file:
+                data = file.readline()
+                if header_line is None:
+                    header_line = data
+                else:
+                    if header_line != data:
+                        result['result'] = False
+                        result['error'] = 'processed file format inconsistent'
+                        return result
+                if not header_parsed:
                     #parse header
                     res = check_processed_file_header(data)
                     if 'error' in res:
