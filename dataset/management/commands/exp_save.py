@@ -85,7 +85,9 @@ def get_exp_data(exp, precheked):
         if f.find('processed_') == 0:
             with open(exp_dir+f, 'r') as file:
                 for d in file:
+                    d = d.strip()
                     if row_skip>0 or d=='':
+                        row_skip = row_skip-1
                         continue
                     splited = d.split('\t')
                     if len(splited)<column_count:

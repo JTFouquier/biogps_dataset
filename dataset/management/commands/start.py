@@ -78,7 +78,7 @@ class Command(BaseCommand):
                         if not download_exp(e):
                             logging.info('download experiment fail')
                             with open(ERROR_FILE, 'a') as err_file:
-                                err_file.write('%s %s\n'%(e, 'download experiment fail'))
+                                err_file.write('%s #%s\n'%(e, 'download experiment fail'))
                                 continue
                         try:
                             save_exp(e)
