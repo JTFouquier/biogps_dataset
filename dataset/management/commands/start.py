@@ -84,7 +84,7 @@ class Command(BaseCommand):
                             save_exp(e)
                         except Exception, excep:
                             with open(ERROR_FILE, 'a') as err_file:
-                                err_file.write('%s (%s)\n'%(e,excep))
+                                err_file.write('%s #(%s)\n'%(e,excep))
                     line = file.readline().strip()
         elif options['exp'] is not None:
             if not download_exp(options['exp']):

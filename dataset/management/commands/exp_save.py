@@ -6,7 +6,7 @@ from dataset import models
 from .exp_checker import check_exp
 from .exp_loader import get_exp_dir, BASE_URL
 from django.core.exceptions import ObjectDoesNotExist
-from six import StringIO
+from six import cStringIO
 
 
 SPECIES_MAP = {'Homo sapiens':'human', 'Mus musculus':'mouse', 'Rattus norvegicus':'rat','Drosophila melanogaster':'fruitfly', \
@@ -64,7 +64,7 @@ def save_exp(exp):
     models.BiogpsDatasetData.objects.bulk_create(datasetdata)
     ds_matrix = np.array(list(data_matrix.values()), np.float32)
     #tmp file
-    s = StringIO()
+    s = cStringIO()
     np.save(s, ds_matrix)
     s.seek(0)
     str = s.read()
@@ -84,10 +84,8 @@ def get_exp_data(exp, precheked):
     for f in os.listdir(exp_dir):
         if f.find('processed_') == 0:
             with open(exp_dir+f, 'r') as file:
-                data = file.read()
-                data = data.split('\n')[row_skip:]
-                for d in data:
-                    if d=='':
+                for d in file:
+                    if row_skip>0 or d=='':
                         continue
                     splited = d.split('\t')
                     if len(splited)<column_count:
