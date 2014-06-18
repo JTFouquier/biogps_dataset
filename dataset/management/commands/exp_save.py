@@ -6,7 +6,7 @@ from dataset import models
 from .exp_checker import check_exp
 from .exp_loader import get_exp_dir, BASE_URL
 from django.core.exceptions import ObjectDoesNotExist
-from six import cStringIO
+from six.moves import cStringIO
 
 
 SPECIES_MAP = {'Homo sapiens':'human', 'Mus musculus':'mouse', 'Rattus norvegicus':'rat','Drosophila melanogaster':'fruitfly', \
