@@ -14,25 +14,32 @@ SPECIES_MAP = {'Homo sapiens':'human', 'Mus musculus':'mouse', 'Rattus norvegicu
                'Xenopus tropicalis':'frog', 'Sus scrofa':'pig'}
 MAX_SAMPLES = 200
 
-def save_exp(exp):
+def save_exp(exp, platform=None):
     check_res = check_exp(exp)
     if check_res['result']==False:
         logging.error('experiment check FAIL')
         raise Exception('experiment check failed')
     logging.info('--- save experiment %s ---'%(exp))
-    logging.info('--- %d column data in total ---'%(check_res['processed']['column_total']))
-    if check_res['processed']['column_total']>MAX_SAMPLES:
+    logging.info('--- %d column data in total ---'%(check_res['exp_info']['column_total']))
+    if check_res['exp_info']['column_total']>MAX_SAMPLES:
         raise Exception('more sample that we can accept')
     dataset = get_exp_info(exp)
-    data_matrix = get_exp_data(exp, check_res['processed'])
+    data_matrix = get_exp_data(exp, check_res['exp_info'], check_res['processed'])
     #remove length incorrect lines in matrix
-    invalids = []
-    for k in data_matrix:
-        if len(data_matrix[k]) != check_res['processed']['column_total']:
-            invalids.append(k)
-    for k in invalids:
-        del data_matrix[k]
-    arraytype = dataset['arraytype']['accession']
+#     invalids = []
+#     for k in data_matrix:
+#         if len(data_matrix[k]) != check_res['processed']['column_total']:
+#             invalids.append(k)
+#     for k in invalids:
+#         del data_matrix[k]
+    if platform is None:
+        #print dataset['arraytype']
+        if dataset['arraytype'] is not dict:
+            arraytype = dataset['arraytype'][0]['accession']
+        else:
+            arraytype = dataset['arraytype']['accession']
+    else:
+        arraytype = platform
     #platform
     try:
         pf = models.BiogpsDatasetPlatform.objects.get(platform=arraytype)
@@ -76,35 +83,61 @@ def save_exp(exp):
     return
 
 #setup data from file downloaded
-def get_exp_data(exp, precheked):
+def get_exp_data(exp, precheked, file_format):
     data_matrix = {}
     exp_dir = get_exp_dir(exp)
-    row_skip = precheked['row_skip']
-    column_count = precheked['column_count']
-    for f in os.listdir(exp_dir):
+    column_skip = precheked['column_skip']
+    column_total = precheked['column_total']
+    column_left = column_total
+    row_skip = file_format['row_skip']
+    column_valid = file_format['column_valid']
+    #print '%d, %d, %d, %s'%(column_skip, column_total, row_skip, column_valid)
+    files = os.listdir(exp_dir)
+    files.sort()
+    for f in files:
         if f.find('processed_') == 0:
+            if column_skip > 0:
+                column_skip = column_skip - (column_valid-1)
+                #print 'column skip'
+                continue
+            if column_left == 0:
+                #print 'column total reached'
+                break
             with open(exp_dir+f, 'r') as file:
+                rs = row_skip
                 for d in file:
                     d = d.strip()
-                    if row_skip>0 or d=='':
-                        row_skip = row_skip-1
+                    if rs>0 or d=='':
+                        rs = rs-1
+                        #print 'row skip'
                         continue
                     splited = d.split('\t')
-                    if len(splited)<column_count:
+                    if len(splited)<column_valid:
+                        #print 'invalid line'
                         continue
                     reporter = splited[0]
                     if reporter in data_matrix:
-                        data_matrix[reporter].extend(splited[1:column_count])
+                        data_matrix[reporter].extend(splited[1:column_valid])
                     else:
-                        data_matrix[reporter] = splited[1:column_count]
-                    for e in data_matrix[reporter]:
-                        #skip lines with invalid(can't convert to float)
-                        try:
-                            tmp = float(e)
-                        except Exception:
-                            del data_matrix[reporter]
-                            break
-                            
+                        data_matrix[reporter] = splited[1:column_valid]
+            column_left = column_left-(column_valid-1)
+            #print 'column total left: %d'%column_left
+
+    invalids = []
+    for a in data_matrix:
+        #print a
+        #print data_matrix[a]
+        if len(data_matrix[a]) != column_total:
+            invalids.append(a)
+            continue
+        for e in data_matrix[a]:
+            #skip lines with invalid(can't convert to float)
+            try:
+                tmp = float(e)
+            except Exception:
+                invalids.append(a)
+    for k in invalids:
+        del data_matrix[k]
     return data_matrix
 
 def get_exp_info(exp):

@@ -81,7 +81,7 @@ class Command(BaseCommand):
                                 err_file.write('%s #%s\n'%(e, 'download experiment fail'))
                                 continue
                         try:
-                            save_exp(e)
+                            save_exp(e, line)
                         except Exception, excep:
                             with open(ERROR_FILE, 'a') as err_file:
                                 err_file.write('%s #(%s)\n'%(e,excep))
