@@ -31,6 +31,7 @@ class Command(BaseCommand):
     option_list = option_list+(make_option("-s", "--skip", action="store", type="string", dest="skip_file", help='Specify file containing array types to skip, only effect with -a',),)
     option_list = option_list+(make_option("-t", "--test", action="store", type="string", dest="test", help='Test the specified experiment. No database writing.',),)
     option_list = option_list+(make_option("-e", "--exp", action="store", type="string", dest="exp", help='Load the specified experiment.',),)
+    option_list = option_list+(make_option("-p", "--platform", action="store", type="string", dest="platform", help='use data from specified platform, go with -e, -t',),)
 
     def handle(self, *args, **options):
         if options['test'] is not None:
@@ -90,4 +91,4 @@ class Command(BaseCommand):
             if not download_exp(options['exp']):
                 logging.info('download experiment fail')
                 return
-            save_exp(options['exp'])
+            save_exp(options['exp'], options['platform'])

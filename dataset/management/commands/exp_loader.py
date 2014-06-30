@@ -5,6 +5,7 @@ import requests, requests_cache
 import urllib
 import zipfile
 import shutil
+import csv
 
 WORK_DIR = {'base':'exp_loader/','downloading':'exp_loader/downloading'}
 BASE_URL = "http://www.ebi.ac.uk/arrayexpress/json/v2/"
@@ -103,6 +104,22 @@ def download_exp(exp):
             processed_done = True
     if not processed_done or not sdrf_done:
         return False
+
+    #check sdrf file, to find contained platforms
+    ps = []
+    with codecs.open(exp_folder+'sdrf', 'rb') as file:
+         l = list(csv.reader(file, delimiter='\t'))
+         platform_pos = l[0].index('Array Design REF')
+         for r in l[1:]:
+             ps.append(r[platform_pos])
+    #divide processed files into correspond directory
+    i=0
+    while i < len(ps):
+        p_name = ps[i]
+        if not os.path.exists('%s/%s/'%(exp_folder,p_name)):
+            os.makedirs('%s/%s/'%(exp_folder,p_name))
+        os.rename('%s/processed_%d'%(exp_folder,i), '%s/%s/processed_%d'%(exp_folder,p_name, i))
+        i = i+1
     logging.info('--- download success ---')
     return True
 

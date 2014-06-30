@@ -15,16 +15,17 @@ SPECIES_MAP = {'Homo sapiens':'human', 'Mus musculus':'mouse', 'Rattus norvegicu
 MAX_SAMPLES = 200
 
 def save_exp(exp, platform=None):
-    check_res = check_exp(exp)
+    check_res = check_exp(exp, platform)
+    print check_res
     if check_res['result']==False:
         logging.error('experiment check FAIL')
         raise Exception('experiment check failed')
     logging.info('--- save experiment %s ---'%(exp))
-    logging.info('--- %d column data in total ---'%(check_res['exp_info']['column_total']))
-    if check_res['exp_info']['column_total']>MAX_SAMPLES:
-        raise Exception('more sample that we can accept')
+#     logging.info('--- %d column data in total ---'%(check_res['exp_info']['column_total']))
+#     if check_res['exp_info']['column_total']>MAX_SAMPLES:
+#         raise Exception('more sample that we can accept')
     dataset = get_exp_info(exp)
-    data_matrix = get_exp_data(exp, check_res['exp_info'], check_res['processed'])
+    data_matrix = get_exp_data(exp, platform, check_res['processed'])
     #remove length incorrect lines in matrix
 #     invalids = []
 #     for k in data_matrix:
@@ -83,27 +84,17 @@ def save_exp(exp, platform=None):
     return
 
 #setup data from file downloaded
-def get_exp_data(exp, precheked, file_format):
+def get_exp_data(exp, platform, file_format):
     data_matrix = {}
     exp_dir = get_exp_dir(exp)
-    column_skip = precheked['column_skip']
-    column_total = precheked['column_total']
-    column_left = column_total
     row_skip = file_format['row_skip']
     column_valid = file_format['column_valid']
     #print '%d, %d, %d, %s'%(column_skip, column_total, row_skip, column_valid)
-    files = os.listdir(exp_dir)
+    files = os.listdir('%s%s/'%(exp_dir, platform))
     files.sort()
     for f in files:
         if f.find('processed_') == 0:
-            if column_skip > 0:
-                column_skip = column_skip - (column_valid-1)
-                #print 'column skip'
-                continue
-            if column_left == 0:
-                #print 'column total reached'
-                break
-            with open(exp_dir+f, 'r') as file:
+            with open('%s%s/%s'%(exp_dir,platform,f), 'r') as file:
                 rs = row_skip
                 for d in file:
                     d = d.strip()
@@ -120,16 +111,13 @@ def get_exp_data(exp, precheked, file_format):
                         data_matrix[reporter].extend(splited[1:column_valid])
                     else:
                         data_matrix[reporter] = splited[1:column_valid]
-            column_left = column_left-(column_valid-1)
             #print 'column total left: %d'%column_left
 
     invalids = []
     for a in data_matrix:
-        #print a
-        #print data_matrix[a]
-        if len(data_matrix[a]) != column_total:
-            invalids.append(a)
-            continue
+#         if len(data_matrix[a]) != column_total:
+#             invalids.append(a)
+#             continue
         for e in data_matrix[a]:
             #skip lines with invalid(can't convert to float)
             try:

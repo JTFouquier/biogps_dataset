@@ -25,7 +25,7 @@ def check_processed_file_header(header):
             result['column_valid'] = 2
         #most common cases E-GEOD-15568
         else:
-            logging.info('1 line header')
+            #logging.info('1 line header')
             result['row_skip'] = 1
             result['column_valid'] = len(splited)
     #E-MEXP-3476 style, skp 2 lines
@@ -38,7 +38,9 @@ def check_processed_file_header(header):
         result['error'] = 'can not recognize processed data format'
     return result
 
-def check_processed(exp, c_s, c_t):
+
+
+def check_processed(exp, platform):
     result = {'result':True}
     exp_dir = get_exp_dir(exp)
     #header_parsed = False
@@ -49,44 +51,25 @@ def check_processed(exp, c_s, c_t):
         result['result'] = False
         result['error'] = 'can not locate experiment directory'
         return result
-    files = os.listdir(exp_dir)
+    files = os.listdir('%s%s/'%(exp_dir, platform))
     files.sort()
     for f in files:
         if f.find('processed_') == 0:
             #logging.info('check processed file %s'%f)
-            with open(exp_dir+f, 'r') as file:
+            with open('%s%s/%s'%(exp_dir, platform, f), 'r') as file:
                 data = file.readline()
-#                 if header_line is None:
-#                     header_line = data
-#                 else:
-#                     if header_line != data:
-#                         result['result'] = False
-#                         result['error'] = 'processed file format inconsistent'
-#                         return result
-                #if not header_parsed:
                 #parse header
                 res = check_processed_file_header(data)
                 if 'error' in res:
                     result['result'] = False
                     result['error'] = res['error']
                     return result
-                if c_s > 0:
-                    c_s = c_s - res['column_valid']
                 column_total = column_total + res['column_valid'] -1
-                if column_total == c_t:
-                    break
-                #result.update(res)
-                #header_parsed = True
-            #column_total = column_total + result['column_count'] -1
-    if column_total != c_t:
-        result['result'] = False
-        result['error'] = 'column in processed data not correct'
-    else:
-        result.update(res)
+    result.update(res)
     return result
 
 
-def check_exp_info(exp, platform):
+def check_exp_info(exp):
     result = {'result':True}
     exp_dir = get_exp_dir(exp)
     if not os.path.exists(exp_dir):
@@ -103,43 +86,36 @@ def check_exp_info(exp, platform):
                     experiment = e
         else:
             experiment = parsed['experiments']['experiment']
-        colum_skip = 0
+        result['platform'] = []
         #total count of data
-        if platform is not None:
-            if type(experiment['arraydesign']) is list:
-                i = 0
-                while i < len(experiment['arraydesign']):
-                    arraydesign = experiment['arraydesign'][i]
-                    if arraydesign['accession'] == platform:
-                        result['column_total'] = arraydesign['count']
-                        result['column_skip'] = colum_skip
-                        break
-                    else:
-                        colum_skip = colum_skip + arraydesign['count']
-                    i = i+1
-            else:
-                result['column_total'] = arraydesign['count']
-                result['column_skip'] = 0
-        #plat form is None, take 1st platform
+        if type(experiment['arraydesign']) is list:
+            i = 0
+            while i < len(experiment['arraydesign']):
+                arraydesign = experiment['arraydesign'][i]
+                result['platform'] .append(experiment['arraydesign'][i]['accession'])
+                i = i+1
         else:
-            if type(experiment['arraydesign']) is not dict:
-                arraydesign = experiment['arraydesign'][0]
-            else:
-                arraydesign = experiment['arraydesign']
-            result['column_total'] = arraydesign['count']
-            result['column_skip'] = 0
+            result['platform'] = experiment['arraydesign']['accession']
     return result
     
 
 def check_exp(exp, platform=None):
     logging.info('--- check experiment %s ---'%(exp))
     result = {}
-    result['exp_info'] = check_exp_info(exp, platform)
-    result['processed'] = check_processed(exp, result['exp_info']['column_skip'], result['exp_info']['column_total'])
-    if result['exp_info']['result']==True and result['processed']['result']==True:
+    #seems useless now, check experiment
+    res = check_exp_info(exp)
+    if platform is None:
+        if len(res['platform']) > 0:
+            logging.info('multiple platforms in the experiment, please specify a platform, then run again.')
+            return {'result': False}
+        else:
+            platform = res['platform'][0]
+    result['processed'] = check_processed(exp, platform)
+    #if result['exp_info']['result']==True and result['processed']['result']==True:
+    if result['processed']['result']==True:
         result['result'] = True
     else:
         result['result'] = False
     logging.info('--- check experiment over ---')
-    print result
+    #print result
     return result
