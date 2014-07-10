@@ -107,6 +107,8 @@ def get_exp_data(exp, platform, file_format):
                         #print 'invalid line'
                         continue
                     reporter = splited[0]
+                    if ':' in reporter:
+                        reporter=reporter.split(':')[-1]
                     if reporter in data_matrix:
                         data_matrix[reporter].extend(splited[1:column_valid])
                     else:
