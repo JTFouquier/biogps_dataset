@@ -110,7 +110,7 @@ class BiogpsDataset(models.Model):
         return wrap_str(self.summary, 140)
 
     # Custom manager
-    objects = BiogpsDatasetManager()
+    #objects = BiogpsDatasetManager()
 
     # Required setting for ModelWithPermission and PermissionManager working
     object_type = 'D'

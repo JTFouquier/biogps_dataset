@@ -1,6 +1,7 @@
 from django.conf.urls import patterns, include, url
-from biogps_dataset import settings
+from django.conf import settings
 from django.contrib import admin
+from django.conf.urls.static import static
 admin.autodiscover()
 
 urlpatterns = patterns('',
@@ -10,5 +11,6 @@ urlpatterns = patterns('',
 
     url(r'^admin/', include(admin.site.urls)),
     url(r'^grappelli/', include('grappelli.urls')), # grappelli URLS
+    url(r'^dataset/', include('dataset.urls')), 
 )
-urlpatterns += static.static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
