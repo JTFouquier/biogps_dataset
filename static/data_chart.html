@@ -545,13 +545,13 @@
 
 					// Dataset factors
 					var mygeneReps = this.mygeneReps;
-					$.getJSON("/data_chart/gnf_json_proxy.cgi?url=http://biogps.org/dataset/" + ds + "/?format=json", function(metaJson, code) {
+					$.getJSON("/dataset/info/", function(metaJson, code) {
 						if (code != "success") {
 							// Error getting json from server
 							DCCG.buildCanvasError(DC_026887848.getCanvas());
 						} else {
 							// Dataset values
-							var prox_url = "/data_chart/gnf_json_proxy.cgi?url=http://biogps.org/dataset/" + ds + "/values/?reporters=" + mygeneReps;
+							var prox_url = "/dataset/data/?id=1017";
 							$.getJSON(prox_url, function(dataJson, code) {
 								if (code != "success") {
 									DCCG.buildCanvasError(DC_026887848.getCanvas());
@@ -580,8 +580,8 @@
 				 */
 				setProbeData : function() {
 					// Populate dataset metadata fields in plugin
-					var dsMetadata = arguments[0];
-					var dsValues = arguments[1];
+					var dsMetadata = arguments[0]['detail'];
+					var dsValues = arguments[1]['detail'];
 					var dsName = dsMetadata["name"];
 					DC_026887848.dsName = dsName;
 					$("#datasetName").html('<a class="ds-name" href="http://biogps.org/dataset/' + this.dsID + '" target="_blank">' + dsName + '</a>');
