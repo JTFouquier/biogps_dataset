@@ -1,3 +1,4 @@
+#-*-coding: utf-8 -*-
 from django.conf import settings
 from django.views.decorators.http import require_http_methods
 import models
@@ -14,11 +15,17 @@ def adopt_dataset():
     try:
         ds_id = settings.DEFAULT_DATASET_ID
         ds = models.BiogpsDataset.objects.get(id=ds_id)
-    except Exception:
+    except Exception, e:
         ds = models.BiogpsDataset.objects.first()
     return ds
-    
-    
+   
+ #return an array of keys that stand for samples in ds   
+def get_ds_factors_keys(ds):
+    factors = []
+    for f in ds.metadata['factors']:
+        factors.append(f.keys()[0])
+    return factors
+ 
 #get information about a dataset
 @require_http_methods(["GET"])
 def dataset_info(request):
@@ -31,21 +38,16 @@ def dataset_info(request):
             'geo_gpl_id':ds.metadata['geo_gpl_id']['accession'], 'species':[ds.species] 
     }
     factors = []
-    for f in ds.metadata['factors']:
-        k = f.keys()[0]
-        factors.append({k:{"color_idx":31,  "order_idx":76, "title":k}})
+    fa = get_ds_factors_keys(ds)
+    for f in fa:
+        factors.append({f:{"color_idx":31,  "order_idx":76, "title":f}})
     ret.update(preset)
     ret.update({'factors':factors})
     #print factors
     ret = json.dumps(ret)
     return HttpResponse('{"code":0, "detail":%s}'%ret, content_type="application/json")
 
-#get information about a dataset
-@require_http_methods(["GET"])
-def dataset_data(request):
-    _id = request.GET.get('id', None)
-    if _id is None:
-        return HttpResponse('{"code":4004, "detail":"argument needed"}', content_type="application/json")
+def  get_dataset_data(_id):
     ds = adopt_dataset()
     url = 'http://mygene.info/v2/gene/%s/?fields=entrezgene,reporter,refseq.rna'%_id
     res = requests.get(url)
@@ -54,11 +56,98 @@ def dataset_data(request):
     for i in data_json['reporter'].values():
         reporters = reporters+i
     dd = ds.dataset_data.filter(reporter__in = reporters)
-    ret = {'id':ds.id, 'name':ds.name}
     data_list = []
     for d in dd:
         data_list.append({d.reporter:{'values':d.data}})
-    ret['probeset_list'] = data_list
+    return {'id':ds.id, 'name':ds.name, 'data':data_list}
+
+#显示柱状图，但是需要接受id和at参数
+def dataset_chart(request):
+    _id = request.GET.get('id', None)
+    _at= request.GET.get('at', None)
+    if _id is None or  _at is None:
+        return HttpResponse('{"code":4004, "detail":"argument needed"}', content_type="application/json")
+    data_list=get_dataset_data(_id)['data']
+    print data_list
+    str_list=[]
+    for item in data_list:
+        if _at  in item:
+             str_list=item[_at]["values"]
+             break
+    
+    if  len(str_list)==0:
+        return HttpResponse('{"code":4004, "detail":"_at  can not  find"}', content_type="application/json")
+    print str_list
+    val_list=[]
+    for item in str_list:
+        temp=float(item)
+        val_list.append(temp)
+    print val_list
+    ds = adopt_dataset()
+    name_list=get_ds_factors_keys(ds)
+    print name_list
+    
+    from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+    import matplotlib.pyplot as plt 
+    import django
+    import numpy as np
+    y_pos = [0.0,0.45]
+    plt.figure(1,figsize=(160,6)).clear()
+    #根据传回的参数获取x轴的范围
+    if val_list[0]>val_list[1]:
+        x_max=int(val_list[0])
+    else:
+        x_max=int(val_list[1])
+    print "x_max=",x_max
+    temp_count=0
+    temp_val=0
+    while x_max>0:
+        temp_count=temp_count+1
+        temp_val=x_max%10
+        x_max=x_max/10
+    x_max=(temp_val+1)*10**(temp_count-1)
+    print "=====" ,temp_count,temp_val,x_max
+#画柱状图    
+    xylist=[0, 0, 0, 2.0]  
+    xylist[1]=x_max  
+    print xylist
+    plt.axis(xylist)
+    plt.barh(y_pos,val_list,height=0.4,color="m")
+#画label    
+    plt.text(-2.5*x_max/30,0.2,name_list[0],fontsize=80)
+    plt.text(-2.5*x_max/30,0.6,name_list[1],fontsize=80)
+
+#画x坐标    
+    x_per=x_max/5
+    i=1
+    while i<=5:
+        x_label=i*x_per
+        str_temp='%.2f'%x_label
+        plt.text(x_label-0.3*x_max/30,1.3,str_temp,fontsize=80)
+        list_temp=[]
+        list_temp.append(x_label)
+        list_temp.append(x_label)
+        plt.plot(list_temp, [1, 0.7],"k",linewidth=4)
+        i=i+1
+    list_temp=[]
+    list_temp.append(0)
+    list_temp.append(x_max)
+    plt.plot(list_temp, [1, 1],"k",linewidth=4)
+    canvas = FigureCanvas(plt.figure(1))
+    response=django.http.HttpResponse(content_type='image/png')
+    canvas.print_png(response) 
+    return response
+
+#get information about a dataset
+@require_http_methods(["GET"])
+def dataset_data(request):
+    _id = request.GET.get('id', None)
+    if _id is None :
+        return HttpResponse('{"code":4004, "detail":"argument needed"}', content_type="application/json")
+    ret = get_dataset_data(_id)
+    print ret
+    ret['probeset_list'] = ret['data']
+    del ret['data']
     return HttpResponse('{"code":0, "detail":%s}'%json.dumps(ret), content_type="application/json")
     
     
