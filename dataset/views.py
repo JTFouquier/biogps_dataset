@@ -107,6 +107,10 @@ def dataset_chart(request):
         x_max=x_max/10
     x_max=(temp_val+1)*10**(temp_count-1)
     print "=====" ,temp_count,temp_val,x_max
+#修改背景色
+    fig1 = plt.figure(1)
+    rect=fig1.patch
+    rect.set_facecolor('white')
 #画柱状图    
     xylist=[0, 0, 0, 2.0]  
     xylist[1]=x_max  
