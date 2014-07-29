@@ -22,9 +22,17 @@ def adopt_dataset():
    
  #return an array of keys that stand for samples in ds   
 def get_ds_factors_keys(ds):
-    factors = []
+    factors =[]
     for f in ds.metadata['factors']:
-        factors.append(f.keys()[0])
+        print f
+        comment=f[f.keys()[0]]['comment']
+        temp=comment.get('Sample_title',None)
+        if temp==None:
+            temp=comment.get('Sample_title',None)
+            if temp == None:
+                temp=f.keys()[0]
+        factors.append(temp)
+    
     return factors
  
 #get information about a dataset
@@ -148,7 +156,6 @@ def get_cvs(request):
      if _id is None:
          return HttpResponse('{"code":4004, "detail":"argument needed"}', content_type="application/json")
      data_list=get_dataset_data(_id)['data']
-     print "data_list=" ,data_list
      row_list=['Tissue']
      val_list=[]
      for item in data_list:
@@ -156,12 +163,9 @@ def get_cvs(request):
          for key_item in key_list:
              row_list.append(key_item)
              val_list.append(item[key_item]['values'])
-     print row_list
-     print val_list
      length=len(val_list[0])       
      ds = adopt_dataset()
      name_list=get_ds_factors_keys(ds)
-     print name_list
      response = HttpResponse(mimetype='text/csv')
      response['Content-Disposition'] = 'attachment; filename=asd.csv'
      writer = csv.writer(response)
@@ -173,8 +177,7 @@ def get_cvs(request):
          for item in val_list:
              temp_list.append(item[i])
          writer.writerow(temp_list)
-         i=i+1
-         print temp_list     
+         i=i+1   
      return response
     
     
