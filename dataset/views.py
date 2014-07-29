@@ -1,4 +1,5 @@
 #-*-coding: utf-8 -*-
+import csv
 from django.conf import settings
 from django.views.decorators.http import require_http_methods
 import models
@@ -142,6 +143,42 @@ def dataset_chart(request):
     canvas.print_png(response) 
     return response
 
+def get_cvs(request):
+     _id = request.GET.get('id', None)
+     if _id is None:
+         return HttpResponse('{"code":4004, "detail":"argument needed"}', content_type="application/json")
+     data_list=get_dataset_data(_id)['data']
+     print "data_list=" ,data_list
+     row_list=['Tissue']
+     val_list=[]
+     for item in data_list:
+         key_list=item.keys()
+         for key_item in key_list:
+             row_list.append(key_item)
+             val_list.append(item[key_item]['values'])
+     print row_list
+     print val_list
+     length=len(val_list[0])       
+     ds = adopt_dataset()
+     name_list=get_ds_factors_keys(ds)
+     print name_list
+     response = HttpResponse(mimetype='text/csv')
+     response['Content-Disposition'] = 'attachment; filename=asd.csv'
+     writer = csv.writer(response)
+     writer.writerow(row_list)
+     i=0
+     while(i<length):
+         temp_list=[]
+         temp_list.append(name_list[i])
+         for item in val_list:
+             temp_list.append(item[i])
+         writer.writerow(temp_list)
+         i=i+1
+         print temp_list     
+     return response
+    
+    
+    
 #get information about a dataset
 @require_http_methods(["GET"])
 def dataset_data(request):
