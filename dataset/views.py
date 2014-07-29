@@ -77,7 +77,6 @@ def dataset_chart(request):
     if _id is None :
         return HttpResponse('{"code":4004, "detail":"argument needed"}', content_type="application/json")
     data_list=get_dataset_data(_id)['data']
-    print data_list
     str_list=[]
 #    for item in data_list:
 #        if _at  in item:
@@ -86,18 +85,17 @@ def dataset_chart(request):
     temp=data_list[0]
     xx=temp[temp.keys()[0]]
     str_list=xx['values']
-    print "str_list==" , str_list
+    
     if  len(str_list)==0:
         return HttpResponse('{"code":4004, "detail":"_at  can not  find"}', content_type="application/json")
-    print str_list
+    
     val_list=[]
     for item in str_list:
         temp=float(item)
         val_list.append(temp)
-    print val_list
+    
     ds = adopt_dataset()
     name_list=get_ds_factors_keys(ds)
-    print name_list
     
     from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
     import matplotlib.pyplot as plt 
@@ -110,17 +108,16 @@ def dataset_chart(request):
 #    per_next=1.0/length*(1.0/8)
     i=1;
     while(i<length):
-        y_pos.append(i*0.45)
+        y_pos.append(i)
         i=i+1
-    print "y_pos===",y_pos
-    print 3+length*1.5
+    
     plt.figure(1,figsize=(160,3+length*1.5)).clear()
     #根据传回的参数获取x轴的范围
     if val_list[0]>val_list[1]:
         x_max=int(val_list[0])
     else:
         x_max=int(val_list[1])
-    print "x_max=",x_max
+    
     temp_count=0
     temp_val=0
     while x_max>0:
@@ -128,7 +125,7 @@ def dataset_chart(request):
         temp_val=x_max%10
         x_max=x_max/10
     x_max=(temp_val+1)*10**(temp_count-1)
-    print "=====" ,temp_count,temp_val,x_max
+    
 #修改背景色
     fig1 = plt.figure(1)
     rect=fig1.patch
@@ -137,29 +134,36 @@ def dataset_chart(request):
     xylist=[0, 0, 0,]
     xylist.append(length+2)  
     xylist[1]=x_max  
-    print 'xylist===', xylist
     plt.axis(xylist)
-    plt.barh(y_pos,val_list,height=0.4,color="m")
-#画label    
-    plt.text(-2.5*x_max/30,0.2,name_list[0],fontsize=80)
-    plt.text(-2.5*x_max/30,0.6,name_list[1],fontsize=80)
+    plt.barh(y_pos,val_list,height=1*7.0/8,color="m")
+#画label 
+    i=0
+    for name_item in name_list :
+        plt.text(0,y_pos[i],name_item,fontsize=80,horizontalalignment='right')
+        i=i+1
 
 #画x坐标    
     x_per=x_max/5
     i=1
+    y_list=[]
+    y_list.append(length+0.2)
+    y_list.append(length-0.5)
     while i<=5:
         x_label=i*x_per
         str_temp='%.2f'%x_label
-        plt.text(x_label-0.3*x_max/30,1.3,str_temp,fontsize=80)
+        plt.text(x_label-0.3*x_max/30,length+0.5,str_temp,fontsize=80)
         list_temp=[]
         list_temp.append(x_label)
         list_temp.append(x_label)
-        plt.plot(list_temp, [1, 0.7],"k",linewidth=4)
+        plt.plot(list_temp, y_list,"k",linewidth=4)
         i=i+1
     list_temp=[]
     list_temp.append(0)
     list_temp.append(x_max)
-    plt.plot(list_temp, [1, 1],"k",linewidth=4)
+    y_list=[]
+    y_list.append(length)
+    y_list.append(length)
+    plt.plot(list_temp, y_list,"k",linewidth=4)
     canvas = FigureCanvas(plt.figure(1))
     response=django.http.HttpResponse(content_type='image/png')
     canvas.print_png(response) 
