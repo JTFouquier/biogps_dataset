@@ -111,7 +111,7 @@ def dataset_chart(request):
         y_pos.append(i)
         i=i+1
     
-    plt.figure(1,figsize=(160,3+length*1.5)).clear()
+    plt.figure(1,figsize=(160,3+length*1.5),dpi=15).clear()
     #根据传回的参数获取x轴的范围
     if val_list[0]>val_list[1]:
         x_max=int(val_list[0])
