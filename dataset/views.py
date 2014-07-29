@@ -24,7 +24,7 @@ def adopt_dataset():
 def get_ds_factors_keys(ds):
     factors =[]
     for f in ds.metadata['factors']:
-        print f
+#        print f
         comment=f[f.keys()[0]]['comment']
         temp=comment.get('Sample_title',None)
         if temp==None:
@@ -73,17 +73,20 @@ def  get_dataset_data(_id):
 #显示柱状图，但是需要接受id和at参数
 def dataset_chart(request):
     _id = request.GET.get('id', None)
-    _at= request.GET.get('at', None)
-    if _id is None or  _at is None:
+#    _at= request.GET.get('at', None)
+    if _id is None :
         return HttpResponse('{"code":4004, "detail":"argument needed"}', content_type="application/json")
     data_list=get_dataset_data(_id)['data']
     print data_list
     str_list=[]
-    for item in data_list:
-        if _at  in item:
-             str_list=item[_at]["values"]
-             break
-    
+#    for item in data_list:
+#        if _at  in item:
+#             str_list=item[_at]["values"]
+#             break
+    temp=data_list[0]
+    xx=temp[temp.keys()[0]]
+    str_list=xx['values']
+    print "str_list==" , str_list
     if  len(str_list)==0:
         return HttpResponse('{"code":4004, "detail":"_at  can not  find"}', content_type="application/json")
     print str_list
@@ -100,8 +103,18 @@ def dataset_chart(request):
     import matplotlib.pyplot as plt 
     import django
     import numpy as np
-    y_pos = [0.0,0.45]
-    plt.figure(1,figsize=(160,6)).clear()
+    #判断要画几根柱状图
+    length=len(name_list)
+    y_pos=[0,]
+#    per=1.0/length
+#    per_next=1.0/length*(1.0/8)
+    i=1;
+    while(i<length):
+        y_pos.append(i*0.45)
+        i=i+1
+    print "y_pos===",y_pos
+    print 3+length*1.5
+    plt.figure(1,figsize=(160,3+length*1.5)).clear()
     #根据传回的参数获取x轴的范围
     if val_list[0]>val_list[1]:
         x_max=int(val_list[0])
@@ -121,9 +134,10 @@ def dataset_chart(request):
     rect=fig1.patch
     rect.set_facecolor('white')
 #画柱状图    
-    xylist=[0, 0, 0, 2.0]  
+    xylist=[0, 0, 0,]
+    xylist.append(length+2)  
     xylist[1]=x_max  
-    print xylist
+    print 'xylist===', xylist
     plt.axis(xylist)
     plt.barh(y_pos,val_list,height=0.4,color="m")
 #画label    
