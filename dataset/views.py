@@ -71,23 +71,19 @@ def  get_dataset_data(_id):
     return {'id':ds.id, 'name':ds.name, 'data':data_list}
 
 #显示柱状图，但是需要接受id和at参数
-def dataset_chart(request):
-    _id = request.GET.get('id', None)
-#    _at= request.GET.get('at', None)
+def dataset_chart(request,_id,reporter):
     if _id is None :
         return HttpResponse('{"code":4004, "detail":"argument needed"}', content_type="application/json")
     data_list=get_dataset_data(_id)['data']
+    print "data_list==",data_list
     str_list=[]
-#    for item in data_list:
-#        if _at  in item:
-#             str_list=item[_at]["values"]
-#             break
-    temp=data_list[0]
-    xx=temp[temp.keys()[0]]
-    str_list=xx['values']
+    for item in data_list:
+        if reporter  in item:
+             str_list=item[reporter]["values"]
+             break
     
     if  len(str_list)==0:
-        return HttpResponse('{"code":4004, "detail":"_at  can not  find"}', content_type="application/json")
+        return HttpResponse('{"code":4004, "detail":"reporter  can not  find"}', content_type="application/json")
     
     val_list=[]
     for item in str_list:
@@ -112,14 +108,14 @@ def dataset_chart(request):
         i=i+1
     
     plt.figure(1,figsize=(160,3+length*1.5),dpi=15).clear()
-    #根据传回的参数获取x轴的范围
-    if val_list[0]>val_list[1]:
-        x_max=int(val_list[0])
-    else:
-        x_max=int(val_list[1])
-    
+  
+   #计算x轴的最大值  
     temp_count=0
     temp_val=0
+    temp=np.median(val_list)
+    x_max=30*temp
+    x_max=int(x_max)
+    print "xxxxx====",x_max,"    ==",temp
     while x_max>0:
         temp_count=temp_count+1
         temp_val=x_max%10
@@ -142,16 +138,24 @@ def dataset_chart(request):
         plt.text(0,y_pos[i],name_item,fontsize=80,horizontalalignment='right')
         i=i+1
 
-#画x坐标    
-    x_per=x_max/5
+#画x坐标    x位3,10,30程中位数
+    x_median=np.median(val_list)
+    x_per_list=[1,3,10,30]
     i=1
     y_list=[]
     y_list.append(length+0.2)
-    y_list.append(length-0.5)
-    while i<=5:
-        x_label=i*x_per
+#    y_list.append(length-0.5)
+    y_list.append(0)
+    print x_max,'   ',x_median
+    while i<=4:
+        x_label=x_median*x_per_list[i-1]
+#        if x_label>x_max:
+#            print "x_label=",x_label,"    x_max=",x_max,"   i=",i
+#            break
         str_temp='%.2f'%x_label
+        print str_temp
         plt.text(x_label-0.3*x_max/30,length+0.5,str_temp,fontsize=80)
+        #plt.text(x_label,length,str_temp,fontsize=80)
         list_temp=[]
         list_temp.append(x_label)
         list_temp.append(x_label)
@@ -167,6 +171,27 @@ def dataset_chart(request):
     canvas = FigureCanvas(plt.figure(1))
     response=django.http.HttpResponse(content_type='image/png')
     canvas.print_png(response) 
+    return response
+
+
+#简单的返回查询的结果
+from django.views.decorators.csrf import csrf_exempt
+import json  
+@csrf_exempt
+def show_search(request):
+    my_str=request.POST.get("str",None)
+    body={"query" : {"match" : {"_all": " "}}}
+    from elasticsearch import  Elasticsearch
+    es=Elasticsearch()
+    body["query"]["match"]["_all"]=my_str
+    my_json=es.search(index="blogs",doc_type="biogps",body=body)
+   # print "======================="
+   # print my_json
+    #print "======================="
+    response = HttpResponse()
+    response.status_code = 200
+    response['Content-Type'] = "application/json"
+    response.content = json.dumps(my_json)
     return response
 
 def get_cvs(request):
