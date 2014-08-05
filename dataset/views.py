@@ -4,6 +4,7 @@ from django.conf import settings
 from django.views.decorators.http import require_http_methods
 import models
 from django.http.response import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
 import json
 import datetime
 from django.db.models.query import QuerySet
@@ -178,7 +179,19 @@ def dataset_chart(request):
     return response
 
 
-def get_csv(request):
+@csrf_exempt
+def show_search(request):
+    my_str = request.POST.get("str", None)
+    body = {"query": {"match": {"_all": " "}}}
+    from elasticsearch import  Elasticsearch
+    es = Elasticsearch()
+    body["query"]["match"]["_all"] = my_str
+    res = es.search(index="blogs", doc_type="biogps", body=body)
+    return HttpResponse('{"code":0, "detail":%s}' % json.dumps(res), \
+                    content_type="application/json")
+
+
+def dataset_csv(request):
     _id = request.GET.get('id', None)
     if _id is None:
         return HttpResponse('{"code":4004, "detail":"argument needed"}', \
