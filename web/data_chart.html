@@ -117,7 +117,7 @@
                     }
                     var datarowname = "" + pval;
                     var datasetid = "" + this.dsID;
-                    document.images["DC_026887848_probe_set_image"].src = ('/dataset/csv/?id=1017&at='+datarowname);
+                    document.images["DC_026887848_probe_set_image"].src = ('/dataset/csv/?id=1017&at=' + datarowname);
                 },
 
                 setProbe : function() {
@@ -1219,67 +1219,65 @@
                     Ext.Ajax.timeout = 30000;
                     //reset timeout to default 30s
                 }
-            }
-
-            //-->
+            };
         </script>
 
         <script type="text/javaScript" src="./js/data_chart_canvas.js"></script>
         <script language="JavaScript">
-var searchBar = $("<center><div id=\"searchBar\" style=\"font-size: 12px\">\
-<b>Search: </b><input type=\"text\" id=\"searchDS\" size=\"50\" onkeypress=\"DC_026887848.changeSearchTerm(event, this.value)\">\
-<div id=\"dialog\"></div>\
-</div></center>\
-");
+            var searchBar = $("<center><div id=\"searchBar\" style=\"font-size: 12px\">\
+            <b>Search: </b><input type=\"text\" id=\"searchDS\" size=\"50\" onkeypress=\"DC_026887848.changeSearchTerm(event, this.value)\">\
+            <div id=\"dialog\"></div>\
+            </div></center>\
+            ");
 
-// Bind handler to retain search input focus, fire search
-//$(document).delegate("#searchDS", "keyup", function(event) {
-//  event.preventDefault();
-//  event.stopPropagation();
-//  $("#searchDS").focus();
-//});
+            // Bind handler to retain search input focus, fire search
+            //$(document).delegate("#searchDS", "keyup", function(event) {
+            //  event.preventDefault();
+            //  event.stopPropagation();
+            //  $("#searchDS").focus();
+            //});
 
-var _dialog = $("<div id=\"accordion\" style=\"font-size: 12px\">\
-<h3><a href=\"#\"><b>Default Datasets</b> (<span id=\"dsDefaultTotal\">0</span>)</a></h3>\
-<div id=\"dsDefaults\">\
-<ul id=\"dsDefaultsList\"></ul>\
-</div>\
-<h3><a href=\"#\"><b>Dataset Library</b> (<span id=\"dsLibTotal\">0</span>)</a></h3>\
-<div>\
-<ul id=\"dsList\"></ul>\
-<hr />\
-<span id=\"dialogBottomNav\">\
-<center>\
-<span id=\"pagingNav\">\
-<span id=\"prevPage\" style=\"width:15px\">\
-<a class=\"ds-dialog-nav\" href=\"javascript:void(0)\" onclick=\"DC_026887848.changeDSPage('-')\">\u00ab&nbsp;Prev</a></span>&nbsp;&nbsp;&nbsp;<span id=\"nextPage\" style=\"width:15px\"><a class=\"ds-dialog-nav\" href=\"javascript:void(0)\" onclick=\"DC_026887848.changeDSPage('+')\">Next&nbsp;\u00bb</a>\
-</span>\
-</span>\
-<span style=\"float: right\" id=\"dsLibPageText\">Page <span id=\"dsLibPageNum\"></span> of <span id=\"dsLibPages\"></span></span>\
-</center>\
-</span>\
-</div>\
-</div>").accordion({active: 1, autoHeight: false, icons: false});
+            var _dialog = $("<div id=\"accordion\" style=\"font-size: 12px\">\
+            <h3><a href=\"#\"><b>Default Datasets</b> (<span id=\"dsDefaultTotal\">0</span>)</a></h3>\
+            <div id=\"dsDefaults\">\
+            <ul id=\"dsDefaultsList\"></ul>\
+            </div>\
+            <h3><a href=\"#\"><b>Dataset Library</b> (<span id=\"dsLibTotal\">0</span>)</a></h3>\
+            <div>\
+            <ul id=\"dsList\"></ul>\
+            <hr />\
+            <span id=\"dialogBottomNav\">\
+            <center>\
+            <span id=\"pagingNav\">\
+            <span id=\"prevPage\" style=\"width:15px\">\
+            <a class=\"ds-dialog-nav\" href=\"javascript:void(0)\" onclick=\"DC_026887848.changeDSPage('-')\">\u00ab&nbsp;Prev</a></span>&nbsp;&nbsp;&nbsp;<span id=\"nextPage\" style=\"width:15px\"><a class=\"ds-dialog-nav\" href=\"javascript:void(0)\" onclick=\"DC_026887848.changeDSPage('+')\">Next&nbsp;\u00bb</a>\
+            </span>\
+            </span>\
+            <span style=\"float: right\" id=\"dsLibPageText\">Page <span id=\"dsLibPageNum\"></span> of <span id=\"dsLibPages\"></span></span>\
+            </center>\
+            </span>\
+            </div>\
+            </div>").accordion({active: 1, autoHeight: false, icons: false});
 
-// Bind handler to close dialog once ds is selected
-$(document).delegate(".ds-dialog", "click", function(event) {
-$(this).closest(".ui-dialog-content").dialog("destroy");
-});
+            // Bind handler to close dialog once ds is selected
+            $(document).delegate(".ds-dialog", "click", function(event) {
+            $(this).closest(".ui-dialog-content").dialog("destroy");
+            });
 
-$(document).ready(function() {
-var link = $("<link>");
-link.attr({
-type: "text/css",
-rel: "stylesheet",
-href: "./css/jquery-ui-1.8.5.custom.css"
-});
-$("head").append( link );
-//$.getScript("/data_chart/assets/data_chart_canvas.js?ver=3", function() {
-$.getScript("js/jquery-ui.js",function() {
-DC_026887848.init();
-});
-//});
-});
+            $(document).ready(function() {
+            var link = $("<link>");
+            link.attr({
+            type: "text/css",
+            rel: "stylesheet",
+            href: "./css/jquery-ui-1.8.5.custom.css"
+            });
+            $("head").append( link );
+            //$.getScript("/data_chart/assets/data_chart_canvas.js?ver=3", function() {
+            $.getScript("js/jquery-ui.js",function() {
+            DC_026887848.init();
+            });
+            //});
+            });
         </script>
 
     </head>
@@ -1307,7 +1305,62 @@ DC_026887848.init();
                 </div>
             </div>
             <div id="DC_026887848_tabs1" style="clear: both; margin: 5px;">
-
+                <div id="dataChartTabPanel" class=" x-tab-panel" style="width: 1168px;"></div>
+                <div id="DC_026887848_dataset_canvas" class="">
+                    <div style="font: normal normal normal 11px/normal tahoma, arial, helvetica, sans-serif;">
+                        <div style="float:left; width:100%; display: block; position: relative; margin-top:5px">
+                            <div style="position:relative; float:left; left: 100%; margin-left: -99%; width:98%">
+                                <p id="DC_026887848_canvas_error_message" class="\&quot;ds-error\&quot;" style="display:none; text-align:left">
+                                    Your browser does not support HTML5 features required for the interactive gene expression chart. Please use the Static Image or update to the latest version of your browser.
+                                </p>
+                            </div>
+                        </div>
+                        <div style="float:left; width:100%; display: block; position: relative; margin-top:5px">
+                            <div style="position:relative; float:left; left: 100%; margin-left: -99%; width:35%">
+                                <p id="DC_026887848_canvas_search_controls" style="text-align: left;">
+                                    Search:
+                                    <input style="font-size: 10px; width:50%;" type="text" id="DC_026887848_canvas_search" size="8" onkeyup="DC_026887848.searchGraph()">
+                                </p>
+                            </div>
+                            <div style="position:relative; float:left; left: 100%; margin-left: -64%; width:15%; margin-top:3px">
+                                <p id="DC_026887848_canvas_zoom_label" style="text-align: right;">
+                                    Zoom:
+                                </p>
+                            </div>
+                            <div style="position:relative; float:left; left: 100%; margin-left: -48%; width:45%; margin-top:5px">
+                                <div id="DC_026887848_canvas_chart_slider" class="ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all">
+                                    <div class="ui-slider-range ui-widget-header" style="left: 0%; width: 100%;"></div><a href="http://plugins.biogps.org/data_chart/data_chart.cgi?id=362817#" class="ui-slider-handle ui-state-default ui-corner-all" style="left: 0%;"></a><a href="http://plugins.biogps.org/data_chart/data_chart.cgi?id=362817#" class="ui-slider-handle ui-state-default ui-corner-all" style="left: 100%;"></a>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="float:left; width:100%; display: block; position: relative;">
+                            <div style="position:relative; float:left; left: 100%; margin-left: -99%; width:99%">
+                                <canvas id="DC_026887848_canvas_chart" height="511" width="1168">
+                                    <iframe frameborder="0" style="border: 1px solid #AAAAAA;" width="370" height="370" src="./browsers.html">
+                                        &lt;p&gt;Your browser does not support iframes or the canvas object.  You might consider upgrading to a modern browser.&lt;/p&gt;
+                                    </iframe>
+                                </canvas>
+                            </div>
+                        </div>
+                        <div style="float:left; width:100%; display: block; position: relative;">
+                            <div style="position:relative; float:left; left: 100%; margin-left: -99%; width:20%">
+                                <input style="" type="button" id="DC_026887848_canvas_save_button" value="Save Image" onclick="DC_026887848.saveCanvas()">
+                            </div>
+                            <div style="position:relative; float:left; left: 100%; margin-left: -75%; width:30%">
+                                <p style="" id="DC_026887848_canvas_graph_type_wrapper">
+                                    Chart Type:
+                                    <select style="font-size: 10px;" id="DC_026887848_canvas_graph_type" onchange="DC_026887848.changeCanvasGraphType()">
+                                        <option value="bar">Bar</option>
+                                        <!--<option value="plot">Plot</option>-->
+                                    </select>
+                                </p>
+                            </div>
+                            <div style="position:relative; float:left; left: 100%; margin-left: -25%; width:25%; text-align:right;">
+                                <input style="" type="button" id="DC_026887848_canvas_clear_button" value="Clear Labels" onclick="DC_026887848.clearCanvasLabels()">
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div id="DC_026887848_dataset_image" class="x-hide-display">
                     <img id="DC_026887848_probe_set_image" title="Data Chart Image" alt="Data Chart Image" src="/dataset/chart/?id=1017&at=211803_at">
                 </div>
@@ -1325,94 +1378,7 @@ DC_026887848.init();
                             <a id="DC_026887848_Download_link" href="/dataset/csv/?id=1017&at=211803_at">Get raw data for GeneAtlas RGU34A, gcrma</a>
                         </p> </span>
                 </div>
-                <div id="dataChartTabPanel" class=" x-tab-panel" style="width: 1168px;">
-                    <div class="x-tab-panel-header x-unselectable" id="ext-gen5" style="width: 1166px;">
-                        <div class="x-tab-strip-wrap" id="ext-gen8">
-                            <ul class="x-tab-strip x-tab-strip-top" id="ext-gen10">
-                                <li class=" x-tab-strip-active" id="dataChartTabPanel__ext-comp-1001">
-                                    <a class="x-tab-strip-close" id="ext-gen13"></a><a class="x-tab-right" href="http://plugins.biogps.org/data_chart/data_chart.cgi?id=362817#" id="ext-gen14"><em class="x-tab-left"><span class="x-tab-strip-inner"><span class="x-tab-strip-text ">Interactive Image</span></span></em></a>
-                                </li>
-                                <li class="" id="dataChartTabPanel__ext-comp-1002">
-                                    <a class="x-tab-strip-close" id="ext-gen15"></a><a class="x-tab-right" href="/dataset/chart/?id=1017&at=211803_at" id="ext-gen16"><em class="x-tab-left"><span class="x-tab-strip-inner"><span class="x-tab-strip-text ">Static Image</span></span></em></a>
-                                </li>
-                                <li class="" id="dataChartTabPanel__ext-comp-1003">
-                                    <a class="x-tab-strip-close" id="ext-gen17"></a><a class="x-tab-right" href="http://plugins.biogps.org/data_chart/data_chart.cgi?id=362817#" id="ext-gen18"><em class="x-tab-left"><span class="x-tab-strip-inner"><span class="x-tab-strip-text ">Correlation</span></span></em></a>
-                                </li>
-                                <li class="" id="dataChartTabPanel__ext-comp-1004">
-                                    <a class="x-tab-strip-close" id="ext-gen19"></a><a class="x-tab-right" href="http://plugins.biogps.org/data_chart/data_chart.cgi?id=362817#" id="ext-gen20"><em class="x-tab-left"><span class="x-tab-strip-inner"><span class="x-tab-strip-text ">Downloads</span></span></em></a>
-                                </li>
-                                <li class="x-tab-edge" id="ext-gen11">
-                                    <span class="x-tab-strip-text">&nbsp;</span>
-                                </li><div class="x-clear" id="ext-gen12"></div>
-                            </ul>
-                        </div><div class="x-tab-strip-spacer" id="ext-gen9"></div>
-                    </div>
-                    <div class="x-tab-panel-bwrap" id="ext-gen6">
-                        <div class="x-tab-panel-body x-tab-panel-body-top" id="ext-gen7" style="width: 1166px;">
-                            <div id="ext-comp-1001" class=" x-panel x-panel-noborder" style="width: 1166px;">
-                                <div class="x-panel-bwrap" id="ext-gen21">
-                                    <div class="x-panel-body x-panel-body-noheader x-panel-body-noborder" id="ext-gen22" style="height: auto; width: 1166px;">
-                                        <div id="DC_026887848_dataset_canvas" class="">
 
-                                            <div style="font: normal normal normal 11px/normal tahoma, arial, helvetica, sans-serif;">
-                                                <div style="float:left; width:100%; display: block; position: relative; margin-top:5px">
-                                                    <div style="position:relative; float:left; left: 100%; margin-left: -99%; width:98%">
-                                                        <p id="DC_026887848_canvas_error_message" class="\&quot;ds-error\&quot;" style="display:none; text-align:left">
-                                                            Your browser does not support HTML5 features required for the interactive gene expression chart. Please use the Static Image or update to the latest version of your browser.
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                                <div style="float:left; width:100%; display: block; position: relative; margin-top:5px">
-                                                    <div style="position:relative; float:left; left: 100%; margin-left: -99%; width:35%">
-                                                        <p id="DC_026887848_canvas_search_controls" style="text-align: left;">
-                                                            Search:
-                                                            <input style="font-size: 10px; width:50%;" type="text" id="DC_026887848_canvas_search" size="8" onkeyup="DC_026887848.searchGraph()">
-                                                        </p>
-                                                    </div>
-                                                    <div style="position:relative; float:left; left: 100%; margin-left: -64%; width:15%; margin-top:3px">
-                                                        <p id="DC_026887848_canvas_zoom_label" style="text-align: right;">
-                                                            Zoom:
-                                                        </p>
-                                                    </div>
-                                                    <div style="position:relative; float:left; left: 100%; margin-left: -48%; width:45%; margin-top:5px">
-                                                        <div id="DC_026887848_canvas_chart_slider" class="ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all">
-                                                            <div class="ui-slider-range ui-widget-header" style="left: 0%; width: 100%;"></div><a href="http://plugins.biogps.org/data_chart/data_chart.cgi?id=362817#" class="ui-slider-handle ui-state-default ui-corner-all" style="left: 0%;"></a><a href="http://plugins.biogps.org/data_chart/data_chart.cgi?id=362817#" class="ui-slider-handle ui-state-default ui-corner-all" style="left: 100%;"></a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div style="float:left; width:100%; display: block; position: relative;">
-                                                    <div style="position:relative; float:left; left: 100%; margin-left: -99%; width:99%">
-                                                        <canvas id="DC_026887848_canvas_chart" height="511" width="1168">
-                                                            <iframe frameborder="0" style="border: 1px solid #AAAAAA;" width="370" height="370" src="./browsers.html">
-                                                                &lt;p&gt;Your browser does not support iframes or the canvas object.  You might consider upgrading to a modern browser.&lt;/p&gt;
-                                                            </iframe>
-                                                        </canvas>
-                                                    </div>
-                                                </div>
-                                                <div style="float:left; width:100%; display: block; position: relative;">
-                                                    <div style="position:relative; float:left; left: 100%; margin-left: -99%; width:20%">
-                                                        <input style="" type="button" id="DC_026887848_canvas_save_button" value="Save Image" onclick="DC_026887848.saveCanvas()">
-                                                    </div>
-                                                    <div style="position:relative; float:left; left: 100%; margin-left: -75%; width:30%">
-                                                        <p style="" id="DC_026887848_canvas_graph_type_wrapper">
-                                                            Chart Type:
-                                                            <select style="font-size: 10px;" id="DC_026887848_canvas_graph_type" onchange="DC_026887848.changeCanvasGraphType()">
-                                                                <option value="bar">Bar</option>
-                                                                <!--<option value="plot">Plot</option>-->
-                                                            </select>
-                                                        </p>
-                                                    </div>
-                                                    <div style="position:relative; float:left; left: 100%; margin-left: -25%; width:25%; text-align:right;">
-                                                        <input style="" type="button" id="DC_026887848_canvas_clear_button" value="Clear Labels" onclick="DC_026887848.clearCanvasLabels()">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
             <p style="font-size: 8pt">
