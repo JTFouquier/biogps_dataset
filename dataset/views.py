@@ -85,9 +85,7 @@ def  get_dataset_data(_id):
 
 
 #显示柱状图，但是需要接受id和at参数
-def dataset_chart(request):
-    _id = request.GET.get('id', None)
-#    _at= request.GET.get('at', None)
+def dataset_chart(request, _id, at):
     if _id is None:
         return HttpResponse('{"code":4004, "detail":"argument needed"}',\
                              content_type="application/json")
