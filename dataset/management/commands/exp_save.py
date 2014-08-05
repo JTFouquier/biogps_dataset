@@ -4,15 +4,87 @@ import os
 import numpy as np
 from dataset import models
 from .exp_checker import check_exp
-from .exp_loader import get_exp_dir, BASE_URL
 from django.core.exceptions import ObjectDoesNotExist
-from six.moves import cStringIO
 
 
-SPECIES_MAP = {'Homo sapiens':'human', 'Mus musculus':'mouse', 'Rattus norvegicus':'rat','Drosophila melanogaster':'fruitfly', \
-               'Caenorhabditis elegans':'nematode', 'Danio rerio':'zebrafish', 'Arabidopsis thaliana':'thale-cress',\
-               'Xenopus tropicalis':'frog', 'Sus scrofa':'pig'}
-MAX_SAMPLES = 200
+#given experiment sdrf, infomation, processed data,
+#save to biogps db, note: experiment may contains
+#more than one platform data, select one you want.
+class ExperimentSave:
+
+    SPECIES_MAP = {'Homo sapiens': 'human', 'Mus musculus': 'mouse',\
+      'Rattus norvegicus': 'rat', 'Drosophila melanogaster': 'fruitfly', \
+        'Caenorhabditis elegans': 'nematode', 'Danio rerio': 'zebrafish',\
+        'Arabidopsis thaliana': 'thale-cress', 'Xenopus tropicalis': 'frog',\
+         'Sus scrofa': 'pig'}
+
+    def __init__(self, ep):
+        self.data = ep.data
+        #self.info = info
+        self.sdrf = ep.sdrf
+        self.platform = platform
+        self.dataset = None
+
+    def save_dataset(self):
+        pass
+
+    def save(self):
+        self.sort_sdrf()
+
+    #parse sample info from sdrf
+    def get_sample_info(self):
+        data = file.read()
+        header = data.split('\n')[0]
+        filter = parse_sdrf_header(header)
+        data = data.split('\n')[1:]
+        for d in data:
+            if d == '':
+                continue
+            factor = {'factorvalue':{}, 'comment':{}, 'characteristics': {}}
+            cel = d.split('\t')
+            for k in filter['factorvalue']:
+                factor['factorvalue'][k] = cel[filter['factorvalue'][k]]
+            for k in filter['comment']:
+                factor['comment'][k] = cel[filter['comment'][k]]
+            for k in filter['characteristics']:
+                factor['characteristics'][k] = cel[filter['characteristics'][k]]
+            dataset['factors'].append({cel[0]:factor})
+
+    def get_dataset(self):
+        dataset = {}
+        data_json = self.info
+        data_json = json.loads(data)
+        dataset['name'] = data_json["experiments"]["experiment"]["name"]
+        dataset['summary'] = data_json["experiments"]["experiment"]["description"]["text"]
+        dataset['species'] = data_json["experiments"]["experiment"]["organism"]
+        dataset['arraytype'] = data_json["experiments"]["experiment"]["arraydesign"]
+        try:
+            dataset['secondaryaccession'] = data_json["experiments"]["experiment"]["secondaryaccession"]
+        except Exception:
+            dataset['secondaryaccession'] = ''
+        try:
+            dataset['pubmed_id'] = data_json["experiments"]["experiment"]["bibliography"]["accession"]
+        except Exception:
+            dataset['pubmed_id'] = ''
+        dataset['factors'] = []
+        with open(exp_dir+'sdrf', 'r') as file:
+            data = file.read()
+            header = data.split('\n')[0]
+            filter = parse_sdrf_header(header)
+            data = data.split('\n')[1:]
+            for d in data:
+                if d == '':
+                    continue
+                factor = {'factorvalue':{}, 'comment':{}, 'characteristics': {}}
+                cel = d.split('\t')
+                for k in filter['factorvalue']:
+                    factor['factorvalue'][k] = cel[filter['factorvalue'][k]]
+                for k in filter['comment']:
+                    factor['comment'][k] = cel[filter['comment'][k]]
+                for k in filter['characteristics']:
+                    factor['characteristics'][k] = cel[filter['characteristics'][k]]
+                dataset['factors'].append({cel[0]:factor})
+        return dataset
 
 def save_exp(exp, platform=None):
     check_res = check_exp(exp, platform)

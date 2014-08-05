@@ -56,9 +56,6 @@ ROOT_URLCONF = 'biogps_dataset.urls'
 WSGI_APPLICATION = 'biogps_dataset.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/1.6/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -79,10 +76,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.6/howto/static-files/
-
 STATIC_URL = '/static/'
 
 STATIC_ROOT = ''
@@ -102,4 +95,6 @@ STATICFILES_FINDERS = (
     # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
-DEFAULT_DATASET_ID = 2
+DEFAULT_DATASET_ID = 1
+
+from settings_dev import *

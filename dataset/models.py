@@ -187,7 +187,7 @@ class BiogpsDatasetData(models.Model):
     dataset = models.ForeignKey(BiogpsDataset, related_name='dataset_data')
     reporter = models.CharField(max_length=200)
     data = JSONField(blank=False, editable=True)
-    
+
     class Meta:
         unique_together = ("dataset", "reporter")
 
