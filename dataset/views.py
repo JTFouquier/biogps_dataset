@@ -180,7 +180,7 @@ def dataset_chart(request):
 
 
 @csrf_exempt
-def show_search(request):
+def dataset_search(request):
     my_str = request.POST.get("str", None)
     body = {"query": {"match": {"_all": " "}}}
     from elasticsearch import  Elasticsearch
