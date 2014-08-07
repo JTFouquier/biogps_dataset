@@ -8,5 +8,5 @@ urlpatterns = patterns('',
         name='dataset chart'),
     #url(r'^chart/$', views.dataset_chart, name='dataset chart'),
     url(r'^csv/$', views.dataset_csv, name='dataset csv'),
-    url(r'^search/$',views.dataset_search,name='get search')
+    url(r'^search/$', views.dataset_search, name='dataset search')
 )
