@@ -11,9 +11,10 @@ from django.core.serializers import serialize, deserialize
 from json.encoder import JSONEncoder
 from django.db.models.base import Model
 import requests
+     
 
 def adopt_dataset():
-    try:
+    try:  
         ds_id = settings.DEFAULT_DATASET_ID
         ds = models.BiogpsDataset.objects.get(id=ds_id)
     except Exception, e:
@@ -107,35 +108,40 @@ def dataset_chart(request,_id,reporter):
         y_pos.append(i)
         i=i+1
     
-    plt.figure(1,figsize=(160,3+length*1.5),dpi=15).clear()
+    plt.figure(1,figsize=(80,(3+length*1.5)/2),dpi=15).clear()
   
    #计算x轴的最大值  
     temp_count=0
     temp_val=0
-    temp=np.median(val_list)
-    x_max=30*temp
+    #先算出val_list的最大值
+    x_max=0;
+    for item in val_list:
+        if x_max<item:
+            x_max=item
+    #由于x_max原先是float，需要转成int放弃小数
     x_max=int(x_max)
-    print "xxxxx====",x_max,"    ==",temp
     while x_max>0:
         temp_count=temp_count+1
         temp_val=x_max%10
         x_max=x_max/10
-    x_max=(temp_val+1)*10**(temp_count-1)
+    x_max=int((temp_val+1)*(10**(temp_count-1)))
     
 #修改背景色
     fig1 = plt.figure(1)
     rect=fig1.patch
-    rect.set_facecolor('white')
+  #  rect.set_facecolor('white')
 #画柱状图    
     xylist=[0, 0, 0,]
     xylist.append(length+2)  
     xylist[1]=x_max  
     plt.axis(xylist)
     plt.barh(y_pos,val_list,height=1*7.0/8,color="m")
+    #取消x轴和y轴
+    plt.axis('off')
 #画label 
     i=0
     for name_item in name_list :
-        plt.text(0,y_pos[i],name_item,fontsize=80,horizontalalignment='right')
+        plt.text(0,y_pos[i],name_item,fontsize=40,horizontalalignment='right')
         i=i+1
 
 #画x坐标    x位3,10,30程中位数
@@ -161,6 +167,7 @@ def dataset_chart(request,_id,reporter):
         list_temp.append(x_label)
         plt.plot(list_temp, y_list,"k",linewidth=4)
         i=i+1
+    #画框
     list_temp=[]
     list_temp.append(0)
     list_temp.append(x_max)
@@ -168,6 +175,15 @@ def dataset_chart(request,_id,reporter):
     y_list.append(length)
     y_list.append(length)
     plt.plot(list_temp, y_list,"k",linewidth=4)
+    y_list[0]=0
+    y_list[1]=0
+    plt.plot(list_temp, y_list,"k",linewidth=10)
+    list_temp[0]=x_max
+    list_temp[1]=x_max
+    y_list[0]=0
+    y_list[1]=length
+    plt.plot(list_temp, y_list,"k",linewidth=10)
+    
     canvas = FigureCanvas(plt.figure(1))
     response=django.http.HttpResponse(content_type='image/png')
     canvas.print_png(response) 
@@ -176,8 +192,9 @@ def dataset_chart(request,_id,reporter):
 
 #简单的返回查询的结果
 from django.views.decorators.csrf import csrf_exempt
-import json  
-@csrf_exempt
+import json
+#csrf_exempt,避免csrf攻击，不然会出现禁止访问403错误，只存在与post请求中  
+@csrf_exempt   
 def show_search(request):
     my_str=request.POST.get("str",None)
     body={"query" : {"match" : {"_all": " "}}}

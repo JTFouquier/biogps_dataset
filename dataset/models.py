@@ -4,12 +4,12 @@ Models for datasets loaded from ArrayExpress
 import base64
 import types
 import textwrap
-from six import u
 from django.db import models
 #from django.utils.encoding import smart_unicode
 from django.template.defaultfilters import slugify
 from django_extensions.db.fields import AutoSlugField
-from jsonfield import JSONField   # https://github.com/bradjasper/django-jsonfield
+# https://github.com/bradjasper/django-jsonfield
+from jsonfield import JSONField
 
 
 def wrap_str(_str, max_len):
@@ -75,7 +75,7 @@ class BiogpsDataset(models.Model):
 #             for f in facs:
 #                 formatted.add(f)
 #             return formatted
-# 
+#
 #         _fac_txt = set()
 #         for fac_dict in self.metadata['factors']:
 #             for sample in fac_dict.values():
@@ -85,6 +85,9 @@ class BiogpsDataset(models.Model):
 #                     for v in format_factor(val):
 #                         _fac_txt.add(v)
 #         return ' '.join(_fac_txt)
+
+    def get_body(self):
+        return {"name": self.name, "summary": self.summary, "id": self.id}
 
     @property
     def name_wrapped(self):
@@ -187,7 +190,7 @@ class BiogpsDatasetData(models.Model):
     dataset = models.ForeignKey(BiogpsDataset, related_name='dataset_data')
     reporter = models.CharField(max_length=200)
     data = JSONField(blank=False, editable=True)
-    
+
     class Meta:
         unique_together = ("dataset", "reporter")
 
@@ -201,10 +204,10 @@ class BiogpsDatasetMatrix(models.Model):
 
     def get_data(self):
         return base64.decodestring(self._matrix)
- 
+
     def set_data(self, matrix):
         self._matrix = base64.encodestring(matrix)
- 
+
     matrix = property(get_data, set_data)
 
 
@@ -218,7 +221,8 @@ class BiogpsDatasetGeoLoaded(models.Model):
     """Model definition for BiogpsDatasetGeoLoaded. This model tracks what
        GEO datasets have been loaded."""
     geo_type = models.CharField(max_length=20)
-    dataset = models.OneToOneField(BiogpsDataset, related_name='dataset_geo_loaded')
+    dataset = models.OneToOneField(BiogpsDataset, \
+                                   related_name='dataset_geo_loaded')
     with_platform = models.CharField(max_length=100)
 
 
@@ -226,7 +230,8 @@ class BiogpsDatasetGeoFlagged(models.Model):
     """Model definition for BiogpsDatasetGeoFlagged. This model tracks what
        GEO datasets have been flagged, and the reason why."""
     geo_type = models.CharField(max_length=10)
-    dataset = models.OneToOneField(BiogpsDataset, related_name='dataset_geo_flagged')
+    dataset = models.OneToOneField(BiogpsDataset, \
+                                   related_name='dataset_geo_flagged')
     reason = models.CharField(max_length=1000)
 
 
