@@ -72,121 +72,149 @@ def  get_dataset_data(_id):
     return {'id':ds.id, 'name':ds.name, 'data':data_list}
 
 #显示柱状图，但是需要接受id和at参数
-def dataset_chart(request,_id,reporter):
-    if _id is None :
-        return HttpResponse('{"code":4004, "detail":"argument needed"}', content_type="application/json")
-    data_list=get_dataset_data(_id)['data']
-    print "data_list==",data_list
-    str_list=[]
+def dataset_chart(request, _id, reporter):
+    if _id is None:
+        return HttpResponse('{"code":4004, "detail":"argument needed"}',\
+                            content_type="application/json")
+    data_list = get_dataset_data(_id)['data']
+    print "data_list==", data_list
+    str_list = []
     for item in data_list:
         if reporter  in item:
-             str_list=item[reporter]["values"]
-             break
-    
-    if  len(str_list)==0:
-        return HttpResponse('{"code":4004, "detail":"reporter  can not  find"}', content_type="application/json")
-    
-    val_list=[]
+            str_list = item[reporter]["values"]
+            break
+
+    if  len(str_list) == 0:
+        return HttpResponse('{"code":4004, "detail":"reporter  can not  \
+        find"}', content_type="application/json")
+
+    val_list = []
     for item in str_list:
-        temp=float(item)
+        temp = float(item)
         val_list.append(temp)
-    
+
     ds = adopt_dataset()
-    name_list=get_ds_factors_keys(ds)
-    
+    name_list = get_ds_factors_keys(ds)
+
+    label_maxlen = 0
+    for item in name_list:
+        if len(item) > label_maxlen:
+            label_maxlen = len(item)
+
     from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
-    import matplotlib.pyplot as plt 
+    import matplotlib.pyplot as plt
     import django
     import numpy as np
     #判断要画几根柱状图
-    length=len(name_list)
-    y_pos=[0,]
+    length = len(name_list)
+    y_pos = [0, ]
 #    per=1.0/length
 #    per_next=1.0/length*(1.0/8)
-    i=1;
-    while(i<length):
+    i = 1
+    while(i < length):
         y_pos.append(i)
-        i=i+1
-    
-    plt.figure(1,figsize=(80,(3+length*1.5)/2),dpi=15).clear()
-  
-   #计算x轴的最大值  
-    temp_count=0
-    temp_val=0
+        i = i + 1
+
+    plt.figure(1, figsize=(80, (3 + length * 1.5) / 2), dpi=15).clear()
+
+    #计算x轴的最大值
+    temp_count = 0
+    temp_val = 0
     #先算出val_list的最大值
-    x_max=0;
+    x_max = 0
     for item in val_list:
-        if x_max<item:
-            x_max=item
+        if x_max < item:
+            x_max = item
     #由于x_max原先是float，需要转成int放弃小数
-    x_max=int(x_max)
-    while x_max>0:
-        temp_count=temp_count+1
-        temp_val=x_max%10
-        x_max=x_max/10
-    x_max=int((temp_val+1)*(10**(temp_count-1)))
-    
+    x_max = int(x_max)
+    while x_max > 0:
+        temp_count = temp_count + 1
+        temp_val = x_max % 10
+        x_max = x_max / 10
+    x_max = int((temp_val + 1) * (10 ** (temp_count - 1)))
+
 #修改背景色
     fig1 = plt.figure(1)
-    rect=fig1.patch
-  #  rect.set_facecolor('white')
-#画柱状图    
-    xylist=[0, 0, 0,]
-    xylist.append(length+2)  
-    xylist[1]=x_max  
+    rect = fig1.patch
+    rect.set_facecolor('white')
+
+    #画柱状图
+    xylist = [0, 0, 0]
+    xylist.append(length + 2)
+    xylist[1] = x_max
     plt.axis(xylist)
-    plt.barh(y_pos,val_list,height=1*7.0/8,color="m")
+    plt.barh(y_pos, val_list, height=1 * 7.0 / 8,\
+             color="m")
     #取消x轴和y轴
     plt.axis('off')
-#画label 
-    i=0
-    for name_item in name_list :
-        plt.text(0,y_pos[i],name_item,fontsize=40,horizontalalignment='right')
-        i=i+1
+    #画label
+    i = 0
+    for name_item in name_list:
+        plt.text(0, y_pos[i], name_item, fontsize=40,\
+                 horizontalalignment='right')
+        i = i + 1
 
-#画x坐标    x位3,10,30程中位数
-    x_median=np.median(val_list)
-    x_per_list=[1,3,10,30]
-    i=1
-    y_list=[]
-    y_list.append(length+0.2)
-#    y_list.append(length-0.5)
+    #画x坐标    x位3,10,30程中位数
+    x_median = np.median(val_list)
+    x_per_list = [1, 3, 10, 30]
+    i = 1
+    y_list = []
+    y_list.append(length + 0.2)
+    #y_list.append(length-0.5)
     y_list.append(0)
-    print x_max,'   ',x_median
-    while i<=4:
-        x_label=x_median*x_per_list[i-1]
-#        if x_label>x_max:
-#            print "x_label=",x_label,"    x_max=",x_max,"   i=",i
-#            break
-        str_temp='%.2f'%x_label
+
+    while i <= 4:
+        x_label = x_median * x_per_list[i - 1]
+        str_temp = '%.2f' % x_label
         print str_temp
-        plt.text(x_label-0.3*x_max/30,length+0.5,str_temp,fontsize=80)
+        plt.text(x_label - 0.5 * x_max / 30, length + 0.5,\
+                 "median(" + str_temp + ")", fontsize=40)
         #plt.text(x_label,length,str_temp,fontsize=80)
-        list_temp=[]
+        list_temp = []
         list_temp.append(x_label)
         list_temp.append(x_label)
-        plt.plot(list_temp, y_list,"k",linewidth=4)
-        i=i+1
+        plt.plot(list_temp, y_list, "k", linewidth=4)
+        i = i + 1
     #画框
-    list_temp=[]
+    list_temp = []
     list_temp.append(0)
     list_temp.append(x_max)
-    y_list=[]
+    y_list = []
     y_list.append(length)
     y_list.append(length)
-    plt.plot(list_temp, y_list,"k",linewidth=4)
-    y_list[0]=0
-    y_list[1]=0
-    plt.plot(list_temp, y_list,"k",linewidth=10)
-    list_temp[0]=x_max
-    list_temp[1]=x_max
-    y_list[0]=0
-    y_list[1]=length
-    plt.plot(list_temp, y_list,"k",linewidth=10)
-    
+    plt.plot(list_temp, y_list, "k", linewidth=4)
+    y_list[0] = 0
+    y_list[1] = 0
+    plt.plot(list_temp, y_list, "k", linewidth=10)
+    list_temp[0] = x_max
+    list_temp[1] = x_max
+    y_list[0] = 0
+    y_list[1] = length
+    plt.plot(list_temp, y_list, "k", linewidth=10)
+
+    #画x轴
+    y_list[0] = length
+    y_list[1] = length - 0.5
+    for i in range(0, temp_val + 2):
+        list_x = []
+        x_val = i * (10 ** (temp_count - 1))
+        list_x.append(x_val)
+        list_x.append(x_val)
+        plt.plot(list_x, y_list, "k", linewidth=3)
+        per = 10 * 0.3 * x_max / 30
+        if abs(x_val - x_median) < per or\
+        abs(x_val - x_median * 3) < per or\
+        abs(x_val - x_median * 3) < per:
+            continue
+        plt.text(x_val - 0.3 * x_max / 30, length + 0.5,\
+                 x_val, fontsize=40)
+    #设置图形和图片左右的距离
+    plt.subplots_adjust(left=0.05 * (label_maxlen / 10), right=0.9,\
+                        top=0.9, bottom=0.1)
+    #返回图片
     canvas = FigureCanvas(plt.figure(1))
-    response=django.http.HttpResponse(content_type='image/png')
-    canvas.print_png(response) 
+    response = HttpResponse(content_type='image/png')
+    canvas.print_png(response)
     return response
 
 
