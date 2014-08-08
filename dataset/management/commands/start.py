@@ -94,14 +94,9 @@ class Command(BaseCommand):
             p.save()
             er = ExperimentRaw(options['exp'])
             er.load()
+            #er.dump()
             ep = ExperimentDataParse(er, options['platform'])
             ep.parse()
-            return
-            es = ExperimentSave(er.info, er.sdrf, er.data, p.platform)
+            es = ExperimentSave(ep)
             es.save()
-            #er.dump()
             return
-            if not download_exp(options['exp']):
-                logging.info('download experiment fail')
-                return
-            save_exp(options['exp'], options['platform'])

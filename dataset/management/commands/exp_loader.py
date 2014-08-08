@@ -6,16 +6,7 @@ import zipfile
 import csv
 import StringIO
 import json
-from dataset.management.commands.exp_checker import DP_E_GEOD_4006,\
-    DP_E_GEOD_15568
 from dataset import models
-from django.core.exceptions import ObjectDoesNotExist
-
-BASE_URL = "http://www.ebi.ac.uk/arrayexpress/json/v2/"
-FOOTPRINT = True
-
-
-requests_cache.install_cache('arrayexpress_cache')
 
 
 class ResourceRequest:
@@ -77,7 +68,7 @@ class ExperimentRaw(ResourceRequest):
     """
     URL = "http://www.ebi.ac.uk/arrayexpress/json/v2/"
 
-    def __init__(self, name):
+    def __init__(self, name, cache):
         '''
             dump -- an existing path to dump downloaded file, say,
                 for human reading.
@@ -94,6 +85,8 @@ class ExperimentRaw(ResourceRequest):
         #processed data file name and
         #file content mapping
         self.data = None
+        if cache:
+            requests_cache.install_cache('arrayexpress_cache')
 
     def get_json_by_url(self, url):
         res = ResourceRequest.get(url)

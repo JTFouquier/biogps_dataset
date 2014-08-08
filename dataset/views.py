@@ -84,13 +84,13 @@ def  get_dataset_data(_id):
         data_list.append({d.reporter: {'values': d.data}})
     return {'id': ds.id, 'name': ds.name, 'data': data_list}
 
+
 #显示柱状图，但是需要接受id和at参数
 def dataset_chart(request, _id, reporter):
     if _id is None:
-        return HttpResponse('{"code":4004, "detail":"argument needed"}',\
+        return HttpResponse('{"code":4004, "detail":"argument needed"}', \
                             content_type="application/json")
     data_list = get_dataset_data(_id)['data']
-    print "data_list==", data_list
     str_list = []
     for item in data_list:
         if reporter  in item:
@@ -98,8 +98,8 @@ def dataset_chart(request, _id, reporter):
             break
 
     if  len(str_list) == 0:
-        return HttpResponse('{"code":4004, "detail":"reporter  can not  \
-        find"}', content_type="application/json")
+        return HttpResponse('{"code":4004, "detail":"reporter can not find"}',\
+                        content_type="application/json")
 
     val_list = []
     for item in str_list:
@@ -116,13 +116,10 @@ def dataset_chart(request, _id, reporter):
 
     from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
     import matplotlib.pyplot as plt
-    import django
     import numpy as np
     #判断要画几根柱状图
     length = len(name_list)
-    y_pos = [0, ]
-#    per=1.0/length
-#    per_next=1.0/length*(1.0/8)
+    y_pos = [0]
     i = 1
     while(i < length):
         y_pos.append(i)
@@ -146,7 +143,7 @@ def dataset_chart(request, _id, reporter):
         x_max = x_max / 10
     x_max = int((temp_val + 1) * (10 ** (temp_count - 1)))
 
-#修改背景色
+    #修改背景色
     fig1 = plt.figure(1)
     rect = fig1.patch
     rect.set_facecolor('white')
@@ -173,13 +170,11 @@ def dataset_chart(request, _id, reporter):
     i = 1
     y_list = []
     y_list.append(length + 0.2)
-    #y_list.append(length-0.5)
     y_list.append(0)
 
     while i <= 4:
         x_label = x_median * x_per_list[i - 1]
         str_temp = '%.2f' % x_label
-        print str_temp
         plt.text(x_label - 0.5 * x_max / 30, length + 0.5,\
                  "median(" + str_temp + ")", fontsize=40)
         #plt.text(x_label,length,str_temp,fontsize=80)
