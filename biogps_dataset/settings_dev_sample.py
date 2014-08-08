@@ -1,5 +1,7 @@
 #put your local settings here, like DB config
 #and others
+import os
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 DATABASES = {
     'default': {

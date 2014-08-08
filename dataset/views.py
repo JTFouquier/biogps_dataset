@@ -253,7 +253,7 @@ def dataset_search(request):
     page_by = request.POST.get("page_by", 10)
 
     count = es_get_count(query)
-    start = page * page_by
+    start = int(page) * int(page_by)
     body = {"from": start, "size": page_by,\
             "query": {"match": {"_all": query}}}
     es = Elasticsearch()
@@ -265,11 +265,14 @@ def dataset_search(request):
         ds = models.BiogpsDataset.objects.get(id=int(item["_id"]))
         temp_dic["id"] = ds.id
         temp_dic["name"] = ds.name
-        temp_dic["factors"] = get_ds_factors_keys(ds)
+        fac_list = []
+        for fac_item in get_ds_factors_keys(ds):
+            fac_list.append({"name": fac_item})
+        temp_dic["factors"] = fac_list
         res.append(temp_dic)
 
     res = {"count": count, "results": temp_dic}
-    return HttpResponse('{"code":0,"details":%s' % json.dumps(res),\
+    return HttpResponse('{"code":0, "details":%s}' % json.dumps(res),\
                         content_type="appliction/json")
 
 
