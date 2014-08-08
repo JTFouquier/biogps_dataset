@@ -85,9 +85,10 @@ class BiogpsDataset(models.Model):
 #                     for v in format_factor(val):
 #                         _fac_txt.add(v)
 #         return ' '.join(_fac_txt)
-
-    def get_body(self):
-        return {"name": self.name, "summary": self.summary, "id": self.id}
+    #serialize object data for es index setup
+    def es_index_serialize(self):
+        return {"name": self.name,\
+                "summary": self.summary, "id": self.id}
 
     @property
     def name_wrapped(self):
