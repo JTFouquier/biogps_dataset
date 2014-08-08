@@ -12,6 +12,7 @@ from django.core.serializers import serialize, deserialize
 from json.encoder import JSONEncoder
 from django.db.models.base import Model
 import requests
+from elasticsearch import Elasticsearch
 
 
 def adopt_dataset():
@@ -225,17 +226,51 @@ def dataset_chart(request, _id, reporter):
     return response
 
 
+def es_get_count(my_str):
+    body = {"query": {"match": {"_all": my_str}}}
+    es = Elasticsearch()
+    my_dir = es.search(index="blogs", doc_type="biogps", body=body)
+    return len(my_dir["hits"]["hits"])
 
+
+#每一页显示10条记录，page是页数
+def es_get_body(page, page_by, my_str):
+    if page == None:
+        page = 0
+    if page_by == None:
+        page_by = 10
+    my_from = page * page_by
+    body = {"from": my_from, "size": page_by,\
+            "query": {"match": {"_all": my_str}}}
+    return body
+
+
+#接受查询的字段组合str和获取的第几页page
 @csrf_exempt
 def dataset_search(request):
-    my_str = request.POST.get("str", None)
-    body = {"query": {"match": {"_all": " "}}}
-    from elasticsearch import  Elasticsearch
+    query = request.POST.get("query", None)
+    page = request.POST.get("page", 0)
+    page_by = request.POST.get("page_by", 10)
+
+    count = es_get_count(query)
+    start = page * page_by
+    body = {"from": start, "size": page_by,\
+            "query": {"match": {"_all": query}}}
     es = Elasticsearch()
-    body["query"]["match"]["_all"] = my_str
-    res = es.search(index="blogs", doc_type="biogps", body=body)
-    return HttpResponse('{"code":0, "detail":%s}' % json.dumps(res), \
-                    content_type="application/json")
+    ret = es.search(index="blogs", doc_type="biogps", body=body)
+
+    res = []
+    temp_dic = {}
+    for item in ret["hits"]["hits"]:
+        ds = models.BiogpsDataset.objects.get(id=int(item["_id"]))
+        temp_dic["id"] = ds.id
+        temp_dic["name"] = ds.name
+        temp_dic["factors"] = get_ds_factors_keys(ds)
+        res.append(temp_dic)
+
+    res = {"count": count, "results": temp_dic}
+    return HttpResponse('{"code":0,"details":%s' % json.dumps(res),\
+                        content_type="appliction/json")
 
 
 def dataset_csv(request):
