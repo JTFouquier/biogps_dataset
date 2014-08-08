@@ -4,6 +4,7 @@ from django.conf import settings
 from django.views.decorators.http import require_http_methods
 import models
 from django.http.response import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
 import json
 import datetime
 from django.db.models.query import QuerySet
@@ -11,65 +12,77 @@ from django.core.serializers import serialize, deserialize
 from json.encoder import JSONEncoder
 from django.db.models.base import Model
 import requests
-     
+from elasticsearch import Elasticsearch
+
 
 def adopt_dataset():
-    try:  
+    try:
         ds_id = settings.DEFAULT_DATASET_ID
         ds = models.BiogpsDataset.objects.get(id=ds_id)
-    except Exception, e:
+    except Exception:
         ds = models.BiogpsDataset.objects.first()
     return ds
-   
- #return an array of keys that stand for samples in ds   
+
+
+#return an array of keys that stand for samples in ds
 def get_ds_factors_keys(ds):
-    factors =[]
+    factors = []
     for f in ds.metadata['factors']:
-#        print f
-        comment=f[f.keys()[0]]['comment']
-        temp=comment.get('Sample_title',None)
-        if temp==None:
-            temp=comment.get('Sample_title',None)
+        comment = f[f.keys()[0]]['comment']
+        temp = comment.get('Sample_title', None)
+        if temp == None:
+            temp = comment.get('Sample_title', None)
             if temp == None:
-                temp=f.keys()[0]
+                temp = f.keys()[0]
         factors.append(temp)
-    
     return factors
- 
+
+
 #get information about a dataset
 @require_http_methods(["GET"])
 def dataset_info(request):
     ds = adopt_dataset()
-    preset = {'default':True, 'permission_style':'public', 'role_permission': ['biogpsusers'], 'rating_data':{ 'total':5, 'avg_stars':10, 'avg':5 }, 
-        'display_params': {'color': ['color_idx'], 'sort': ['order_idx'], 'aggregate': ['title']}
+    preset = {'default': True, 'permission_style': 'public', \
+              'role_permission': ['biogpsusers'], 'rating_data':\
+              {'total': 5, 'avg_stars': 10, 'avg': 5}, 'display_params':\
+             {'color': ['color_idx'], 'sort': ['order_idx'], 'aggregate': \
+              ['title']}
      }
-    ret = {'id':ds.id, 'name_wrapped':ds.name, 'name':ds.name, 'owner': ds.ownerprofile_id, 'lastmodified':ds.lastmodified.strftime('%Y-%m-%d %H:%M:%S'), 
-           'pubmed_id':ds.metadata['pubmed_id'], 'summary':ds.summary, 'geo_gse_id':ds.geo_gse_id, 'created':ds.created.strftime('%Y-%m-%d %H:%M:%S'),
-            'geo_gpl_id':ds.metadata['geo_gpl_id']['accession'], 'species':[ds.species] 
+    ret = {'id': ds.id, 'name_wrapped': ds.name, 'name': ds.name, \
+           'owner': ds.ownerprofile_id, 'lastmodified':\
+           ds.lastmodified.strftime('%Y-%m-%d %H:%M:%S'),\
+           'pubmed_id': ds.metadata['pubmed_id'], 'summary': ds.summary,\
+           'geo_gse_id': ds.geo_gse_id, 'created':\
+           ds.created.strftime('%Y-%m-%d %H:%M:%S'),
+            'geo_gpl_id': ds.metadata['geo_gpl_id']['accession'], \
+            'species': [ds.species]
     }
     factors = []
     fa = get_ds_factors_keys(ds)
     for f in fa:
-        factors.append({f:{"color_idx":31,  "order_idx":76, "title":f}})
+        factors.append({f: {"color_idx": 31,  "order_idx": 76, "title": f}})
     ret.update(preset)
-    ret.update({'factors':factors})
+    ret.update({'factors': factors})
     #print factors
     ret = json.dumps(ret)
-    return HttpResponse('{"code":0, "detail":%s}'%ret, content_type="application/json")
+    return HttpResponse('{"code":0, "detail":%s}' % ret, \
+                        content_type="application/json")
+
 
 def  get_dataset_data(_id):
     ds = adopt_dataset()
-    url = 'http://mygene.info/v2/gene/%s/?fields=entrezgene,reporter,refseq.rna'%_id
+    url = 'http://mygene.info/v2/gene/%s/?\
+        fields=entrezgene,reporter,refseq.rna' % _id
     res = requests.get(url)
     data_json = res.json()
     reporters = []
     for i in data_json['reporter'].values():
-        reporters = reporters+i
-    dd = ds.dataset_data.filter(reporter__in = reporters)
+        reporters = reporters + i
+    dd = ds.dataset_data.filter(reporter__in=reporters)
     data_list = []
     for d in dd:
-        data_list.append({d.reporter:{'values':d.data}})
-    return {'id':ds.id, 'name':ds.name, 'data':data_list}
+        data_list.append({d.reporter: {'values': d.data}})
+    return {'id': ds.id, 'name': ds.name, 'data': data_list}
 
 #显示柱状图，但是需要接受id和at参数
 def dataset_chart(request, _id, reporter):
@@ -218,71 +231,100 @@ def dataset_chart(request, _id, reporter):
     return response
 
 
-#简单的返回查询的结果
-from django.views.decorators.csrf import csrf_exempt
-import json
-#csrf_exempt,避免csrf攻击，不然会出现禁止访问403错误，只存在与post请求中  
-@csrf_exempt   
-def show_search(request):
-    my_str=request.POST.get("str",None)
-    body={"query" : {"match" : {"_all": " "}}}
-    from elasticsearch import  Elasticsearch
-    es=Elasticsearch()
-    body["query"]["match"]["_all"]=my_str
-    my_json=es.search(index="blogs",doc_type="biogps",body=body)
-   # print "======================="
-   # print my_json
-    #print "======================="
-    response = HttpResponse()
-    response.status_code = 200
-    response['Content-Type'] = "application/json"
-    response.content = json.dumps(my_json)
+def es_get_count(my_str):
+    body = {"query": {"match": {"_all": my_str}}}
+    es = Elasticsearch()
+    my_dir = es.search(index="blogs", doc_type="biogps", body=body)
+    return len(my_dir["hits"]["hits"])
+
+
+#每一页显示10条记录，page是页数
+def es_get_body(page, page_by, my_str):
+    if page == None:
+        page = 0
+    if page_by == None:
+        page_by = 10
+    my_from = page * page_by
+    body = {"from": my_from, "size": page_by,\
+            "query": {"match": {"_all": my_str}}}
+    return body
+
+
+#接受查询的字段组合str和获取的第几页page
+@csrf_exempt
+def dataset_search(request):
+    query = request.POST.get("query", None)
+    page = request.POST.get("page", 0)
+    page_by = request.POST.get("page_by", 10)
+
+    count = es_get_count(query)
+    start = page * page_by
+    body = {"from": start, "size": page_by,\
+            "query": {"match": {"_all": query}}}
+    es = Elasticsearch()
+    ret = es.search(index="blogs", doc_type="biogps", body=body)
+
+    res = []
+    temp_dic = {}
+    for item in ret["hits"]["hits"]:
+        ds = models.BiogpsDataset.objects.get(id=int(item["_id"]))
+        temp_dic["id"] = ds.id
+        temp_dic["name"] = ds.name
+        temp_dic["factors"] = get_ds_factors_keys(ds)
+        res.append(temp_dic)
+
+    res = {"count": count, "results": temp_dic}
+    return HttpResponse('{"code":0,"details":%s' % json.dumps(res),\
+                        content_type="appliction/json")
+
+
+def dataset_csv(request):
+    _id = request.GET.get('id', None)
+    if _id is None:
+        return HttpResponse('{"code":4004, "detail":"argument needed"}', \
+                            content_type="application/json")
+    data_list = get_dataset_data(_id)['data']
+    row_list = ['Tissue']
+    val_list = []
+    for item in data_list:
+        key_list = item.keys()
+        for key_item in key_list:
+            row_list.append(key_item)
+            val_list.append(item[key_item]['values'])
+    length = len(val_list[0])
+    ds = adopt_dataset()
+    name_list = get_ds_factors_keys(ds)
+    response = HttpResponse(mimetype='text/csv')
+    response['Content-Disposition'] = 'attachment; filename=%s.csv' \
+        % ds.geo_gse_id
+    writer = csv.writer(response)
+    writer.writerow(row_list)
+    i = 0
+    while(i < length):
+        temp_list = []
+        temp_list.append(name_list[i])
+        for item in val_list:
+            temp_list.append(item[i])
+        writer.writerow(temp_list)
+        i = i + 1
     return response
 
-def get_cvs(request):
-     _id = request.GET.get('id', None)
-     if _id is None:
-         return HttpResponse('{"code":4004, "detail":"argument needed"}', content_type="application/json")
-     data_list=get_dataset_data(_id)['data']
-     row_list=['Tissue']
-     val_list=[]
-     for item in data_list:
-         key_list=item.keys()
-         for key_item in key_list:
-             row_list.append(key_item)
-             val_list.append(item[key_item]['values'])
-     length=len(val_list[0])       
-     ds = adopt_dataset()
-     name_list=get_ds_factors_keys(ds)
-     response = HttpResponse(mimetype='text/csv')
-     response['Content-Disposition'] = 'attachment; filename=asd.csv'
-     writer = csv.writer(response)
-     writer.writerow(row_list)
-     i=0
-     while(i<length):
-         temp_list=[]
-         temp_list.append(name_list[i])
-         for item in val_list:
-             temp_list.append(item[i])
-         writer.writerow(temp_list)
-         i=i+1   
-     return response
-    
-    
-    
+
 #get information about a dataset
 @require_http_methods(["GET"])
 def dataset_data(request):
     _id = request.GET.get('id', None)
-    if _id is None :
-        return HttpResponse('{"code":4004, "detail":"argument needed"}', content_type="application/json")
+    if _id is None:
+        return HttpResponse('{"code":4004, "detail":"argument needed"}',\
+                            content_type="application/json")
     ret = get_dataset_data(_id)
     print ret
     ret['probeset_list'] = ret['data']
     del ret['data']
-    return HttpResponse('{"code":0, "detail":%s}'%json.dumps(ret), content_type="application/json")
-    
-    
+    return HttpResponse('{"code":0, "detail":%s}' % json.dumps(ret), \
+                        content_type="application/json")
+
+
 class ComplexEncoder(JSONEncoder):
     def default(self, obj):
         print type(obj)
