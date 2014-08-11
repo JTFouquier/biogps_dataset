@@ -260,18 +260,16 @@ def dataset_search(request):
     ret = es.search(index="blogs", doc_type="biogps", body=body)
 
     res = []
-    temp_dic = {}
     for item in ret["hits"]["hits"]:
         ds = models.BiogpsDataset.objects.get(id=int(item["_id"]))
-        temp_dic["id"] = ds.id
-        temp_dic["name"] = ds.name
+        temp_dic = {"id": ds.id, "name": ds.name}
         fac_list = []
         for fac_item in get_ds_factors_keys(ds):
             fac_list.append({"name": fac_item})
         temp_dic["factors"] = fac_list
         res.append(temp_dic)
 
-    res = {"count": count, "results": temp_dic}
+    res = {"count": count, "results": res}
     return HttpResponse('{"code":0, "details":%s}' % json.dumps(res),\
                         content_type="appliction/json")
 
