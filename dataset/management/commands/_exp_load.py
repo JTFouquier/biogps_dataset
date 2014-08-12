@@ -37,7 +37,6 @@ class Platform(ResourceRequest):
         response = ResourceRequest.get(url)
         raw = response.content.strip()
         split = raw.split('\n')
-        #print split
         start = split.index('[main]') + 2
         split = split[start:]
         self.reporters = []
@@ -68,7 +67,7 @@ class ExperimentRaw(ResourceRequest):
     """
     URL = "http://www.ebi.ac.uk/arrayexpress/json/v2/"
 
-    def __init__(self, name, cache):
+    def __init__(self, name):
         '''
             dump -- an existing path to dump downloaded file, say,
                 for human reading.
@@ -79,14 +78,10 @@ class ExperimentRaw(ResourceRequest):
         #sdrf, processed file urls and others
         self.files_info = None
         #sdrf file content as StringIO
-        self.sdrf_raw = None
-        #sdrf as json array
         self.sdrf = None
         #processed data file name and
         #file content mapping
         self.data = None
-        if cache:
-            requests_cache.install_cache('arrayexpress_cache')
 
     def get_json_by_url(self, url):
         res = ResourceRequest.get(url)
@@ -126,14 +121,8 @@ class ExperimentRaw(ResourceRequest):
         logging.info('load_sdrf')
         for f in self.files_info:
             if f["kind"] == 'sdrf':
-                self.sdrf_raw = self.get_stringio_by_url(f["url"])
+                self.sdrf = self.get_stringio_by_url(f["url"])
                 break
-        if self.sdrf_raw is not None:
-            self.sdrf = []
-            self.sdrf_raw.seek(0)
-            l = list(csv.reader(self.sdrf_raw, delimiter='\t'))
-            for r in l[1:]:
-                self.sdrf.append(dict(zip(l[0], r)))
 
     def load_processed_data(self):
         logging.info('load_processed_data')
@@ -158,9 +147,10 @@ class ExperimentRaw(ResourceRequest):
         except:
             os.mkdir(self.name)
         with open('%s/%s.sdrf' % (self.name, self.name), 'w') as f:
-            f.write(self.sdrf_raw.getvalue())
-        with open('%s/%s.sdrf.json' % (self.name, self.name), 'w') as f:
-            f.write(json.dumps(self.sdrf))
-        for k in self.data:
+            f.write(self.sdrf.getvalue())
+#         with open('%s/%s.sdrf.json' % (self.name, self.name), 'w') as f:
+#             f.write(json.dumps(self.sdrf))
+        
+        for k in self.data_raw:
             with open('%s/%s' % (self.name, k), 'w') as f:
                 f.write(self.data_raw[k].getvalue())

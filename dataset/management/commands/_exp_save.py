@@ -30,19 +30,18 @@ class ExperimentSave:
             pf = models.BiogpsDatasetPlatform.objects\
               .get(platform=self.platform)
         except ObjectDoesNotExist:
-            raise Exception('can not create data set before its \
-              platform exists.')
+            raise Exception('platform does not exist.')
         #dataset
         dataset = self.dataset
         meta = {'geo_gds_id': '', 'name': dataset['name'], 'factors': {}, \
                  'default': False, 'display_params': {}, \
                  'summary': dataset['summary'], 'source':\
-                  "http://www.ebi.ac.uk/arrayexpress/json/v2/experiments/"\
-                   + self.name, 'geo_gse_id': self.name, 'pubmed_id':\
-                   dataset['pubmed_id'], 'owner': 'ArrayExpress Uploader', \
-                   'geo_gpl_id': dataset['arraytype'], 'secondaryaccession':\
-                   dataset['secondaryaccession'], 'factors': dataset['factors']}
-        ds, created = models.BiogpsDataset.objects.get_or_create(\
+               "http://www.ebi.ac.uk/arrayexpress/json/v2/experiments/"\
+                + self.name, 'geo_gse_id': self.name, 'pubmed_id':\
+                dataset['pubmed_id'], 'owner': 'ArrayExpress Uploader', \
+               'geo_gpl_id': dataset['arraytype'], 'secondaryaccession':\
+                dataset['secondaryaccession'], 'factors': dataset['factors']}
+        ds = models.BiogpsDataset.objects.create(\
                              name=dataset['name'],
                              summary=dataset['summary'],
                              ownerprofile_id='arrayexpress_sid',
@@ -56,7 +55,7 @@ class ExperimentSave:
         datasetdata = []
         for idx in self.data.index:
             datasetdata.append(models.BiogpsDatasetData(dataset=ds,\
-              reporter=idx, data=self.data.loc[idx, :]))
+              reporter=idx, data=list(self.data.loc[idx, :].values)))
         models.BiogpsDatasetData.objects.bulk_create(datasetdata)
         #tmp file
         s = StringIO.StringIO()
@@ -93,10 +92,10 @@ class ExperimentSave:
             dataset['pubmed_id'] = ''
         dataset['factors'] = []
 
-        ks = self.parse_sdrf_header(self.sdrf[0].keys())
-        for d in self.sdrf:
+        ks = self.parse_sdrf_header(list(self.sdrf.columns))
+        for d in self.sdrf.index:
             factor = {'factorvalue': {}, 'comment': {}, 'characteristics': {}}
-            cel = d.values()
+            cel = self.sdrf.loc[d]
             for k in ks['factorvalue']:
                 factor['factorvalue'][k] = cel[ks['factorvalue'][k]]
             for k in ks['comment']:
