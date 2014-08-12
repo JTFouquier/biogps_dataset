@@ -49,6 +49,7 @@ def dataset_info(request):
              {'color': ['color_idx'], 'sort': ['order_idx'], 'aggregate': \
               ['title']}
      }
+    print ds
     ret = {'id': ds.id, 'name_wrapped': ds.name, 'name': ds.name, \
            'owner': ds.ownerprofile_id, 'lastmodified':\
            ds.lastmodified.strftime('%Y-%m-%d %H:%M:%S'),\
