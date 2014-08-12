@@ -164,11 +164,11 @@
                 getDatasets : function() {
                     // Query SL for relevant datasets, encoding url for use with proxy
                     var _repParam = "%26reporters%3DNM_199501,XM_006240778,XR_355212,1378874_at,1394320_at,D28753_i_at,D28754_s_at,362817";
-                    var _dsLibUrl = "/data_chart/gnf_json_proxy.cgi?url=http://biogps.org/dataset/search/%3Fpage%3D" + DC_026887848.dsPage + _repParam;
+                    var _dsLibUrl = "/dataset/search/?page=" + DC_026887848.dsPage;
                     var _dsDefaultUrl = "/data_chart/gnf_json_proxy.cgi?url=http://biogps.org/dataset/search/%3FdefaultDS%3Dt" + _repParam;
                     if (DC_026887848.dsSearchTerm !== "") {
-                        _qTerm = "%26q%3D" + DC_026887848.dsSearchTerm;
-                        _dsLibUrl += _qTerm;
+                        _qTerm =    DC_026887848.dsSearchTerm;
+                        _dsLibUrl += '&query='+_qTerm;
                         _dsDefaultUrl += _qTerm;
                     }
 
@@ -178,6 +178,8 @@
                             // Error getting json from server
                             DCCG.buildCanvasError(DC_026887848.getCanvas());
                         } else {
+                            DC_026887848.updateDialog(allDatasets.details, true);
+                            return
                             // Default datasets
                             $.getJSON(_dsDefaultUrl, function(defaultDatasets, code) {
                                 if (code != "success") {
@@ -209,22 +211,22 @@
                     } else {
                         // Set datset info/pages for all datasets,
                         // returned results are [results count, total pages, page of results]
-                        $("#dsLibTotal").html(allDatasets[0]);
+                        $("#dsLibTotal").html(allDatasets.count);
                         $("#dsLibPageNum").html(DC_026887848.dsPage);
-                        var _numPages = allDatasets[1];
-                        DC_026887848.dsPages = _numPages;
+                        var _numPages = '1';
+                        DC_026887848.dsPages = '3';
                         $("#dsLibPages").html(_numPages);
 
                         // Append datasets to list
                         var _titleWidth = 100;
                         $("#dsList").empty();
-                        $.each(allDatasets[2], function(idx, ds) {
+                        $.each(allDatasets.results, function(idx, ds) {
                             var _dsClass = (idx % 2 == 0 ? "odd-li" : "even-li");
                             var _dsTitle = (ds.name.length > _titleWidth ? ds.name.substring(0, _titleWidth - 3) + "..." : ds.name);
                             _dsTitle += "  (" + ds.factors.length + " samples)";
                             $("#dsList").append('<a class="ds-dialog" href="javascript:void(0)" onclick="DC_026887848.loadDataset(' + ds.id + ')"><li class="ds-dialog ' + _dsClass + '" id="ds' + ds.id + '">' + _dsTitle + '</li></a>');
                         });
-
+                        return;
                         // Update default datasets
                         $("#dsDefaultsList").empty();
                         $("#dsDefaultTotal").html(defaultDatasets.length);

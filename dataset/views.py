@@ -250,29 +250,45 @@ def es_get_body(page, page_by, my_str):
     return body
 
 
-#接受查询的字段组合str和获取的第几页page
+#接受查询的字段组合query和获取的第几页page
 @csrf_exempt
 def dataset_search(request):
-    query = request.POST.get("query", None)
-    page = request.POST.get("page", 0)
-    page_by = request.POST.get("page_by", 10)
+    query = request.GET.get("query", None)
+    page = request.GET.get("page", 0)
+    page_by = request.GET.get("page_by", 10)
 
-    count = es_get_count(query)
-    start = int(page) * int(page_by)
-    body = {"from": start, "size": page_by,\
-            "query": {"match": {"_all": query}}}
-    es = Elasticsearch()
-    ret = es.search(index="blogs", doc_type="biogps", body=body)
-
-    res = []
-    for item in ret["hits"]["hits"]:
-        ds = models.BiogpsDataset.objects.get(id=int(item["_id"]))
-        temp_dic = {"id": ds.id, "name": ds.name}
-        fac_list = []
-        for fac_item in get_ds_factors_keys(ds):
-            fac_list.append({"name": fac_item})
-        temp_dic["factors"] = fac_list
-        res.append(temp_dic)
+    page = int(page) - 1
+    page_by = int(page_by)
+    if query is not None:
+        count = es_get_count(query)
+        start = page * page_by
+        body = {"from": start, "size": page_by,\
+                "query": {"match": {"_all": query}}}
+        es = Elasticsearch()
+        ret = es.search(index="blogs", doc_type="biogps", body=body)
+        res = []
+        for item in ret["hits"]["hits"]:
+            ds = models.BiogpsDataset.objects.get(id=int(item["_id"]))
+            temp_dic = {"id": ds.id, "name": ds.name}
+            fac_list = []
+            for fac_item in get_ds_factors_keys(ds):
+                fac_list.append({"name": fac_item})
+            temp_dic["factors"] = fac_list
+            res.append(temp_dic)
+    else:
+        start = page_by * page
+        end = start + page_by
+        qs = models.BiogpsDataset.objects.all()
+        count = qs.count()
+        qs = qs[start: end]
+        res = []
+        for ds in qs:
+            temp_dic = {"id": ds.id, "name": ds.name}
+            fac_list = []
+            for fac_item in get_ds_factors_keys(ds):
+                fac_list.append({"name": fac_item})
+            temp_dic["factors"] = fac_list
+            res.append(temp_dic)
 
     res = {"count": count, "results": res}
     return HttpResponse('{"code":0, "details":%s}' % json.dumps(res),\
