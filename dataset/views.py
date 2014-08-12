@@ -268,7 +268,10 @@ def dataset_search(request):
         ret = es.search(index="blogs", doc_type="biogps", body=body)
         res = []
         for item in ret["hits"]["hits"]:
-            ds = models.BiogpsDataset.objects.get(id=int(item["_id"]))
+            try:
+                ds = models.BiogpsDataset.objects.get(id=int(item["_id"]))
+            except Exception:
+                continue
             temp_dic = {"id": ds.id, "name": ds.name}
             fac_list = []
             for fac_item in get_ds_factors_keys(ds):
