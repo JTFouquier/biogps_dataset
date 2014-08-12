@@ -10,4 +10,4 @@ DATABASES = {
     }
 }
 
-
+CACHE_HTTP_DATA = False
