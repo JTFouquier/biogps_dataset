@@ -11,3 +11,7 @@ DATABASES = {
 }
 
 CACHE_HTTP_DATA = False
+
+#dataset mining takes long time, debug mode may leak memory
+#set False then
+DEBUG = True
