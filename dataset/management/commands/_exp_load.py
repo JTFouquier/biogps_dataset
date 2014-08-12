@@ -7,6 +7,7 @@ import csv
 import StringIO
 import json
 from dataset import models
+from django.core.exceptions import ObjectDoesNotExist
 
 
 class ResourceRequest:
@@ -57,8 +58,12 @@ class Platform(ResourceRequest):
             self.exps.sort()
 
     def save(self):
-        self.platform, created = models.BiogpsDatasetPlatform.objects.\
-          get_or_create(platform=self.name, reporters=self.reporters)
+        try:
+            ps = models.BiogpsDatasetPlatform.objects.get(platform=self.name)
+            self.platform = ps
+        except ObjectDoesNotExist:
+            self.platform = models.BiogpsDatasetPlatform.objects.\
+              create(platform=self.name, reporters=self.reporters)
 
 
 class ExperimentRaw(ResourceRequest):
