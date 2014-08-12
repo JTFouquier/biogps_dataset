@@ -7,6 +7,7 @@ import requests_cache
 from ._exp_save import ExperimentSave
 from ._exp_check import ExperimentDataParse
 from django.core.exceptions import ObjectDoesNotExist
+from django.conf import settings
 
 logging.basicConfig(
     level=logging.INFO,
@@ -15,9 +16,7 @@ logging.basicConfig(
     datefmt='%d-%b %H:%M',
 )
 
-CACHE = True
-
-if CACHE:
+if settings.CACHE_HTTP_DATA:
     requests_cache.install_cache('arrayexpress_cache')
 
 
