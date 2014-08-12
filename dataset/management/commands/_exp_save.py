@@ -33,6 +33,10 @@ class ExperimentSave:
             raise Exception('platform does not exist.')
         #dataset
         dataset = self.dataset
+        if type(dataset['arraytype']) is list:
+            for e in dataset['arraytype']:
+                if e['accession'] == self.platform:
+                    dataset['arraytype'] = e
         meta = {'geo_gds_id': '', 'name': dataset['name'], 'factors': {}, \
                  'default': False, 'display_params': {}, \
                  'summary': dataset['summary'], 'source':\
