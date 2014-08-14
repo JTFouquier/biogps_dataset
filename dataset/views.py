@@ -21,7 +21,6 @@ def adopt_dataset():
         ds = models.BiogpsDataset.objects.get(id=ds_id)
     except Exception:
         ds = models.BiogpsDataset.objects.first()
-    print ds.id
     return ds
 
 
@@ -107,12 +106,8 @@ def dataset_chart(request, _id, reporter):
         temp = float(item)
         val_list.append(temp)
 
-    print val_list
-
     ds = adopt_dataset()
     name_list = get_ds_factors_keys(ds)
-
-    print name_list
 
     label_maxlen = 0
     for item in name_list:
