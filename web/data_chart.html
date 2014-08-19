@@ -1003,13 +1003,14 @@
                         return;
                     } else {
                         DC_026887848.clearCorrData();
+                        //1st try url
                         if (!dsID)
                         {
                             dsID = this._getUrlParam('dataset');
                         }
                         if (!dsID) {
-                            // No ID provided, load default/cookie ID
-                            var dsID = "5";
+                            // then cookie
+                            var dsID = "default";
                             var org_cookie_name = "org_10116";
                             var allcookies = document.cookie;
                             var cpos = allcookies.indexOf(org_cookie_name + "=");
@@ -1020,7 +1021,7 @@
                                 if (end == -1) {
                                     end = allcookies.length;
                                 }
-                                dsID = decodeURIComponent(allcookies.substring(start, end));
+                              //  dsID = decodeURIComponent(allcookies.substring(start, end));
                             }
                         }
                         this.dsID = dsID;
