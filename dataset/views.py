@@ -41,8 +41,12 @@ def get_ds_factors_keys(ds):
 
 #get information about a dataset
 @require_http_methods(["GET"])
-def dataset_info(request):
-    ds = adopt_dataset()
+def dataset_info(request, ds_id):
+    try:
+        ds = models.BiogpsDataset.objects.get(id=ds_id)
+    except Exception:
+        return HttpResponse('{"code":4004, "detail":"dataset with this id not \
+            found"}', content_type="application/json")
     preset = {'default': True, 'permission_style': 'public', \
               'role_permission': ['biogpsusers'], 'rating_data':\
               {'total': 5, 'avg_stars': 10, 'avg': 5}, 'display_params':\
@@ -70,15 +74,19 @@ def dataset_info(request):
                         content_type="application/json")
 
 
-def  get_dataset_data(_id):
-    ds = adopt_dataset()
-    url = 'http://mygene.info/v2/gene/%s/?\
-        fields=entrezgene,reporter,refseq.rna' % _id
-    res = requests.get(url)
-    data_json = res.json()
+def  get_dataset_data(ds, gene_id=None, reporter_id=None):
     reporters = []
-    for i in data_json['reporter'].values():
-        reporters = reporters + i
+    if gene_id is not None:
+        url = 'http://mygene.info/v2/gene/%s/?\
+            fields=entrezgene,reporter,refseq.rna' % gene_id
+        res = requests.get(url)
+        data_json = res.json()
+        for i in data_json['reporter'].values():
+            reporters = reporters + i
+    elif reporter_id is not None:
+        reporters.append(reporter_id)
+    else:
+        return None
     dd = ds.dataset_data.filter(reporter__in=reporters)
     data_list = []
     for d in dd:
@@ -87,27 +95,18 @@ def  get_dataset_data(_id):
 
 
 #显示柱状图，但是需要接受id和at参数
-def dataset_chart(request, _id, reporter):
-    if _id is None:
-        return HttpResponse('{"code":4004, "detail":"argument needed"}', \
-                            content_type="application/json")
-    data_list = get_dataset_data(_id)['data']
-    str_list = []
-    for item in data_list:
-        if reporter  in item:
-            str_list = item[reporter]["values"]
-            break
-
-    if  len(str_list) == 0:
-        return HttpResponse('{"code":4004, "detail":"reporter can not find"}',\
-                        content_type="application/json")
-
+def dataset_chart(request, ds_id, reporter_id):
+    try:
+        ds = models.BiogpsDataset.objects.get(id=ds_id)
+    except Exception:
+        return HttpResponse('{"code":4004, "detail":"dataset with this id not \
+            found"}', content_type="application/json")
+    data_list = get_dataset_data(ds, reporter_id=reporter_id)['data']
+    data_list = data_list[0][reporter_id]['values']
     val_list = []
-    for item in str_list:
+    for item in data_list:
         temp = float(item)
         val_list.append(temp)
-
-    ds = adopt_dataset()
     name_list = get_ds_factors_keys(ds)
 
     label_maxlen = 0
@@ -269,12 +268,13 @@ def dataset_search(request):
                         content_type="appliction/json")
 
 
-def dataset_csv(request):
-    _id = request.GET.get('id', None)
-    if _id is None:
-        return HttpResponse('{"code":4004, "detail":"argument needed"}', \
-                            content_type="application/json")
-    data_list = get_dataset_data(_id)['data']
+def dataset_csv(request, ds_id, gene_id):
+    try:
+        ds = models.BiogpsDataset.objects.get(id=ds_id)
+    except Exception:
+        return HttpResponse('{"code":4004, "detail":"dataset with this id not \
+            found"}', content_type="application/json")
+    data_list = get_dataset_data(ds, gene_id=gene_id)['data']
     row_list = ['Tissue']
     val_list = []
     for item in data_list:
@@ -283,7 +283,6 @@ def dataset_csv(request):
             row_list.append(key_item)
             val_list.append(item[key_item]['values'])
     length = len(val_list[0])
-    ds = adopt_dataset()
     name_list = get_ds_factors_keys(ds)
     response = HttpResponse(mimetype='text/csv')
     response['Content-Disposition'] = 'attachment; filename=%s.csv' \
@@ -303,13 +302,13 @@ def dataset_csv(request):
 
 #get information about a dataset
 @require_http_methods(["GET"])
-def dataset_data(request):
-    _id = request.GET.get('id', None)
-    if _id is None:
-        return HttpResponse('{"code":4004, "detail":"argument needed"}',\
-                            content_type="application/json")
-    ret = get_dataset_data(_id)
-    print ret
+def dataset_data(request, ds_id, gene_id):
+    try:
+        ds = models.BiogpsDataset.objects.get(id=ds_id)
+    except Exception:
+        return HttpResponse('{"code":4004, "detail":"dataset with this id not \
+            found"}', content_type="application/json")
+    ret = get_dataset_data(ds, gene_id=gene_id)
     ret['probeset_list'] = ret['data']
     del ret['data']
     return HttpResponse('{"code":0, "detail":%s}' % json.dumps(ret), \
@@ -318,7 +317,6 @@ def dataset_data(request):
 
 class ComplexEncoder(JSONEncoder):
     def default(self, obj):
-        print type(obj)
         if isinstance(obj, Model):
             return json.loads(serialize('json', [obj])[1:-1])['fields']
         if isinstance(obj, QuerySet):

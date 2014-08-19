@@ -99,7 +99,7 @@
                     }
 
                     var rawLink = document.getElementById("DC_026887848_Download_link");
-                    var url = "/dataset/csv/?id=1017&at=211803_at";
+                    var url = "/dataset/csv/"+this.dsID+"/gene/1017/";
                     rawLink.href = url;
                     rawLink.innerHTML = "Get raw data for " + this.dsName;
                 },
@@ -117,7 +117,7 @@
                     }
                     var datarowname = "" + pval;
                     var datasetid = "" + this.dsID;
-                    document.images["DC_026887848_probe_set_image"].src = ('/dataset/1017/chart/' + datarowname+'/');
+                    document.images["DC_026887848_probe_set_image"].src = ('/dataset/chart/'+datasetid+'/reporter/' + datarowname+'/');
                 },
 
                 setProbe : function() {
@@ -553,13 +553,13 @@
 
                     // Dataset factors
                     var mygeneReps = this.mygeneReps;
-                    $.getJSON("/dataset/info/", function(metaJson, code) {
+                    $.getJSON("/dataset/meta/"+ds+"/", function(metaJson, code) {
                         if (code != "success") {
                             // Error getting json from server
                             DCCG.buildCanvasError(DC_026887848.getCanvas());
                         } else {
                             // Dataset values
-                            var prox_url = "/dataset/data/?id=1017";
+                            var prox_url = "/dataset/data/"+ds+"/gene/1017/";
                             $.getJSON(prox_url, function(dataJson, code) {
                                 if (code != "success") {
                                     DCCG.buildCanvasError(DC_026887848.getCanvas());
@@ -1003,6 +1003,10 @@
                         return;
                     } else {
                         DC_026887848.clearCorrData();
+                        if (!dsID)
+                        {
+                            dsID = this._getUrlParam('dataset');
+                        }
                         if (!dsID) {
                             // No ID provided, load default/cookie ID
                             var dsID = "5";
@@ -1030,7 +1034,6 @@
                     this.clearProbeData();
                     this.getProbeData();
                 },
-
                 loadTabs : function() {
                     var start_tab = 1
                     if (this.checkForCanvas()) {
@@ -1062,6 +1065,13 @@
                             title : "Downloads"
                         }]
                     });
+                },
+
+                _getUrlParam : function (name)
+                {
+                var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+                var r = window.location.search.substr(1).match(reg);
+                if (r!=null) return unescape(r[2]); return null;
                 },
 
                 Corr_Grid : null, //use to store the correlation data.
@@ -1385,7 +1395,7 @@
                 <div id="DC_026887848_Download" class="x-hide-display">
                     <span id="DC_026887848_downloadContainer">
                         <p style="margin:5px">
-                            <a id="DC_026887848_Download_link" href="/dataset/csv/?id=1017&at=211803_at">Get raw data for GeneAtlas RGU34A, gcrma</a>
+                            <a id="DC_026887848_Download_link" href="javascript:void(0)"></a>
                         </p> </span>
                 </div>
 
