@@ -227,23 +227,11 @@ def dataset_chart(request, _id, reporter):
     return response
 
 
-def es_get_count(my_str):
-    body = {"query": {"match": {"_all": my_str}}}
+def es_get_count(q):
+    body = {"query": {"match": {"_all": q}}}
     es = Elasticsearch()
-    my_dir = es.search(index="blogs", doc_type="biogps", body=body)
-    return len(my_dir["hits"]["hits"])
-
-
-#每一页显示10条记录，page是页数
-def es_get_body(page, page_by, my_str):
-    if page == None:
-        page = 0
-    if page_by == None:
-        page_by = 10
-    my_from = page * page_by
-    body = {"from": my_from, "size": page_by,\
-            "query": {"match": {"_all": my_str}}}
-    return body
+    res = es.search(index="blogs", doc_type="biogps", body=body)
+    return res["hits"]["total"]
 
 
 #接受查询的字段组合query和获取的第几页page
@@ -255,40 +243,25 @@ def dataset_search(request):
 
     page = int(page) - 1
     page_by = int(page_by)
+    body = {"from": page * page_by, "size": page_by}
     if query is not None:
-        count = es_get_count(query)
-        start = page * page_by
-        body = {"from": start, "size": page_by,\
-                "query": {"match": {"_all": query}}}
-        es = Elasticsearch()
-        ret = es.search(index="blogs", doc_type="biogps", body=body)
-        res = []
-        for item in ret["hits"]["hits"]:
-            try:
-                ds = models.BiogpsDataset.objects.get(id=int(item["_id"]))
-            except Exception:
-                continue
-            temp_dic = {"id": ds.id, "name": ds.name}
-            fac_list = []
-            for fac_item in get_ds_factors_keys(ds):
-                fac_list.append({"name": fac_item})
-            temp_dic["factors"] = fac_list
-            res.append(temp_dic)
-    else:
-        start = page_by * page
-        end = start + page_by
-        qs = models.BiogpsDataset.objects.all()
-        count = qs.count()
-        qs = qs[start: end]
-        res = []
-        for ds in qs:
-            temp_dic = {"id": ds.id, "name": ds.name}
-            fac_list = []
-            for fac_item in get_ds_factors_keys(ds):
-                fac_list.append({"name": fac_item})
-            temp_dic["factors"] = fac_list
-            res.append(temp_dic)
-
+        body["query"] = {"match": {"_all": query}}
+    es = Elasticsearch()
+    ret = es.search(index="blogs", doc_type="biogps", body=body)
+    count = ret["hits"]["total"]
+    res = []
+    for item in ret["hits"]["hits"]:
+        try:
+            ds = models.BiogpsDataset.objects.get(id=int(item["_id"]))
+        except Exception, e:
+            print e
+            continue
+        temp_dic = {"id": ds.id, "name": ds.name}
+        fac_list = []
+        for fac_item in get_ds_factors_keys(ds):
+            fac_list.append({"name": fac_item})
+        temp_dic["factors"] = fac_list
+        res.append(temp_dic)
     total_page = int(math.ceil(float(count) / float(page_by)))
     res = {"current_page": page + 1, "total_page": total_page, "count": count,\
             "results": res}
