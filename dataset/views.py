@@ -13,6 +13,7 @@ from json.encoder import JSONEncoder
 from django.db.models.base import Model
 import requests
 from elasticsearch import Elasticsearch
+import math
 
 
 def adopt_dataset():
@@ -288,7 +289,9 @@ def dataset_search(request):
             temp_dic["factors"] = fac_list
             res.append(temp_dic)
 
-    res = {"count": count, "results": res}
+    total_page = int(math.ceil(float(count) / float(page_by)))
+    res = {"current_page": page + 1, "total_page": total_page, "count": count,\
+            "results": res}
     return HttpResponse('{"code":0, "details":%s}' % json.dumps(res),\
                         content_type="appliction/json")
 
