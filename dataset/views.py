@@ -16,13 +16,13 @@ from elasticsearch import Elasticsearch
 import math
 
 
-def adopt_dataset():
-    try:
+def adopt_dataset(ds_id):
+    if ds_id == 'default':
         ds_id = settings.DEFAULT_DATASET_ID
-        ds = models.BiogpsDataset.objects.get(id=ds_id)
+    try:
+        return models.BiogpsDataset.objects.get(id=ds_id)
     except Exception:
-        ds = models.BiogpsDataset.objects.first()
-    return ds
+        return None
 
 
 #return an array of keys that stand for samples in ds
@@ -42,9 +42,8 @@ def get_ds_factors_keys(ds):
 #get information about a dataset
 @require_http_methods(["GET"])
 def dataset_info(request, ds_id):
-    try:
-        ds = models.BiogpsDataset.objects.get(id=ds_id)
-    except Exception:
+    ds = adopt_dataset(ds_id)
+    if ds is None:
         return HttpResponse('{"code":4004, "detail":"dataset with this id not \
             found"}', content_type="application/json")
     preset = {'default': True, 'permission_style': 'public', \
@@ -96,9 +95,8 @@ def  get_dataset_data(ds, gene_id=None, reporter_id=None):
 
 #显示柱状图，但是需要接受id和at参数
 def dataset_chart(request, ds_id, reporter_id):
-    try:
-        ds = models.BiogpsDataset.objects.get(id=ds_id)
-    except Exception:
+    ds = adopt_dataset(ds_id)
+    if ds is None:
         return HttpResponse('{"code":4004, "detail":"dataset with this id not \
             found"}', content_type="application/json")
     data_list = get_dataset_data(ds, reporter_id=reporter_id)['data']
@@ -269,9 +267,8 @@ def dataset_search(request):
 
 
 def dataset_csv(request, ds_id, gene_id):
-    try:
-        ds = models.BiogpsDataset.objects.get(id=ds_id)
-    except Exception:
+    ds = adopt_dataset(ds_id)
+    if ds is None:
         return HttpResponse('{"code":4004, "detail":"dataset with this id not \
             found"}', content_type="application/json")
     data_list = get_dataset_data(ds, gene_id=gene_id)['data']
@@ -303,9 +300,8 @@ def dataset_csv(request, ds_id, gene_id):
 #get information about a dataset
 @require_http_methods(["GET"])
 def dataset_data(request, ds_id, gene_id):
-    try:
-        ds = models.BiogpsDataset.objects.get(id=ds_id)
-    except Exception:
+    ds = adopt_dataset(ds_id)
+    if ds is None:
         return HttpResponse('{"code":4004, "detail":"dataset with this id not \
             found"}', content_type="application/json")
     ret = get_dataset_data(ds, gene_id=gene_id)
