@@ -213,8 +213,8 @@
                         // returned results are [results count, total pages, page of results]
                         $("#dsLibTotal").html(allDatasets.count);
                         $("#dsLibPageNum").html(DC_026887848.dsPage);
-                        var _numPages = '1';
-                        DC_026887848.dsPages = '3';
+                        var _numPages = allDatasets.total_page;
+                        DC_026887848.dsPages = allDatasets.current_page;
                         $("#dsLibPages").html(_numPages);
 
                         // Append datasets to list

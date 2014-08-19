@@ -17,7 +17,7 @@ class Pattern():
 #E-MTAB-1169
 class DP_E_GEOD_4006(Pattern):
 
-    sample_keys = ['Hybridization Name']
+    sample_keys = ['Scan Name', 'Hybridization Name']
     data_keys = ['Scan REF', 'Hybridization REF']
     platform_keys = ['Array Design REF']
     name = '4006'
@@ -52,6 +52,9 @@ class DP_E_GEOD_4006(Pattern):
         sdrf = sdrf.sort(columns=sample_key)
         #filter by platform
         sdrf = sdrf[sdrf[platform_key].isin([platform])]
+        print sample_key
+        print list(sdrf[sample_key])
+        print list(df.columns)
         df = df.loc[:, list(sdrf[sample_key])]
         return (sdrf, df)
 
