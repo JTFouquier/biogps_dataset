@@ -276,6 +276,12 @@
                     }
                 },
 
+                resetDSLib : function() {
+                    $('#searchDS').val('');
+                    DC_026887848.dsSearchTerm = "";
+                    DC_026887848.getDatasets();
+                },
+
                 changeDataset : function() {
                     _dialog.dialog({
                         draggable : false,
@@ -1250,6 +1256,7 @@
             <hr />\
             <span id=\"dialogBottomNav\">\
             <center>\
+            <span style=\"float: left\" id=\"dsLibReset\" ><a class=\"ds-dialog-nav\" href=\"javascript:void(0)\" onclick=\"DC_026887848.resetDSLib()\">Reset</a></span>\
             <span id=\"pagingNav\">\
             <span id=\"prevPage\" style=\"width:15px\">\
             <a class=\"ds-dialog-nav\" href=\"javascript:void(0)\" onclick=\"DC_026887848.changeDSPage('-')\">\u00ab&nbsp;Prev</a></span>&nbsp;&nbsp;&nbsp;<span id=\"nextPage\" style=\"width:15px\"><a class=\"ds-dialog-nav\" href=\"javascript:void(0)\" onclick=\"DC_026887848.changeDSPage('+')\">Next&nbsp;\u00bb</a>\
