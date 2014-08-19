@@ -251,7 +251,7 @@ def es_get_body(page, page_by, my_str):
 def dataset_search(request):
     query = request.GET.get("query", None)
     page = request.GET.get("page", 0)
-    page_by = request.GET.get("page_by", 10)
+    page_by = request.GET.get("page_by", 8)
 
     page = int(page) - 1
     page_by = int(page_by)
