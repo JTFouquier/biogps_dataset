@@ -709,7 +709,7 @@
                             this.probeData[pID].maxVal = Math.max.apply(Math, probeVals);
                             var _sumVals = 0;
                             for (var v = 0; v < probeVals.length; v++) {
-                                _sumVals += probeVals[v];
+                                _sumVals += parseFloat(probeVals[v]);
                             }
                             this.probeData[pID].globalMean = _sumVals / probeVals.length;
 
