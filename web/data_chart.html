@@ -1246,6 +1246,7 @@
         <script language="JavaScript">
             var searchBar = $("<center><div id=\"searchBar\" style=\"font-size: 12px\">\
             <b>Search: </b><input type=\"text\" id=\"searchDS\" size=\"50\" onkeypress=\"DC_026887848.changeSearchTerm(event, this.value)\">\
+            <span class=\"span-reset-search\"><a href=\"javascript:void(0)\" onclick=\"DC_026887848.resetDSLib()\">x<\/a><span>\
             <div id=\"dialog\"></div>\
             </div></center>\
             ");
@@ -1268,7 +1269,6 @@
             <hr />\
             <span id=\"dialogBottomNav\">\
             <center>\
-            <span style=\"float: left\" id=\"dsLibReset\" ><a class=\"ds-dialog-nav\" href=\"javascript:void(0)\" onclick=\"DC_026887848.resetDSLib()\">Reset</a></span>\
             <span id=\"pagingNav\">\
             <span id=\"prevPage\" style=\"width:15px\">\
             <a class=\"ds-dialog-nav\" href=\"javascript:void(0)\" onclick=\"DC_026887848.changeDSPage('-')\">\u00ab&nbsp;Prev</a></span>&nbsp;&nbsp;&nbsp;<span id=\"nextPage\" style=\"width:15px\"><a class=\"ds-dialog-nav\" href=\"javascript:void(0)\" onclick=\"DC_026887848.changeDSPage('+')\">Next&nbsp;\u00bb</a>\

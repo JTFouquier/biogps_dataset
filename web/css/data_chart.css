@@ -66,5 +66,14 @@ a.ui-dialog-titlebar-close {
 
 .ui-widget-overlay {
     /* IE8 */
-    position: fixed; 
+    position: fixed;
+}
+
+.span-reset-search {
+    background-color: lightgrey;
+    margin-left: -12px;
+    font-size: larger;
+}
+.span-reset-search a{
+    text-decoration:none;
 }
