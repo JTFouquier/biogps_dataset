@@ -99,7 +99,7 @@
                     }
 
                     var rawLink = document.getElementById("DC_026887848_Download_link");
-                    var url = "/dataset/csv/"+this.dsID+"/gene/1017/";
+                    var url = "/dataset/csv/"+this.dsID+"/gene/"+this.geneID+"/";
                     rawLink.href = url;
                     rawLink.innerHTML = "Get raw data for " + this.dsName;
                 },
@@ -553,13 +553,14 @@
 
                     // Dataset factors
                     var mygeneReps = this.mygeneReps;
+                    var gene = this.geneID;
                     $.getJSON("/dataset/meta/"+ds+"/", function(metaJson, code) {
                         if (code != "success") {
                             // Error getting json from server
                             DCCG.buildCanvasError(DC_026887848.getCanvas());
                         } else {
                             // Dataset values
-                            var prox_url = "/dataset/data/"+ds+"/gene/1017/";
+                            var prox_url = "/dataset/data/"+ds+"/gene/"+gene+"/";
                             $.getJSON(prox_url, function(dataJson, code) {
                                 if (code != "success") {
                                     DCCG.buildCanvasError(DC_026887848.getCanvas());
@@ -998,6 +999,12 @@
                 //
 
                 loadDataset : function(dsID) {
+                    geneID = this._getUrlParam('gene');
+                    if (geneID == null)
+                    {
+                        geneID = 1017;
+                    }
+                    this.geneID = geneID;
                     if (this.dsID == dsID) {
                         // Same dataset ID, do nothing
                         return;
