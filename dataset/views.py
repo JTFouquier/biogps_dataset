@@ -125,10 +125,12 @@ def dataset_chart(request, ds_id, reporter_id):
         y_pos.append(i)
         i = i + 1
 
-    print '----------------'
-    print (length * 1.5) / 2
-    print '----------------'
-    plt.figure(1, figsize=(80, (length * 1.5) / 2), dpi=15).clear()
+    #plt.figure(1, figsize=(80, (3+length * 1.5) / 2), dpi=15).clear()
+
+    fig = plt.gcf()
+    fig.clear()
+    fig.set_dpi(15)
+    fig.set_size_inches(80, (3 + length * 1.5) / 2)
 
     #计算x轴的最大值
     temp_count = 0
@@ -221,7 +223,7 @@ def dataset_chart(request, ds_id, reporter_id):
                  x_val, fontsize=40)
     #设置图形和图片左右的距离
     plt.subplots_adjust(left=0.05 * (label_maxlen / 10), right=0.9,\
-                        top=0.9, bottom=0.1)
+                        top=1, bottom=0)
     #返回图片
     canvas = FigureCanvas(plt.figure(1))
     response = HttpResponse(content_type='image/png')
