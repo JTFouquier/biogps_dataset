@@ -81,6 +81,8 @@ def  get_dataset_data(ds, gene_id=None, reporter_id=None):
         res = requests.get(url)
         data_json = res.json()
         for i in data_json['reporter'].values():
+            if type(i) is not list:
+                i = [i]
             reporters = reporters + i
     elif reporter_id is not None:
         reporters.append(reporter_id)
@@ -123,7 +125,10 @@ def dataset_chart(request, ds_id, reporter_id):
         y_pos.append(i)
         i = i + 1
 
-    plt.figure(1, figsize=(80, (3 + length * 1.5) / 2), dpi=15).clear()
+    print '----------------'
+    print (length * 1.5) / 2
+    print '----------------'
+    plt.figure(1, figsize=(80, (length * 1.5) / 2), dpi=15).clear()
 
     #计算x轴的最大值
     temp_count = 0
