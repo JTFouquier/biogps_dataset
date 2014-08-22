@@ -53,8 +53,6 @@ class Command(BaseCommand):
             #skips = get_list_from_file(options['skip_file'])
             platforms = self.get_list_from_file(options['array_file'])
             skips = self.get_list_from_file(options['skip_file'])
-            if platforms is None:
-                return
             for p in platforms:
                 po = Platform(p)
                 po.load()
@@ -108,7 +106,9 @@ class Command(BaseCommand):
 
     #read lines from a file, and support # comment
     def get_list_from_file(self, path):
-        ret = None
+        ret = []
+        if path is None:
+            return ret
         with open(path, 'r') as f:
             raw = f.readlines()
             if len(raw) > 0:
