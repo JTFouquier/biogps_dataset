@@ -567,7 +567,10 @@
                                     DCCG.buildCanvasError(DC_026887848.getCanvas());
                                 } else {
                                     // Send dataset factors, values
-                                    DC_026887848.setProbeData(metaJson, dataJson);
+                                    if (metaJson.code != 0 || dataJson.code != 0)
+                                        DCCG.buildCanvasError(DC_026887848.getCanvas());
+                                    else
+                                        DC_026887848.setProbeData(metaJson, dataJson);
                                 }
                             });
                         }
