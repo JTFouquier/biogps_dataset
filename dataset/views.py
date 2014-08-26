@@ -364,13 +364,15 @@ def dataset_correlation(request, ds_id, reporter_id, min_corr):
         rep_vector = matrix_data[rep_pos]
         corrs = pearsonr(rep_vector, matrix_data)
         # Get indices of sufficiently correlated reporters
+        min_corr = float(min_corr)
         idx_corrs = np.where(corrs > min_corr)[0]
         # Get values for those indices
         val_corrs = corrs.take(idx_corrs)
         # Return highest correlated first
         corrs = zip(val_corrs, idx_corrs)
         corrs.sort(reverse=True)
-        return general_json_response(detail=[{'Reporter': reporters[str(i[1])],
+        print corrs
+        return general_json_response(detail=[{'Reporter': reporters[i[1]],
                  'Value': round(i[0], 4)} for i in corrs])
 
     return general_json_response(GENERAL_ERRORS.ERROR_BAD_ARGS, \
