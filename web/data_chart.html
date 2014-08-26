@@ -1048,7 +1048,7 @@
                                         DC_026887848.geneID = dataJson.details.gene;
                                         DC_026887848.dsID = dataJson.details.dataset;
                                         if (dsID)
-                                            DC_026887848.dsID = dsID;
+                                            DC_026887848.dsID
                                         DC_026887848.setDatasetCookie();
                                         DC_026887848.loadProbes();
                                     }
@@ -1152,7 +1152,7 @@
                 },
 
                 buildCorrURL : function() {
-                    var corrUrl = "/data_chart/data_chart_corr_proxy.cgi?";
+                    var corrUrl = "/dataset/correlation/";
                     var corrVal = document.getElementById("DC_026887848_cor_val");
                     var corrFactor = parseFloat(corrVal.value);
                     if (corrFactor == "NaN") {
@@ -1181,7 +1181,7 @@
                         }
                     }
 
-                    corrUrl = corrUrl + "ds=" + ds + "&r=" + ps + "&c=" + corrFactor;
+                    corrUrl = corrUrl + ds + "/reporter/" + ps + "/min/" + corrFactor+'/';
                     return corrUrl;
                 },
 

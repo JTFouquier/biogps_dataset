@@ -10,6 +10,7 @@ import requests
 from elasticsearch import Elasticsearch
 import math
 from dataset.util import general_json_response, GENERAL_ERRORS
+import StringIO
 
 
 def adopt_dataset(ds_id):
@@ -328,3 +329,49 @@ def dataset_default(request):
                     "Cannot get default dataset with gene id: %s." % gene_id)
     return general_json_response(detail={'gene': int(gene_id), \
                                          'dataset': ds_id})
+
+
+def dataset_correlation(request, ds_id, reporter_id, min_corr):
+    """Return NumPy correlation matrix for provided ID, reporter,
+       and correlation coefficient
+    """
+    import numpy as np
+
+    def pearsonr(v, m):
+        # Pearson correlation calculation taken from NumPy's implementation
+        v_m = v.mean()
+        m_m = m.mean(axis=1)
+        r_num = ((v - v_m) * (m.transpose() - m_m).transpose()).sum(axis=1)
+        r_den = np.sqrt(((v - v_m) ** 2).sum() *
+            (((m.transpose() - m_m).transpose()) ** 2).sum(axis=1))
+        r = r_num / r_den
+        return r
+
+    # Reconstruct dataset matrix
+    ds = adopt_dataset(ds_id)
+    try:
+        _matrix = models.BiogpsDatasetMatrix.objects.get(dataset=ds)
+    except models.BiogpsDatasetMatrix.DoesNotExist:
+        return general_json_response(GENERAL_ERRORS.ERROR_NOT_FOUND, \
+                    "Cannot get matrix of dataset: %s." % ds_id)
+    reporters = _matrix.reporters
+
+    # Get position of reporter
+    if reporter_id in reporters:
+        rep_pos = reporters.index(reporter_id)
+        # Pearson correlations for provided reporter
+        matrix_data = np.load(StringIO.StringIO(_matrix.matrix))
+        rep_vector = matrix_data[rep_pos]
+        corrs = pearsonr(rep_vector, matrix_data)
+        # Get indices of sufficiently correlated reporters
+        idx_corrs = np.where(corrs > min_corr)[0]
+        # Get values for those indices
+        val_corrs = corrs.take(idx_corrs)
+        # Return highest correlated first
+        corrs = zip(val_corrs, idx_corrs)
+        corrs.sort(reverse=True)
+        return general_json_response(detail=[{'Reporter': reporters[str(i[1])],
+                 'Value': round(i[0], 4)} for i in corrs])
+
+    return general_json_response(GENERAL_ERRORS.ERROR_BAD_ARGS, \
+                "Reporter %s not in dataset: %s." % (reporter_id, ds_id))
