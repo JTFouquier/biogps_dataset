@@ -6,19 +6,13 @@ import models
 from django.http.response import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
-import datetime
-from django.db.models.query import QuerySet
-from django.core.serializers import serialize, deserialize
-from json.encoder import JSONEncoder
-from django.db.models.base import Model
 import requests
 from elasticsearch import Elasticsearch
 import math
+from dataset.util import general_json_response, GENERAL_ERRORS
 
 
 def adopt_dataset(ds_id):
-    if ds_id == 'default':
-        ds_id = settings.DEFAULT_DATASET_ID
     try:
         return models.BiogpsDataset.objects.get(id=ds_id)
     except Exception:
@@ -125,9 +119,6 @@ def dataset_chart(request, ds_id, reporter_id):
         y_pos.append(i)
         i = i + 1
 
-    print '----------------'
-    print (length * 1.5) / 2
-    print '----------------'
     plt.figure(1, figsize=(80, (length * 1.5) / 2), dpi=15).clear()
 
     #计算x轴的最大值
@@ -316,24 +307,19 @@ def dataset_data(request, ds_id, gene_id):
                         content_type="application/json")
 
 
-class ComplexEncoder(JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, Model):
-            return json.loads(serialize('json', [obj])[1:-1])['fields']
-        if isinstance(obj, QuerySet):
-            obj = obj.values()
-            obj = list(obj)
-            return json.loads(json.dumps(obj, cls=ComplexEncoder))
-        if isinstance(obj, datetime.datetime):
-            return obj.strftime('%Y-%m-%d %H:%M')
-        if isinstance(obj, datetime.date):
-            return obj.strftime('%Y-%m-%d')
-        if hasattr(obj, 'isoformat'):
-            return obj.isoformat()
-        return json.JSONEncoder.default(self, obj)
-
-    def jsonBack(self, json):
-        if json[0] == '[':
-            return deserialize('json', json)
-        else:
-            return deserialize('json', '[' + json + ']')
+def dataset_default(request):
+    gene_id = request.GET.get('gene', None)
+    if gene_id is None:
+        gene_id = settings.DEFAULT_GENE_ID
+    url = 'http://mygene.info/v2/gene/%s/?\
+        fields=taxid' % gene_id
+    res = requests.get(url)
+    data_json = res.json()
+    species = data_json['taxid']
+    try:
+        ds_id = settings.DEFAULT_DATASET_MAPPING[species]
+    except:
+        return general_json_response(GENERAL_ERRORS.ERROR_INTERNAL, \
+                    "Cannot get default dataset with gene id: %s." % gene_id)
+    return general_json_response(detail={'gene': int(gene_id), \
+                                         'dataset': ds_id})

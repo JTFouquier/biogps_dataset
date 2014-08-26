@@ -95,6 +95,4 @@ STATICFILES_FINDERS = (
     # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
-DEFAULT_DATASET_ID = 1
-
 from settings_dev import *
