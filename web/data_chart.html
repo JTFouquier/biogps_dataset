@@ -560,6 +560,8 @@
                             // Error getting json from server
                             DCCG.buildCanvasError(DC_026887848.getCanvas());
                         } else {
+                            //set go to Array Express link
+                            $("#go-ae a").attr('href', "http://www.ebi.ac.uk/arrayexpress/experiments/"+metaJson.detail.geo_gse_id+"/");
                             // Dataset values
                             var prox_url = "/dataset/data/"+ds+"/gene/"+gene+"/";
                             $.getJSON(prox_url, function(dataJson, code) {
@@ -712,11 +714,21 @@
                             // Calculate probe data statistics
                             this.probeData[pID].minVal = Math.min.apply(Math, probeVals);
                             this.probeData[pID].maxVal = Math.max.apply(Math, probeVals);
-                            var _sumVals = 0;
-                            for (var v = 0; v < probeVals.length; v++) {
-                                _sumVals += parseFloat(probeVals[v]);
+                            // Calculate median
+                            var tmpArray = probeVals.slice(0);
+                            tmpArray.sort();
+                            var len = tmpArray.length;
+                            var median;
+                            if(len%2 == 0)
+                            {
+                                median = tmpArray[len/2]+tmpArray[len/2-1];
                             }
-                            this.probeData[pID].globalMean = _sumVals / probeVals.length;
+                            else
+                            {
+                                median = tmpArray[Math.floor(len/2)];
+                            }
+                            median = parseFloat(median);
+                            this.probeData[pID].globalMean = median;
 
                             // Combine samples with data and unique factors
                             var sampKeyHash = {};
@@ -1344,7 +1356,9 @@
                     <div style="float:left"></div>
                 </form>
                 <div id="datasetNameContainer" style="width:99%">
-                    <b>Dataset: </b><span id="datasetName"><a class="ds-name" href="http://biogps.org/dataset/5" target="_blank"></a></span><span id="change-dataset">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="change-ds btn-use-object requires-js" href="javascript:void(0)" onclick="DC_026887848.changeDataset();">change</a></span>
+                    <b>Dataset: </b><span id="datasetName"><a class="ds-name" href="http://biogps.org/dataset/5" target="_blank"></a></span>
+                    <span id="change-dataset">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="change-ds btn-use-object requires-js" href="javascript:void(0)" onclick="DC_026887848.changeDataset();">Change</a></span>
+                    <span id="go-ae">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="go-ae btn-use-object requires-js" href="http://www.ebi.ac.uk/">Array Express</a></span>
                 </div>
                 <div id="datasetProbes" style="width:99%">
                     <b>Probeset:</b>
