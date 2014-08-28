@@ -182,7 +182,7 @@ def dataset_chart(request, ds_id, reporter_id):
     while i <= 4:
         x_label = x_median * x_per_list[i - 1]
         str_temp = '%.2f' % x_label
-        plt.text(x_label - 0.5 * x_max / 30, length + 1 + 0.1,\
+        plt.text(x_label - 0.5 * x_max / 30, 0.1,\
                  "median(" + str_temp + ")", fontsize=40)
         #plt.text(x_label,length,str_temp,fontsize=80)
         list_temp = []
@@ -223,11 +223,7 @@ def dataset_chart(request, ds_id, reporter_id):
         list_x.append(x_val)
         list_x.append(x_val)
         plt.plot(list_x, y_list, "k", linewidth=3)
-        per = 10 * 0.3 * x_max / 30
-        if abs(x_val - x_median) < per or\
-        abs(x_val - x_median * 3) < per or\
-        abs(x_val - x_median * 3) < per:
-            continue
+
         plt.text(x_val - 0.3 * x_max / 30, length + 1 + 0.1,\
                  x_val, fontsize=40)
     #设置图形和图片左右的距离
