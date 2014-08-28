@@ -116,7 +116,8 @@ def dataset_chart(request, ds_id, reporter_id):
     length = len(name_list)
     y_pos = [0]
     i = 1
-    while(i < length):
+    #由于后面设置上下的间距是０，所有在下面多画一个ｂａｒ，保证图片下面的留白
+    while(i < length + 1):
         y_pos.append(i)
         i = i + 1
 
@@ -141,7 +142,10 @@ def dataset_chart(request, ds_id, reporter_id):
         temp_count = temp_count + 1
         temp_val = x_max % 10
         x_max = x_max / 10
-    x_max = int((temp_val + 1) * (10 ** (temp_count - 1)))
+    if temp_count != 1:
+        x_max = int((temp_val + 1) * (10 ** (temp_count - 1)))
+    else:
+        x_max=10
 
     #修改背景色
     fig1 = plt.figure(1)
@@ -153,14 +157,16 @@ def dataset_chart(request, ds_id, reporter_id):
     xylist.append(length + 2)
     xylist[1] = x_max
     plt.axis(xylist)
+    val_list=[0]+val_list #多画一个为ｏ的ｂａｒ
     plt.barh(y_pos, val_list, height=1 * 7.0 / 8,\
              color="m")
     #取消x轴和y轴
     plt.axis('off')
     #画label
-    i = 0
+    i = 1
     for name_item in name_list:
-        plt.text(0, y_pos[i], name_item, fontsize=40,\
+        str="--%s-"%name_item
+        plt.text(0, y_pos[i], str, fontsize=40,\
                  horizontalalignment='right')
         i = i + 1
 
@@ -169,13 +175,13 @@ def dataset_chart(request, ds_id, reporter_id):
     x_per_list = [1, 3, 10, 30]
     i = 1
     y_list = []
-    y_list.append(length + 0.2)
-    y_list.append(0)
+    y_list.append(length+1 + 0.2)
+    y_list.append(1)
 
     while i <= 4:
         x_label = x_median * x_per_list[i - 1]
         str_temp = '%.2f' % x_label
-        plt.text(x_label - 0.5 * x_max / 30, length + 0.5,\
+        plt.text(x_label - 0.5 * x_max / 30, length +1+ 0.1,\
                  "median(" + str_temp + ")", fontsize=40)
         #plt.text(x_label,length,str_temp,fontsize=80)
         list_temp = []
@@ -188,22 +194,29 @@ def dataset_chart(request, ds_id, reporter_id):
     list_temp.append(0)
     list_temp.append(x_max)
     y_list = []
-    y_list.append(length)
-    y_list.append(length)
+    y_list.append(length+1)
+    y_list.append(length+1)
     plt.plot(list_temp, y_list, "k", linewidth=4)
-    y_list[0] = 0
-    y_list[1] = 0
-    plt.plot(list_temp, y_list, "k", linewidth=10)
+    y_list[0] = 1
+    y_list[1] = 1
+    plt.plot(list_temp, y_list, "k", linewidth=4)
+
     list_temp[0] = x_max
     list_temp[1] = x_max
-    y_list[0] = 0
-    y_list[1] = length
+    y_list[0] = 1
+    y_list[1] = length + 1
     plt.plot(list_temp, y_list, "k", linewidth=10)
 
     #画x轴
-    y_list[0] = length
-    y_list[1] = length - 0.5
-    for i in range(0, temp_val + 2):
+    y_list[0] = length+1
+    y_list[1] = length+1 - 0.5
+#要画的刻度
+    i_range=[]
+    if x_max==10:
+        i_range = range(0,11)
+    else:
+        i_range=range(0,temp_val+2)
+    for i in i_range:
         list_x = []
         x_val = i * (10 ** (temp_count - 1))
         list_x.append(x_val)
@@ -214,11 +227,16 @@ def dataset_chart(request, ds_id, reporter_id):
         abs(x_val - x_median * 3) < per or\
         abs(x_val - x_median * 3) < per:
             continue
-        plt.text(x_val - 0.3 * x_max / 30, length + 0.5,\
+        plt.text(x_val - 0.3 * x_max / 30, length+1 + 0.1,\
                  x_val, fontsize=40)
     #设置图形和图片左右的距离
-    plt.subplots_adjust(left=0.05 * (label_maxlen / 10), right=0.9,\
+    #plt.subplots_adjust(left=0.05 * (label_maxlen / 10 + 2), right=0.9,\
+    #                   top=1, bottom=0)
+    print 0.05 * ((label_maxlen + 5) / 10)
+    print x_max
+    plt.subplots_adjust(left=0.05 * (label_maxlen + 5) / 10, right=0.9,\
                         top=1, bottom=0)
+
     #返回图片
     canvas = FigureCanvas(plt.figure(1))
     response = HttpResponse(content_type='image/png')
