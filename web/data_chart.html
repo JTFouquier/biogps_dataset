@@ -1,0 +1,1463 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- saved from url=(0061)http://plugins.biogps.org/data_chart/data_chart.cgi?id=362817 -->
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US" class="  ext-strict">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+        <title>Data Chart Plugin</title>
+        <link rel="icon" type="image/vnd.microsoft.icon" href="http://compdisc.gnf.org/hts/hts.ico">
+        <link rel="stylesheet" type="text/css" href="./css/data_chart.css">
+        <link rel="stylesheet" type="text/css" href="./css/ext-all.css">
+        <script src="./js/ext_mainApp.js" type="text/JavaScript"></script>
+        <script src="./js/jquery_custom.js" type="text/JavaScript"></script>
+        <script src="./js/jquery.ui.core.js" type="text/JavaScript"></script>
+        <script src="./js/jquery.ui.widget.js" type="text/JavaScript"></script>
+        <script src="./js/jquery.ui.accordion.js" type="text/JavaScript"></script>
+        <script src="./js/jquery-ui.js" type="text/JavaScript"></script>
+
+        <style id="clearly_highlighting_css" type="text/css">
+/* selection */ html.clearly_highlighting_enabled ::-moz-selection { background: rgba(246, 238, 150, 0.99); } html.clearly_highlighting_enabled ::selection { background: rgba(246, 238, 150, 0.99); } /* cursor */ html.clearly_highlighting_enabled {    /* cursor and hot-spot position -- requires a default cursor, after the URL one */    cursor: url("chrome-extension://pioclpoplcdbaefihamjohnefbikjilc/clearly/images/highlight--cursor.png") 14 16, text; } /* highlight tag */ em.clearly_highlight_element {    font-style: inherit !important; font-weight: inherit !important;    background-image: url("chrome-extension://pioclpoplcdbaefihamjohnefbikjilc/clearly/images/highlight--yellow.png");    background-repeat: repeat-x; background-position: top left; background-size: 100% 100%; } /* the delete-buttons are positioned relative to this */ em.clearly_highlight_element.clearly_highlight_first { position: relative; } /* delete buttons */ em.clearly_highlight_element a.clearly_highlight_delete_element {    display: none; cursor: pointer;    padding: 0; margin: 0; line-height: 0;    position: absolute; width: 34px; height: 34px; left: -17px; top: -17px;    background-image: url("chrome-extension://pioclpoplcdbaefihamjohnefbikjilc/clearly/images/highlight--delete-sprite.png"); background-repeat: no-repeat; background-position: 0px 0px; } em.clearly_highlight_element a.clearly_highlight_delete_element:hover { background-position: -34px 0px; } /* retina */ @media (min--moz-device-pixel-ratio: 2), (-webkit-min-device-pixel-ratio: 2), (min-device-pixel-ratio: 2) {    em.clearly_highlight_element { background-image: url("chrome-extension://pioclpoplcdbaefihamjohnefbikjilc/clearly/images/highlight--yellow@2x.png"); }    em.clearly_highlight_element a.clearly_highlight_delete_element { background-image: url("chrome-extension://pioclpoplcdbaefihamjohnefbikjilc/clearly/images/highlight--delete-sprite@2x.png"); background-size: 68px 34px; } }
+        </style>
+        <link type="text/css" rel="stylesheet" href="./css/jquery-ui-1.8.5.custom.css">
+        <style>
+            [touch-action="none"] {
+                -ms-touch-action: none;
+                touch-action: none;
+            }
+            [touch-action="pan-x"] {
+                -ms-touch-action: pan-x;
+                touch-action: pan-x;
+            }
+            [touch-action="pan-y"] {
+                -ms-touch-action: pan-y;
+                touch-action: pan-y;
+            }
+            [touch-action="scroll"], [touch-action="pan-x pan-y"], [touch-action="pan-y pan-x"] {
+                -ms-touch-action: pan-x pan-y;
+                touch-action: pan-x pan-y;
+            }
+        </style>
+
+        <script language="JavaScript" src="./js/PagingStore_Ext.js"></script>
+        <script language="JavaScript">
+            DC_026887848 = {
+                dsCanvas : false,
+                dsID : -1,
+                geneID : -1,
+                dsName : "",
+                dsPage : 1,
+                dsPages : 1,
+                dsSearchTerm : "",
+                dsSummary : "",
+                mygeneReps : "NM_199501,XM_006240778,XR_355212,1378874_at,1394320_at,D28753_i_at,D28754_s_at,362817",
+                sortFactor : "",
+                tabContentContainerIDs : ["DC_026887848_dataset_canvas", "DC_026887848_probe_set_image", "DC_026887848_correlationContainer", "DC_026887848_downloadContainer"],
+
+                init : function() {
+                    this.loadTabs();
+                    this.showCanvasControls();
+                    this.initSlider();
+                    this.initCanvas();
+                    this.loadDataset("");
+                },
+
+                showCanvasControls : function() {
+                    if (DC_026887848.dsCanvas == true) {
+                        $("#DC_026887848_canvas_clear_button").show();
+                        $("#DC_026887848_canvas_save_button").show();
+                        $("#DC_026887848_canvas_search_controls").show();
+                        $("#DC_026887848_canvas_zoom_label").show();
+                        $("#DC_026887848_canvas_graph_type_wrapper").show();
+                    }
+                },
+
+                probeData : null,
+
+                sliderResolution : 1000,
+                initSlider : function() {
+                    if (DC_026887848.dsCanvas == true) {
+                        $("#DC_026887848_canvas_chart_slider").slider({
+                            range : true,
+                            min : 0,
+                            max : DC_026887848.sliderResolution,
+                            values : [0, DC_026887848.sliderResolution],
+                            slide : function(event, ui) {
+
+                                DC_026887848.updateCanvasGraph();
+                            },
+                            stop : function(event, ui) {
+
+                                DC_026887848.updateCanvasGraph();
+                            }
+                        });
+                    }
+                },
+
+                setRawLink : function() {
+                    var probeBox = document.getElementById("DC_026887848_probe");
+                    var ps = probeBox[0].value;
+                    for (var i = 1; i < probeBox.length; i++) {
+                        ps = ps + "," + probeBox[i].value;
+                    }
+
+                    var rawLink = document.getElementById("DC_026887848_Download_link");
+                    var url = "/dataset/csv/"+this.dsID+"/gene/"+this.geneID+"/";
+                    rawLink.href = url;
+                    rawLink.innerHTML = "Get raw data for " + this.dsName;
+                },
+
+                setProbeImage : function() {
+                    //var url_base = "http://biogps.org/dataset/";
+                    var probes = document.getElementById("DC_026887848_probe");
+                    var pval = "NA";
+
+                    for ( i = 0; i < probes.length; i++) {
+                        if (probes.options[i].selected) {
+                            pval = probes.options[i].text;
+                            break;
+                        }
+                    }
+                    var datarowname = "" + pval;
+                    var datasetid = "" + this.dsID;
+                    document.images["DC_026887848_probe_set_image"].src = ('/dataset/chart/'+datasetid+'/reporter/' + datarowname+'/');
+                },
+
+                setProbe : function() {
+                    this.setProbeImage();
+                    this.updateCanvasGraph();
+                },
+
+                setDatasetCookie : function() {
+                    // Check for last-viewed dataset, otherwise use default
+                    var org_cookie_name = "org_10116";
+                    var ds = "5";
+                    if (this.dsID != -1) {
+                        ds = this.dsID;
+                    }
+                    document.cookie = org_cookie_name + "=" + encodeURIComponent(ds) + "; max-age=" + (60 * 60 * 12);
+                },
+
+                handleNoData : function() {
+                    // Update canvas, etc when no data found
+                    var _msg = "No data for gene 362817 in the \"" + DC_026887848.dsName + "\" data set.";
+                    var _htmlMsg = "<p class=\"ds-error\">" + _msg + "</p>";
+
+                    var containers = DC_026887848.tabContentContainerIDs;
+                    for (var i = 0; i < containers.length; i++) {
+                        var _content = $("#" + containers[i]);
+                        _content.before(_htmlMsg);
+                        _content.hide();
+                    }
+
+                    // Determine position for dataset dialog
+                    var pos = $("#datachartVer").offset();
+
+                    _dialog.dialog({
+                        draggable : true,
+                        modal : false,
+                        position : [pos.left + 5, pos.top + 15],
+                        resizable : false,
+                        title : "Datasets with data for gene 362817",
+                        width : $("#dataChartTabPanel").width() * 0.7,
+                        open : this.updateDialog()
+                    });
+                },
+
+                getDatasets : function() {
+                    // Query SL for relevant datasets, encoding url for use with proxy
+                    var _repParam = "%26reporters%3DNM_199501,XM_006240778,XR_355212,1378874_at,1394320_at,D28753_i_at,D28754_s_at,362817";
+                    var _dsLibUrl = "/dataset/search/?page=" + DC_026887848.dsPage;
+                    var _dsDefaultUrl = "/data_chart/gnf_json_proxy.cgi?url=http://biogps.org/dataset/search/%3FdefaultDS%3Dt" + _repParam;
+                    if (DC_026887848.dsSearchTerm !== "") {
+                        _qTerm =    DC_026887848.dsSearchTerm;
+                        _dsLibUrl += '&query='+_qTerm;
+                        _dsDefaultUrl += _qTerm;
+                    }
+
+                    // All datasets
+                    $.getJSON(_dsLibUrl, function(allDatasets, code) {
+                        if (code != "success") {
+                            // Error getting json from server
+                            DCCG.buildCanvasError(DC_026887848.getCanvas());
+                        } else {
+                            DC_026887848.updateDialog(allDatasets.details, true);
+                            return
+                            // Default datasets
+                            $.getJSON(_dsDefaultUrl, function(defaultDatasets, code) {
+                                if (code != "success") {
+                                    // Error getting json from server
+                                    DCCG.buildCanvasError(DC_026887848.getCanvas());
+                                } else {
+                                    DC_026887848.updateDialog(allDatasets, defaultDatasets);
+                                }
+                            });
+                        }
+                    });
+                },
+
+                changeSearchTerm : function(event, qTerm) {
+                    // Update search term used to query datasets
+                    if (event.keyCode == 13) {
+                        // Enter button pressed
+                        DC_026887848.dsPage = 1;
+                        DC_026887848.dsSearchTerm = qTerm.replace(/ /g, "+");
+                        DC_026887848.updateDialog();
+                    }
+                },
+
+                updateDialog : function(allDatasets, defaultDatasets) {
+                    // Update dialog with dataset results
+                    if (!allDatasets || !defaultDatasets) {
+                        // Get list of datasets for reporters
+                        DC_026887848.getDatasets();
+                    } else {
+                        // Set datset info/pages for all datasets,
+                        // returned results are [results count, total pages, page of results]
+                        $("#dsLibTotal").html(allDatasets.count);
+                        $("#dsLibPageNum").html(DC_026887848.dsPage);
+                        var _numPages = allDatasets.total_page;
+                        DC_026887848.dsPages = _numPages;
+                        $("#dsLibPages").html(_numPages);
+
+                        // Append datasets to list
+                        var _titleWidth = 100;
+                        $("#dsList").empty();
+                        $.each(allDatasets.results, function(idx, ds) {
+                            var _dsClass = (idx % 2 == 0 ? "odd-li" : "even-li");
+                            var _dsTitle = (ds.name.length > _titleWidth ? ds.name.substring(0, _titleWidth - 3) + "..." : ds.name);
+                            _dsTitle += "  (" + ds.factors.length + " samples)";
+                            $("#dsList").append('<a class="ds-dialog" href="javascript:void(0)" onclick="DC_026887848.loadDataset(' + ds.id + ')"><li class="ds-dialog ' + _dsClass + '" id="ds' + ds.id + '">' + _dsTitle + '</li></a>');
+                        });
+                        return;
+                        // Update default datasets
+                        $("#dsDefaultsList").empty();
+                        $("#dsDefaultTotal").html(defaultDatasets.length);
+                        $.each(defaultDatasets, function(idx, ds) {
+                            var _dsClass = (idx % 2 == 0 ? "odd-li" : "even-li");
+                            var _dsTitle = (ds.name.length > _titleWidth ? ds.name.substring(0, _titleWidth - 3) + "..." : ds.name);
+                            _dsTitle += "  (" + ds.factors.length + " samples)";
+                            $("#dsDefaultsList").append('<a class="ds-dialog" href="javascript:void(0)" onclick="DC_026887848.loadDataset(' + ds.id + ')"><li class="ds-dialog ' + _dsClass + '" id="ds' + ds.id + '">' + _dsTitle + '</li></a>');
+                        });
+                    }
+                },
+
+                updateSummary : function(mode) {
+                    // Show/hide long dataset summaries
+                    var _summary = DC_026887848.dsSummary;
+                    if (_summary.length > 100) {
+                        if (mode == "less") {
+                            _summary = _summary.substr(0, 100) + "...";
+                        }
+                        $("#datasetSummaryMoreLink").show();
+                    } else {
+                        $("#datasetSummaryMoreLink").hide();
+                    }
+                    $("#datasetSummary").html(_summary);
+
+                    // Switch mode for output
+                    mode = (mode === "less") ? "more" : "less";
+
+                    // Remove original onClick, bind new, update link text
+                    $("#datasetSummaryMoreLink").attr("onclick", "").click(function() {
+                        DC_026887848.updateSummary(mode);
+                    }).text(mode);
+                },
+
+                changeDSPage : function(dir) {
+                    // Confirm more than one page of results
+                    if (DC_026887848.dsPages !== 1) {
+                        // Change page number for SL call
+                        if (dir === "+" && DC_026887848.dsPage != DC_026887848.dsPages) {
+                            DC_026887848.dsPage += 1;
+                        } else if (dir === "-" && DC_026887848.dsPage > 1) {
+                            DC_026887848.dsPage -= 1;
+                        } else {
+                            DC_026887848.dsPage = 1;
+                        }
+                        this.updateDialog();
+                    }
+                },
+
+                resetDSLib : function() {
+                    $('#searchDS').val('');
+                    DC_026887848.dsSearchTerm = "";
+                    DC_026887848.dsPage = 1;
+                    DC_026887848.getDatasets();
+                },
+
+                changeDataset : function() {
+                    _dialog.dialog({
+                        draggable : false,
+                        modal : true,
+                        position : "top",
+                        resizable : false,
+                        title : "Select a dataset",
+                        width : $("#dataChartTabPanel").width() * 0.7,
+                        open : this.updateDialog()
+                    });
+
+                    // Add search bar to dialog
+                    $("#accordion").before(searchBar);
+                },
+
+                clearCorrData : function() {
+                    if (this.Corr_Store !== null) {
+                        this.Corr_Store.removeAll();
+                    }
+                },
+
+                //
+                //START CANVAS ROUTINES
+                //
+                //
+                //
+                saveCanvas : function() {
+                    if (DC_026887848.dsCanvas == true) {
+                        DCCG.saveCanvas(this.getCanvas());
+                    }
+                },
+
+                getCanvas : function() {
+                    if (DC_026887848.dsCanvas == true) {
+                        var can = document.getElementById("DC_026887848_canvas_chart");
+                        if (can != null) {
+                            return can.getContext("2d");
+                        } else {
+                            return null;
+                        }
+                    }
+                },
+
+                resizeCanvas : function() {
+                    var chart_container_width = $("#DC_026887848_outside").width();
+                    // Ext JS will ignore TabPanel margin setting unless we also use
+                    // BorderLayout or a BoxLayout subclass... Simply subtracting
+                    // margin value here instead
+                    Ext.getCmp("dataChartTabPanel").setWidth(chart_container_width - 10);
+                    if (DC_026887848.dsCanvas == true) {
+                        DCCG.clearCanvas(this.getCanvas());
+                        this.updateCanvasGraph();
+                    }
+                },
+
+                initCanvas : function() {
+                    // Chart container width on initialization is +15px for some odd
+                    // reason... Ext JS?
+                    var chart_container_width = $("#DC_026887848_outside").width() - 15;
+                    Ext.getCmp("dataChartTabPanel").setWidth(chart_container_width - 10);
+                    if (DC_026887848.dsCanvas == true) {
+                        DCCG.clearCanvas(this.getCanvas());
+                        DCCG.buildCanvasLoading(this.getCanvas());
+                    }
+                },
+
+                //holds positional data for the canvas interactive areas.
+                canvasMap : null,
+                setCanvasMouseMap : function(map) {
+                    if (DC_026887848.dsCanvas == true) {
+                        //unbind previous events, just in case.
+                        $("#DC_026887848_canvas_chart").unbind("mousemove");
+                        $("#DC_026887848_canvas_chart").unbind("click");
+
+                        if (map == null) {//A null map indicates that we want to clear the map.
+                            this.canvasMap = null;
+                            return;
+                        } else {
+                            //We want to store the mouse map for the canvas, we also want to bind a few events..
+                            this.canvasMap = map;
+
+                            //Bind the mousemove event so we can respond to mouse movement.
+                            $("#DC_026887848_canvas_chart").mousemove(function(event) {
+                                if (DC_026887848.canvasMap == null) {
+                                    //We dont want this event to fire when we have a null map, so get rid of it.
+                                    $("#DC_026887848_canvas_chart").unbind("mousemove");
+
+                                    return false;
+                                };
+                                //We only get the coordinates relative to the document, so we change them to relative to the canvas.
+                                var offset = $("#DC_026887848_canvas_chart").offset();
+                                DC_026887848.canvasMouseMove(event.pageX - offset.left, event.pageY - offset.top);
+                            });
+                            //Bind the mouse click event so we can respond to mouse clicks.
+                            $("#DC_026887848_canvas_chart").click(function(event) {
+                                if (DC_026887848.canvasMap == null) {
+                                    //We dont want this event to fire when we have a null map, so get rid of it.
+                                    $("#DC_026887848_canvas_chart").unbind("click");
+
+                                    return false;
+                                };
+                                //We only get the coordinates relative to the document, so we change them to relative to the canvas.
+                                var offset = $("#DC_026887848_canvas_chart").offset();
+                                DC_026887848.canvasMouseClick(event.pageX - offset.left, event.pageY - offset.top);
+                            });
+                        }
+                        return;
+                    }
+                },
+
+                //used to cause the canvas to redraw if there is a hover/mouseover event..
+                currentMouseOver : null,
+                canvasMouseMove : function(x, y) {
+                    if (DC_026887848.dsCanvas == true) {
+                        if (this.canvasMap == null) {
+                            return false;
+                        };
+                        var cmo = this.currentMouseOver;
+                        var canvasMap = this.canvasMap;
+
+                        var clear = true;
+                        for (var i = 0; i < canvasMap.length; i++) {
+                            if (y >= canvasMap[i].yStart && y < canvasMap[i].yEnd) {
+                                var dNum = canvasMap[i].dataNum;
+
+                                if (dNum == cmo) {
+                                    return true;
+                                    // No change, do nothing
+                                } else {
+                                    // Mouse over different sample, update everything
+                                    if (this.graph_type == "bar" || this.graph_type == "plot") {
+                                        var singleData = null;
+                                        var ps = this.getCurrentProbeSet();
+                                        singleData = this.probeData[ps];
+                                        if (singleData == null) {
+                                            return false;
+                                        }
+
+                                        // Remove Mouseover from previous sample
+                                        if (cmo != null && cmo >= 0 && singleData[cmo]) {
+                                            singleData[cmo].Mouseover = false;
+                                        }
+
+                                        // Update current sample with Mouseover
+                                        if (dNum != null && dNum >= 0 && singleData[dNum]) {
+                                            singleData[dNum].Mouseover = true;
+                                            this.updateCanvasGraph();
+                                        }
+                                    }//end bar graph.
+                                    this.currentMouseOver = dNum;
+                                }
+                                clear = false;
+                                break;
+                            }
+                        }
+
+                        if (clear == true) {
+                            if (this.graph_type == "bar" || this.graph_type == "plot") {
+                                var singleData = null;
+                                var ps = this.getCurrentProbeSet();
+                                singleData = this.probeData[ps];
+                                if (singleData == null) {
+                                    return false;
+                                }
+
+                                if (cmo != null && cmo >= 0 && singleData[cmo]) {
+                                    singleData[cmo].Mouseover = false;
+                                    this.updateCanvasGraph();
+                                }
+                            }//end bar graph.
+                            this.currentMouseOver = null;
+                        }
+                        return true;
+                    }
+                },
+
+                // Redraw canvas after a click event
+                canvasMouseClick : function(x, y) {
+                    if (DC_026887848.dsCanvas == true) {
+                        if (this.canvasMap == null || this.probeData == null) {
+                            return false;
+                        };
+
+                        var canvasMap = this.canvasMap;
+                        var singleData = null;
+                        var ps = this.getCurrentProbeSet();
+                        singleData = this.probeData[ps];
+
+                        if (this.graph_type == "bar" || this.graph_type == "plot") {
+                            if (singleData == null) {
+                                return false;
+                            }
+
+                            for (var i = 0; i < canvasMap.length; i++) {
+                                if (y >= canvasMap[i].yStart && y < canvasMap[i].yEnd) {
+                                    var dNum = canvasMap[i].dataNum;
+                                    if (dNum != null && dNum >= 0 && dNum < singleData.length) {
+                                        if (singleData[dNum].Selected == null || singleData[dNum].Selected < 0) {
+                                            singleData[dNum].Selected = x;
+                                            //store the location of the click.
+                                        } else {
+                                            singleData[dNum].Selected = -1;
+                                        }
+                                        this.updateCanvasGraph();
+                                    }
+                                    break;
+                                }
+                            }
+                        } else {
+                            return false;
+                        }
+
+                        return true;
+                    }
+                },
+
+                //used to remove all labels on the canvas (caused by clicking).
+                clearCanvasLabels : function() {
+                    if (DC_026887848.dsCanvas == true) {
+                        if (this.probeData == null) {
+                            return false;
+                        };
+
+                        var canvasMap = this.canvasMap;
+                        var singleData = null;
+                        var ps = this.getCurrentProbeSet();
+                        singleData = this.probeData[ps];
+
+                        if (this.graph_type == "bar" || this.graph_type == "plot") {
+                            if (singleData == null) {
+                                return false;
+                            }
+
+                            for (var i = 0; i < singleData.length; i++) {
+                                singleData[i].Selected = -1;
+
+                            }
+                            this.updateCanvasGraph();
+
+                        } else {
+                            return false;
+                        }
+                        return true;
+                    }
+                },
+
+                getProbeData : function() {
+                    // Make two queries to SL - one for dataset metadata (factors),
+                    // one for dataset values (probeset_list)
+                    if (DC_026887848.dsCanvas == true) {
+                        this.initCanvas();
+                    };
+                    var ds = this.dsID;
+                    if (ds == -1) {
+                        alert("Error: No dataset selected");
+                        return false;
+                    }
+
+                    $.ajaxSetup({
+                        "error" : function() {
+                            DCCG.buildCanvasError(DC_026887848.getCanvas());
+                        },
+                        "beforeSend" : function(xhr) {
+                            xhr.setRequestHeader("accept", "application/json");
+
+                        }
+                    });
+
+                    // Dataset factors
+                    var mygeneReps = this.mygeneReps;
+                    var gene = this.geneID;
+                    $.getJSON("/dataset/meta/"+ds+"/", function(metaJson, code) {
+                        if (code != "success") {
+                            // Error getting json from server
+                            DCCG.buildCanvasError(DC_026887848.getCanvas());
+                        } else {
+                            //set go to Array Express link
+                            $("#go-ae a").attr('href', "http://www.ebi.ac.uk/arrayexpress/experiments/"+metaJson.detail.geo_gse_id+"/");
+                            // Dataset values
+                            var prox_url = "/dataset/data/"+ds+"/gene/"+gene+"/";
+                            $.getJSON(prox_url, function(dataJson, code) {
+                                if (code != "success") {
+                                    DCCG.buildCanvasError(DC_026887848.getCanvas());
+                                } else {
+                                    // Send dataset factors, values
+                                    if (metaJson.code != 0 || dataJson.code != 0)
+                                        DCCG.buildCanvasError(DC_026887848.getCanvas());
+                                    else
+                                        DC_026887848.setProbeData(metaJson, dataJson);
+                                }
+                            });
+                        }
+                    });
+                },
+
+                clearProbeData : function() {
+                    // Eradicate any data that we might be holding on probes.
+                    // Clear out previous dataset probes
+                    var probeBox = document.getElementById("DC_026887848_probe");
+                    while (probeBox.length > 0) {
+                        probeBox.remove(0);
+                    }
+                    this.probeData = null;
+                    this.setCanvasMouseMap(null);
+                },
+
+                /* setProbeData -- Call this after downloading json data for new group of probesets. It will
+                 * condition the data and perform minor stat analysis.
+                 */
+                setProbeData : function() {
+                    // Populate dataset metadata fields in plugin
+                    var dsMetadata = arguments[0]['detail'];
+                    var dsValues = arguments[1]['detail'];
+                    var dsName = dsMetadata["name"];
+                    DC_026887848.dsName = dsName;
+                    $("#datasetName").html('<a class="ds-name" href="http://biogps.org/dataset/' + this.dsID + '" target="_blank">' + dsName + '</a>');
+
+                    if (dsMetadata["summary"]) {
+                        DC_026887848.dsSummary = dsMetadata["summary"];
+                        DC_026887848.updateSummary("less");
+                        $("#datasetSummaryContainer").show();
+                    } else {
+                        DC_026887848.dsSummary = "";
+                        // Clear any pre-existing description
+                        $("#datasetSummary").html("");
+                        $("#datasetSummaryContainer").hide();
+                    }
+
+                    if (dsMetadata["source"]) {
+                        $("#datasetSource").html(dsMetadata["source"]);
+                        $("#datasetSourceContainer").show();
+                    } else {
+                        // Clear any pre-existing source
+                        $("#datasetSource").html("");
+                        $("#datasetSourceContainer").hide();
+                    }
+
+                    // Combine json results from dataset factors and values queries
+                    var minVal = 0;
+                    var maxVal = 0;
+
+                    // Determine replicates, unique factors across samples
+                    var _replicates = {};
+                    // {"Kidney": [Pos1, Pos2, ...]}
+                    var _dsFactors = dsMetadata["factors"];
+                    var _sortFac = dsMetadata["display_params"]["sort"][0];
+                    if (!_sortFac) {
+                        DC_026887848.sortFactor = "";
+                    } else {
+                        DC_026887848.sortFactor = _sortFac;
+                    }
+                    var factorGroups = {};
+                    // {"title": ["In vitro..."], "Time": ["1hr", "1day"]}
+                    for (var i = 0; i < _dsFactors.length; i++) {
+                        for (var samp in _dsFactors[i]) {
+                            // Replicates
+                            var repName = samp.split(".")[0];
+                            if (_replicates.hasOwnProperty(repName)) {
+                                // Update last position of this replicate
+                                //_replicates[repName][1] = i;
+                                _replicates[repName].push(i);
+                            } else {
+                                //_replicates[repName] = [i, i];
+                                _replicates[repName] = [i];
+                            }
+
+                            // Factors
+                            var sh = _dsFactors[i][samp];
+                            for (var fac in sh) {
+                                if (factorGroups.hasOwnProperty(fac)) {
+                                    if ($.inArray(sh[fac], factorGroups[fac]) == -1) {
+                                        // New value found for factor
+                                        factorGroups[fac].push(sh[fac]);
+                                    }
+                                } else {
+                                    factorGroups[fac] = [sh[fac]]
+                                }
+                            }
+                        }
+                    }
+                    // Ignore factors without variation
+                    var uniqFactors = new Array();
+                    for (var i in factorGroups) {
+                        if (factorGroups[i].length > 1) {
+                            uniqFactors.push(i);
+                        }
+                    }
+
+                    // Combine factors and values
+                    this.probeData = {};
+                    // {"1007_s_at": [{"sample_id": "GSM345", "title": "ABC", "value": 2.7}, {}, ...]}
+                    var probeBox = document.getElementById("DC_026887848_probe");
+
+                    // Iterate through probe data hashes
+                    var probeList = dsValues.probeset_list;
+                    if (probeList.length == 0) {
+                        DC_026887848.handleNoData();
+                        return;
+                    } else {
+                        // In case previous dataset/gene combo had no data, clean up/reset
+                        $(".ds-error").remove();
+                        var containers = DC_026887848.tabContentContainerIDs;
+                        for (var i = 0; i < containers.length; i++) {
+                            var _content = $("#" + containers[i]);
+                            _content.show();
+                        }
+                    }
+
+                    for (var i = 0; i < probeList.length; i++) {
+                        for (var pID in probeList[i]) {
+                            // Populate dataset probe list
+                            var o = document.createElement("option");
+                            o.text = pID;
+                            try {
+                                probeBox.add(o, null);
+                                // standards compliant
+                            } catch(ex) {
+                                probeBox.add(o);
+                                // IE only
+                            }
+                            probeBox.options[0].selected = true;
+
+                            // Combine data
+                            this.probeData[pID] = new Array();
+                            this.probeData[pID]["id"] = pID;
+                            var probeVals = probeList[i][pID].values;
+
+                            // Calculate probe data statistics
+                            this.probeData[pID].minVal = Math.min.apply(Math, probeVals);
+                            this.probeData[pID].maxVal = Math.max.apply(Math, probeVals);
+                            // Calculate median
+                            var tmpArray = probeVals.slice(0);
+                            tmpArray.sort();
+                            var len = tmpArray.length;
+                            var median;
+                            if(len%2 == 0)
+                            {
+                                median = tmpArray[len/2]+tmpArray[len/2-1];
+                            }
+                            else
+                            {
+                                median = tmpArray[Math.floor(len/2)];
+                            }
+                            median = parseFloat(median);
+                            this.probeData[pID].globalMean = median;
+
+                            // Combine samples with data and unique factors
+                            var sampKeyHash = {};
+                            // {"Kidney": {"value": 1.3, ...}, "Tonsil": {...}, etc}
+                            // Iterate through probe factors hash
+
+                            for (var sampHash in _dsFactors) {
+                                if ( typeof (_dsFactors[sampHash]) != "object") {
+                                    continue;
+                                }
+                                for (var sampID in _dsFactors[sampHash]) {
+                                    var sampName = sampID.split(".")[0];
+                                    if (sampKeyHash.hasOwnProperty(sampName)) {
+                                        // Replicate already parsed
+                                        continue;
+                                    }
+                                    sampKeyHash[sampName] = {};
+                                    var sampDataIndex = _replicates[sampName];
+                                    if (!sampDataIndex) {
+                                        // Extra properties, not samples
+                                        delete sampKeyHash[sampName];
+                                        continue
+                                    }
+
+                                    //var sampData = probeVals.slice(sampDataRange[0], sampDataRange[1]+1);
+                                    var sampData = [];
+                                    for (var r = 0; r < sampDataIndex.length; r++) {
+                                        sampData.push(probeVals[sampDataIndex[r]])
+                                    }
+                                    var sampDataSum = 0;
+
+                                    for (var s = 0; s < sampData.length; s++) {
+                                        sampDataSum += sampData[s];
+                                    }
+
+                                    var sampDataAvg = sampDataSum / sampData.length;
+                                    sampKeyHash[sampName]["value"] = sampDataAvg;
+                                    sampKeyHash[sampName]["mean"] = sampDataAvg;
+
+                                    // Standard error
+                                    if (sampData.length > 1) {
+                                        var _sumDiffs = 0;
+                                        for (var d = 0; d < sampData.length; d++) {
+                                            _sumDiffs += Math.pow((sampData[d] - sampDataAvg), 2);
+                                        }
+                                        var _stdDev = Math.sqrt(_sumDiffs / (sampData.length - 1));
+                                        if (isNaN(_stdDev) == true) {
+                                            sampKeyHash[sampName]["stderr"] = 0;
+                                        } else {
+                                            sampKeyHash[sampName]["stderr"] = _stdDev / (Math.sqrt(sampData.length));
+                                        }
+                                    } else {
+                                        sampKeyHash[sampName]["stderr"] = 0;
+                                    }
+
+                                    for (var facName in _dsFactors[sampHash][sampID]) {
+                                        // Construct hash of samples
+                                        if ($.inArray(facName, uniqFactors) != -1) {
+                                            sampKeyHash[sampName][facName] = _dsFactors[sampHash][sampID][facName];
+                                            // Fake column name for now - fix after implementing grouping
+                                            // Pull from metadata, if empty then use column_name
+                                            if (facName === "title") {
+                                                sampKeyHash[sampName]["column_name"] = _dsFactors[sampHash][sampID][facName];
+                                            }
+                                        }
+                                    }
+                                    if (sampKeyHash[sampName]) {
+                                        this.probeData[pID].push(sampKeyHash[sampName]);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Calculate max text length, min/max data values for each probe
+                    var ctx = this.getCanvas();
+                    for (var pID in this.probeData) {
+                        var max_txt_len = 0;
+                        for (var i = 0; i < this.probeData[pID].length; i++) {
+                            var sampHash = this.probeData[pID][i];
+                            // Calculate maximum text length
+                            var _colName = sampHash["column_name"];
+                            var txt_len = ctx == null ? _colName.length : DCCG.textLen(ctx, _colName);
+                            if (txt_len > max_txt_len) {
+                                max_txt_len = txt_len;
+                            };
+                        }
+                        this.probeData[pID].maxTxtLen = max_txt_len;
+
+                        var maxVal = this.probeData[pID].maxVal;
+                        if (maxVal <= 0) {
+                            maxVal = 1;
+                        } else {
+                            var tmp = Math.pow(10, Math.floor(Math.log(maxVal) / Math.log(10)));
+                            maxVal = (Math.floor(maxVal / tmp) + 1) * tmp;
+                        }
+
+                        var minVal = this.probeData[pID].minVal;
+                        if (minVal >= 0) {
+                            minVal = 0;
+                        } else {
+                            minVal = minVal * -1;
+                            var tmp = Math.pow(10, Math.floor(Math.log(minVal) / Math.log(10)));
+                            minVal = (Math.floor(minVal / tmp) + 1) * tmp;
+                            minVal = minVal * -1;
+                        }
+
+                        this.probeData[pID].roundedMaxVal = maxVal;
+                        this.probeData[pID].roundedMinVal = minVal;
+                        this.probeData[pID].zoomMaxVal = maxVal;
+                        this.probeData[pID].zoomMinVal = minVal;
+
+                        // Sort samples
+                        this.probeData[pID].sort(function(a, b) {
+                            return a[DC_026887848.sortFactor] - b[DC_026887848.sortFactor]
+                        });
+                    }
+                    if (ctx != null) {
+                        this.searchGraph(true);
+                    }
+                    this.setProbeImage();
+                    this.setRawLink();
+                },
+
+                searchTxt : null, //We only want to do a search when this one changes.
+
+                searchGraph : function(override) {
+                    //This is the parent function to searching the probe data.
+                    //First thing we need to validate our input.
+                    var txt = this.getSearchTerm();
+                    txt = txt.replace(/^\s+/, "");
+                    txt = txt.replace(/\s+$/, "");
+
+                    if (/^\s*$/.test(txt)) {
+                        txt = null;
+                    }
+                    if (txt != this.searchTxt || override != null) {
+                        this.searchTxt = txt;
+                        this.searchProbeData(txt);
+                        this.updateCanvasGraph();
+                    }
+                },
+
+                getSearchTerm : function() {
+                    //A quick way to get the term that was searched for.
+                    var txt = $("#DC_026887848_canvas_search").val();
+                    return txt;
+                },
+
+                searchProbeData : function(txt) {
+                    //Allows us to set a highlight flag on samples if the name matches the search terms.
+                    //we set a special flag call .Mark to either true or false (true indicates a match that should be highlighted).
+
+                    var allData = this.probeData;
+                    if (allData == null) {
+                        return false;
+                    }
+
+                    if (txt == null) {
+                        //Dont have a search term, so loop through all the data and clear all the highlight/mark flags.
+
+                        for (var p in allData) {
+                            var sampData = allData[p];
+                            for (var s in sampData) {
+                                sampData[s].Mark = false;
+                            }
+                        }
+                    } else {
+                        //We have something to search for so loop through all the data that we have and mark matches with a highlight flag.
+                        var searchPattern = new RegExp(txt, "i");
+                        for (var p in allData) {
+                            var sampData = allData[p];
+                            for (var s in sampData) {
+                                if (searchPattern.test(sampData[s].column_name)) {
+                                    sampData[s].Mark = true;
+                                } else {
+                                    sampData[s].Mark = false;
+                                }
+                            }
+
+                        }
+                    }
+
+                },
+                graph_type : "bar",
+
+                //Changes the graph type that should be displayed on the canvas.  There may be a quicker
+                //way to do this with jQuery, but this is good enough for now.
+                changeCanvasGraphType : function() {
+                    var types = document.getElementById("DC_026887848_canvas_graph_type");
+                    for ( i = 0; i < types.length; i++) {
+                        if (types.options[i].selected) {
+                            this.graph_type = types.options[i].value;
+                            break;
+                        }
+                    }
+                    //Now update the graph.
+                    this.updateCanvasGraph();
+                },
+
+                updateCanvasGraph : function() {
+                    if (DC_026887848.dsCanvas == true) {
+                        var allData = this.probeData;
+                        var ctx = this.getCanvas();
+                        if (allData == null || ctx == null) {
+                            return false;
+                        }
+
+                        if (this.graph_type == "bar" || this.graph_type == "plot") {
+                            var ps = this.getCurrentProbeSet();
+                            var data = null;
+                            for (var pID in allData) {
+                                if (ps == pID) {
+                                    data = allData[pID];
+                                }
+                            }
+
+                            if (data == null) {
+                                return false;
+                            }
+
+                            // Adjust zoom values based on slider
+                            var slider = $("#DC_026887848_canvas_chart_slider");
+                            var sldValueMin = slider.slider("values", 0) / DC_026887848.sliderResolution;
+                            //divide by the resolution to Get a percentage.
+                            var sldValueMax = slider.slider("values", 1) / DC_026887848.sliderResolution;
+                            data.zoomMaxVal = data.roundedMaxVal - ((data.roundedMaxVal - data.roundedMinVal) * (1 - sldValueMax));
+                            data.zoomMinVal = data.roundedMinVal + ((data.roundedMaxVal - data.roundedMinVal) * (sldValueMin));
+
+                            //Actually update the canvas now.
+                            if (this.graph_type == "bar") {
+                                var dataMap = DCCG.renderChartTall(ctx, data, "bar");
+                                this.setCanvasMouseMap(dataMap);
+                            } else if (this.graph_type == "plot") {
+                                var dataMap = DCCG.renderChartTall(ctx, data, "plot");
+                                this.setCanvasMouseMap(dataMap);
+                            }
+                        } else {
+                            return false;
+                        }
+                    }
+                },
+
+                canvas_check : 0,
+                checkForCanvas : function() {
+                    if (this.canvas_check == 1) {
+                        return true;
+                    }
+
+                    if (this.canvas_check == -1) {
+                        $("#DC_026887848_canvas_error_message").show();
+                        return false;
+                    }
+
+                    var ctx;
+                    var cantest = document.createElement("canvas");
+
+                    if ( typeof (DCCG) == "undefined" || !cantest || !cantest.getContext) {
+                        if (!document.all) {//check for ie
+                            $("#DC_026887848_canvas_error_message").show();
+                        }
+
+                        this.canvas_check = -1;
+                        return false;
+                    }
+
+                    var ctx = cantest.getContext("2d");
+                    if (!ctx || !ctx.fillText) {
+                        if (!document.all) {//check for ie
+                            $("#DC_026887848_canvas_error_message").show();
+                        }
+
+                        this.canvas_check = -1;
+                        return false;
+                    }
+
+                    this.canvas_check = 1;
+                    return true;
+                },
+
+                //
+                //END CANVAS GRAPHING ROUTINES
+                //
+                //
+
+                loadDataset : function(dsID) {
+                    if (this.dsID == dsID) {
+                        // Same dataset ID, do nothing
+                        return;
+                    } else {
+                        DC_026887848.clearCorrData();
+                        //ds is null, will initial ds and gene id
+                        if (!dsID)
+                        {
+                            //1st try url
+                            dsID = this._getUrlParam('dataset');
+                            // then cookie
+                            if (dsID == null)
+                            {
+                                var org_cookie_name = "org_10116";
+                                var allcookies = document.cookie;
+                                var cpos = allcookies.indexOf(org_cookie_name + "=");
+                                if (cpos > -1) {
+                                    var start = allcookies.indexOf("=", cpos) + 1;
+                                    var end = allcookies.indexOf(";", start);
+                                    if (end == -1) {
+                                        end = allcookies.length;
+                                    }
+                                    dsID = decodeURIComponent(allcookies.substring(start, end));
+                                }
+                            }
+                            // finally, server end default
+                            geneID = this._getUrlParam('gene');
+                            var prox_url;
+                            if (geneID != null)
+                                prox_url = "/dataset/default/?gene="+geneID;
+                            else
+                                prox_url = "/dataset/default/";
+                            $.getJSON(prox_url, function(dataJson, code) {
+                                if (code != "success") {
+                                    DCCG.buildCanvasError(DC_026887848.getCanvas());
+                                } else {
+                                    if (dataJson.code != 0)
+                                    {
+                                        DCCG.buildCanvasError(DC_026887848.getCanvas());
+                                    }
+                                    else
+                                    {
+                                        DC_026887848.geneID = dataJson.details.gene;
+                                        DC_026887848.dsID = dataJson.details.dataset;
+                                        if (dsID)
+                                            DC_026887848.dsID
+                                        DC_026887848.setDatasetCookie();
+                                        DC_026887848.loadProbes();
+                                    }
+                                }
+                            });
+
+                        }
+                        else
+                        {//dataset changed
+                            this.dsID = dsID;
+                            this.setDatasetCookie();
+                            this.loadProbes();
+                        }
+                    }
+                },
+
+                loadProbes : function() {
+                    // Clear out old probe data, get new
+                    this.clearProbeData();
+                    this.getProbeData();
+                },
+                loadTabs : function() {
+                    var start_tab = 1
+                    if (this.checkForCanvas()) {
+                        start_tab = 0;
+                        DC_026887848.dsCanvas = true;
+                    }
+
+                    // basic tabs 1, built from existing content
+                    var tabs = new Ext.TabPanel({
+                        id : "dataChartTabPanel",
+                        renderTo : "DC_026887848_tabs1",
+                        activeTab : start_tab,
+                        frame : true,
+                        defaults : {
+                            autoHeight : true
+                        },
+                        resizable : true,
+                        items : [{
+                            contentEl : "DC_026887848_dataset_canvas",
+                            title : "Interactive Image"
+                        }, {
+                            contentEl : "DC_026887848_dataset_image",
+                            title : "Static Image"
+                        }, {
+                            contentEl : "DC_026887848_correlation",
+                            title : "Correlation"
+                        }, {
+                            contentEl : "DC_026887848_Download",
+                            title : "Downloads"
+                        }]
+                    });
+                },
+
+                _getUrlParam : function (name)
+                {
+                var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+                var r = window.location.search.substr(1).match(reg);
+                if (r!=null) return unescape(r[2]); return null;
+                },
+
+                Corr_Grid : null, //use to store the correlation data.
+                Corr_Store : null,
+                loadToBioGPS : function() {
+                    //biogps.utils.loadGeneList([1,2,3]);
+                    var geneList = [];
+                    if (DC_026887848.Corr_Store === null) {
+                        alert("Nothing to load!");
+                        return null;
+                    }
+
+                    var data;
+                    if (DC_026887848.Corr_Store.allData != null) {
+                        data = DC_026887848.Corr_Store.allData.items;
+                    } else {
+                        data = DC_026887848.Corr_Store.data.items;
+                    }
+
+                    if (data.length == 0) {
+                        alert("Nothing to load!");
+                        return null;
+                    }
+
+                    for ( i = 0; i < data.length; i++) {
+                        geneList[i] = data[i].data.matched_term;
+                    }
+
+                    biogps.utils.loadGeneList(geneList);
+                    return null;
+                },
+
+                getCurrentProbeSet : function() {
+                    var probesets = document.getElementById("DC_026887848_probe");
+                    var ps = "-1";
+                    for ( i = 0; i < probesets.length; i++) {
+                        if (probesets.options[i].selected) {
+                            ps = probesets.options[i].text;
+                        }
+                    }
+                    return ps;
+                },
+
+                buildCorrURL : function() {
+                    var corrUrl = "/dataset/correlation/";
+                    var corrVal = document.getElementById("DC_026887848_cor_val");
+                    var corrFactor = parseFloat(corrVal.value);
+                    if (corrFactor == "NaN") {
+                        corrFactor = 0.9;
+                        corrVal.value = 0.9;
+                    } else {
+                        corrVal.value = corrFactor;
+                    }
+
+                    if (corrFactor < 0.5) {
+                        corrFactor = 0.5;
+                        corrVal.value = 0.5;
+                    }
+
+                    if (corrFactor > 1.0) {
+                        corrFactor = 1.0;
+                        corrVal.value = 1.0;
+                    }
+
+                    var ds = this.dsID;
+                    var probesets = document.getElementById("DC_026887848_probe");
+                    var ps = "-1";
+                    for ( i = 0; i < probesets.length; i++) {
+                        if (probesets.options[i].selected) {
+                            ps = probesets.options[i].text;
+                        }
+                    }
+
+                    corrUrl = corrUrl + ds + "/reporter/" + ps + "/min/" + corrFactor+'/';
+                    return corrUrl;
+                },
+
+                DLCorr : function() {
+                    var corrUrl = DC_026887848.buildCorrURL();
+                    corrUrl = corrUrl + "&type=csv";
+                    window.open(corrUrl);
+                },
+
+                loadCorr : function() {
+                    // create the Data Store for the correlation data
+                    var corrUrl = this.buildCorrURL();
+                    Ext.Ajax.timeout = 300000;
+                    //increase default timeout to 5min
+                    if (this.Corr_Store === null) {
+                        var geneRec = Ext.data.Record.create(["id", "symbol", "value", "reporter"]);
+
+                        this.Corr_Store = new Ext.ux.data.PagingStore({
+                            url : corrUrl,
+                            reader : new Ext.data.JsonReader({
+                                // records will have a "gene" tag
+                                id : "reporter"
+                            }, geneRec)
+                        });
+
+                        // create the grid
+                        this.Corr_Grid = new Ext.grid.GridPanel({
+                            store : this.Corr_Store,
+                            columns : [{
+                                header : "Correlation",
+                                width : 80,
+                                dataIndex : "value",
+                                sortable : true
+                            }, {
+                                header : "ID",
+                                width : 60,
+                                dataIndex : "id",
+                                sortable : true
+                            }, {
+                                header : "Gene_Symbol",
+                                width : 100,
+                                dataIndex : "symbol",
+                                sortable : true
+                            }, {
+                                header : "Probe",
+                                width : 100,
+                                dataIndex : "reporter",
+                                sortable : true
+                            }],
+                            renderTo : "DC_026887848_corr-grid",
+                            width : 360,
+                            height : 520,
+                            loadMask : true,
+                            tbar : [{
+                                text : 'Download Correlation',
+                                tooltip : 'Downloads the correlation result as a .csv file',
+                                handler : this.DLCorr,
+                                iconCls : 'icon-load'
+                            }],
+                            bbar : new Ext.PagingToolbar({
+                                pageSize : 20,
+                                store : this.Corr_Store,
+                                displayInfo : true,
+                                displayMsg : "{0}-{1} of {2}",
+                                emptyMsg : "No Genes to display",
+                                items : ["-"]
+                            })
+                        });
+                        this.Corr_Grid.render();
+
+                        var opt = {
+                            params : {
+                                start : 0,
+                                limit : 20
+                            }
+                        };
+                        this.Corr_Store.load(opt);
+                    } else {
+                        var opt = {
+                            params : {
+                                start : 0,
+                                limit : 20
+                            }
+                        };
+                        delete this.Corr_Store.lastParams;
+                        this.Corr_Store.proxy.conn.url = corrUrl;
+                        this.Corr_Store.reload(opt);
+                        this.Corr_Grid.render();
+                    }
+                    Ext.Ajax.timeout = 30000;
+                    //reset timeout to default 30s
+                }
+            };
+        </script>
+
+        <script type="text/javaScript" src="./js/data_chart_canvas.js"></script>
+        <script language="JavaScript">
+            var searchBar = $("<center><div id=\"searchBar\" style=\"font-size: 12px\">\
+            <b>Search: </b><input type=\"text\" id=\"searchDS\" size=\"50\" onkeypress=\"DC_026887848.changeSearchTerm(event, this.value)\">\
+            <span class=\"span-reset-search\"><a href=\"javascript:void(0)\" onclick=\"DC_026887848.resetDSLib()\">x<\/a><span>\
+            <div id=\"dialog\"></div>\
+            </div></center>\
+            ");
+
+            // Bind handler to retain search input focus, fire search
+            //$(document).delegate("#searchDS", "keyup", function(event) {
+            //  event.preventDefault();
+            //  event.stopPropagation();
+            //  $("#searchDS").focus();
+            //});
+
+            var _dialog = $("<div id=\"accordion\" style=\"font-size: 12px\">\
+            <h3><a href=\"#\"><b>Default Datasets</b> (<span id=\"dsDefaultTotal\">0</span>)</a></h3>\
+            <div id=\"dsDefaults\">\
+            <ul id=\"dsDefaultsList\"></ul>\
+            </div>\
+            <h3><a href=\"#\"><b>Dataset Library</b> (<span id=\"dsLibTotal\">0</span>)</a></h3>\
+            <div>\
+            <ul id=\"dsList\"></ul>\
+            <hr />\
+            <span id=\"dialogBottomNav\">\
+            <center>\
+            <span id=\"pagingNav\">\
+            <span id=\"prevPage\" style=\"width:15px\">\
+            <a class=\"ds-dialog-nav\" href=\"javascript:void(0)\" onclick=\"DC_026887848.changeDSPage('-')\">\u00ab&nbsp;Prev</a></span>&nbsp;&nbsp;&nbsp;<span id=\"nextPage\" style=\"width:15px\"><a class=\"ds-dialog-nav\" href=\"javascript:void(0)\" onclick=\"DC_026887848.changeDSPage('+')\">Next&nbsp;\u00bb</a>\
+            </span>\
+            </span>\
+            <span style=\"float: right\" id=\"dsLibPageText\">Page <span id=\"dsLibPageNum\"></span> of <span id=\"dsLibPages\"></span></span>\
+            </center>\
+            </span>\
+            </div>\
+            </div>").accordion({active: 1, autoHeight: false, icons: false});
+
+            // Bind handler to close dialog once ds is selected
+            $(document).delegate(".ds-dialog", "click", function(event) {
+            $(this).closest(".ui-dialog-content").dialog("destroy");
+            });
+
+            $(document).ready(function() {
+            var link = $("<link>");
+            link.attr({
+            type: "text/css",
+            rel: "stylesheet",
+            href: "./css/jquery-ui-1.8.5.custom.css"
+            });
+            $("head").append( link );
+            //$.getScript("/data_chart/assets/data_chart_canvas.js?ver=3", function() {
+            $.getScript("js/jquery-ui.js",function() {
+            DC_026887848.init();
+            });
+            //});
+            });
+        </script>
+
+    </head>
+    <body onresize="DC_026887848.resizeCanvas()" class="   ext-webkit ext-chrome ext-linux">
+        <div id="DC_026887848_outside" style="margin:5px">
+            <div id="DC_026887848_top_input" style="margin:5px">
+                <form method="get" action="./Data Chart Plugin_files/Data Chart Plugin.html" enctype="multipart/form-data" name="form1">
+                    <div style="float:left"></div>
+                </form>
+                <div id="datasetNameContainer" style="width:99%">
+                    <b>Dataset: </b><span id="datasetName"><a class="ds-name" href="http://biogps.org/dataset/5" target="_blank"></a></span>
+                    <span id="change-dataset">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="change-ds btn-use-object requires-js" href="javascript:void(0)" onclick="DC_026887848.changeDataset();">Change</a></span>
+                    <span id="go-ae">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="go-ae btn-use-object requires-js" href="http://www.ebi.ac.uk/">Array Express</a></span>
+                </div>
+                <div id="datasetProbes" style="width:99%">
+                    <b>Probeset:</b>
+                    <select id="DC_026887848_probe" onchange="DC_026887848.setProbe(); DC_026887848.clearCorrData()">
+
+                        <option>D28753_i_at</option><option>D28754_s_at</option>
+                    </select>
+                </div>
+                <div id="datasetSummaryContainer" style="width: 99%;">
+                    <b>Summary: </b><span id="datasetSummary"></span>&nbsp;<a id="datasetSummaryMoreLink" class="requires-js" href="javascript:void(0)" onclick="DC_026887848.updateSummary(&quot;more&quot;);" style="display: none;">more</a>
+                </div>
+                <div id="datasetSourceContainer" style="display: none; width: 99%;">
+                    <b>Source: </b><span id="datasetSource"></span>
+                </div>
+            </div>
+            <div id="DC_026887848_tabs1" style="clear: both; margin: 5px;">
+                <div id="dataChartTabPanel" class=" x-tab-panel" style="width: 1168px;"></div>
+                <div id="DC_026887848_dataset_canvas" class="">
+                    <div style="font: normal normal normal 11px/normal tahoma, arial, helvetica, sans-serif;">
+                        <div style="float:left; width:100%; display: block; position: relative; margin-top:5px">
+                            <div style="position:relative; float:left; left: 100%; margin-left: -99%; width:98%">
+                                <p id="DC_026887848_canvas_error_message" class="\&quot;ds-error\&quot;" style="display:none; text-align:left">
+                                    Your browser does not support HTML5 features required for the interactive gene expression chart. Please use the Static Image or update to the latest version of your browser.
+                                </p>
+                            </div>
+                        </div>
+                        <div style="float:left; width:100%; display: block; position: relative; margin-top:5px">
+                            <div style="position:relative; float:left; left: 100%; margin-left: -99%; width:35%">
+                                <p id="DC_026887848_canvas_search_controls" style="text-align: left;">
+                                    Search:
+                                    <input style="font-size: 10px; width:50%;" type="text" id="DC_026887848_canvas_search" size="8" onkeyup="DC_026887848.searchGraph()">
+                                </p>
+                            </div>
+                            <div style="position:relative; float:left; left: 100%; margin-left: -64%; width:15%; margin-top:3px">
+                                <p id="DC_026887848_canvas_zoom_label" style="text-align: right;">
+                                    Zoom:
+                                </p>
+                            </div>
+                            <div style="position:relative; float:left; left: 100%; margin-left: -48%; width:45%; margin-top:5px">
+                                <div id="DC_026887848_canvas_chart_slider" class="ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all">
+                                    <div class="ui-slider-range ui-widget-header" style="left: 0%; width: 100%;"></div><a href="http://plugins.biogps.org/data_chart/data_chart.cgi?id=362817#" class="ui-slider-handle ui-state-default ui-corner-all" style="left: 0%;"></a><a href="http://plugins.biogps.org/data_chart/data_chart.cgi?id=362817#" class="ui-slider-handle ui-state-default ui-corner-all" style="left: 100%;"></a>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="float:left; width:100%; display: block; position: relative;">
+                            <div style="position:relative; float:left; left: 100%; margin-left: -99%; width:99%">
+                                <canvas id="DC_026887848_canvas_chart" height="511" width="1168">
+                                    <iframe frameborder="0" style="border: 1px solid #AAAAAA;" width="370" height="370" src="./browsers.html">
+                                        &lt;p&gt;Your browser does not support iframes or the canvas object.  You might consider upgrading to a modern browser.&lt;/p&gt;
+                                    </iframe>
+                                </canvas>
+                            </div>
+                        </div>
+                        <div style="float:left; width:100%; display: block; position: relative;">
+                            <div style="position:relative; float:left; left: 100%; margin-left: -99%; width:20%">
+                                <input style="" type="button" id="DC_026887848_canvas_save_button" value="Save Image" onclick="DC_026887848.saveCanvas()">
+                            </div>
+                            <div style="position:relative; float:left; left: 100%; margin-left: -75%; width:30%">
+                                <p style="" id="DC_026887848_canvas_graph_type_wrapper">
+                                    Chart Type:
+                                    <select style="font-size: 10px;" id="DC_026887848_canvas_graph_type" onchange="DC_026887848.changeCanvasGraphType()">
+                                        <option value="bar">Bar</option>
+                                        <!--<option value="plot">Plot</option>-->
+                                    </select>
+                                </p>
+                            </div>
+                            <div style="position:relative; float:left; left: 100%; margin-left: -25%; width:25%; text-align:right;">
+                                <input style="" type="button" id="DC_026887848_canvas_clear_button" value="Clear Labels" onclick="DC_026887848.clearCanvasLabels()">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="DC_026887848_dataset_image" class="x-hide-display">
+                    <img id="DC_026887848_probe_set_image" title="Data Chart Image" alt="Data Chart Image" src="">
+                </div>
+                <div id="DC_026887848_correlation" class="x-hide-display">
+                    <span id="DC_026887848_correlationContainer">
+                        <p style="margin:5px">
+                            Correlation Cutoff:
+                            <input type="text" id="DC_026887848_cor_val" size="5" value="0.9">
+                            <input type="button" id="DC_026887848_cor_button&quot;" value="Go!" onclick="DC_026887848.loadCorr()">
+                        </p> <div id="DC_026887848_corr-grid" style="margin:5px"></div> </span>
+                </div>
+                <div id="DC_026887848_Download" class="x-hide-display">
+                    <span id="DC_026887848_downloadContainer">
+                        <p style="margin:5px">
+                            <a id="DC_026887848_Download_link" href="javascript:void(0)"></a>
+                        </p> </span>
+                </div>
+
+                </div>
+            </div>
+            <p style="font-size: 8pt">
+                <a href="mailto:biogps@googlegroups.com">Can't see the expression image?  Please let us know!</a>
+            </p>
+            <p id="datachartVer" style="font-size: 7pt">
+                Version 2.0
+            </p>
+        </div>
+
+    </body>
+</html>
