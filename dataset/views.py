@@ -11,6 +11,7 @@ from elasticsearch import Elasticsearch
 import math
 from dataset.util import general_json_response, GENERAL_ERRORS
 import StringIO
+import mygene
 
 
 def adopt_dataset(ds_id):
@@ -71,10 +72,9 @@ def dataset_info(request, ds_id):
 def  get_dataset_data(ds, gene_id=None, reporter_id=None):
     reporters = []
     if gene_id is not None:
-        url = 'http://mygene.info/v2/gene/%s/?\
-            fields=entrezgene,reporter,refseq.rna' % gene_id
-        res = requests.get(url)
-        data_json = res.json()
+        mg = mygene.MyGeneInfo()
+        res = mg.querymany([gene_id], scopes='_id', fields='reporter')
+        data_json = res[0]
         for i in data_json['reporter'].values():
             if type(i) is not list:
                 i = [i]
@@ -332,10 +332,9 @@ def dataset_default(request):
     gene_id = request.GET.get('gene', None)
     if gene_id is None:
         gene_id = settings.DEFAULT_GENE_ID
-    url = 'http://mygene.info/v2/gene/%s/?\
-        fields=taxid' % gene_id
-    res = requests.get(url)
-    data_json = res.json()
+    mg = mygene.MyGeneInfo()
+    res = mg.querymany([gene_id], scopes='_id', fields='taxid')
+    data_json = res[0]
     species = data_json['taxid']
     try:
         ds_id = settings.DEFAULT_DATASET_MAPPING[species]
@@ -386,9 +385,35 @@ def dataset_correlation(request, ds_id, reporter_id, min_corr):
         # Return highest correlated first
         corrs = zip(val_corrs, idx_corrs)
         corrs.sort(reverse=True)
-        print corrs
-        return general_json_response(detail=[{'Reporter': reporters[i[1]],
-                 'Value': round(i[0], 4)} for i in corrs])
+        rep_cor = {reporters[i[1]]: i[0] for i in corrs}
+        #query mygene to get symbol from reporter
+        mg = mygene.MyGeneInfo()
+        res = mg.querymany(rep_cor.keys(), scopes='reporter', fields='symbol')
+        result = []
+        for i in res:
+            if 'notfound' in i:
+                gene_id, symbol = '', ''
+            else:
+                gene_id, symbol = i['_id'], i['symbol']
+            result.append({'id': gene_id, 'reporter': i['query'], \
+                'symbol': symbol, 'value': round(rep_cor[i['query']], 4)})
+        ret_type = request.GET.get('type', None)
+        if ret_type is None:
+            #print reporters
+            from .util import ComplexEncoder
+            return HttpResponse(json.dumps(result, cls=ComplexEncoder),\
+                             content_type="application/json")
+        else:
+            response = HttpResponse(mimetype='text/csv')
+            response['Content-Disposition'] = 'attachment; filename=%s.csv' \
+                % ds.geo_gse_id
+            writer = csv.writer(response)
+            writer.writerow(result[0].keys())
+            i = 0
+            while(i < len(result)):
+                writer.writerow(result[i].values())
+                i = i + 1
+            return response
 
     return general_json_response(GENERAL_ERRORS.ERROR_BAD_ARGS, \
                 "Reporter %s not in dataset: %s." % (reporter_id, ds_id))

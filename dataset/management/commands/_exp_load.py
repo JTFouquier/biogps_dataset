@@ -155,7 +155,7 @@ class ExperimentRaw(ResourceRequest):
             f.write(self.sdrf.getvalue())
 #         with open('%s/%s.sdrf.json' % (self.name, self.name), 'w') as f:
 #             f.write(json.dumps(self.sdrf))
-        
+
         for k in self.data_raw:
             with open('%s/%s' % (self.name, k), 'w') as f:
                 f.write(self.data_raw[k].getvalue())
