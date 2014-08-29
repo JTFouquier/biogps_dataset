@@ -555,6 +555,7 @@
                     // Dataset factors
                     var mygeneReps = this.mygeneReps;
                     var gene = this.geneID;
+                    $("#datasetName a").attr('href', "/dataset/meta/"+ds+"/");
                     $.getJSON("/dataset/meta/"+ds+"/", function(metaJson, code) {
                         if (code != "success") {
                             // Error getting json from server
@@ -599,7 +600,7 @@
                     var dsValues = arguments[1]['detail'];
                     var dsName = dsMetadata["name"];
                     DC_026887848.dsName = dsName;
-                    $("#datasetName").html('<a class="ds-name" href="http://biogps.org/dataset/' + this.dsID + '" target="_blank">' + dsName + '</a>');
+                    $("#datasetName a").text(dsName);
 
                     if (dsMetadata["summary"]) {
                         DC_026887848.dsSummary = dsMetadata["summary"];
@@ -1199,7 +1200,7 @@
 
                 DLCorr : function() {
                     var corrUrl = DC_026887848.buildCorrURL();
-                    corrUrl = corrUrl + "&type=csv";
+                    corrUrl = corrUrl + "?type=csv";
                     window.open(corrUrl);
                 },
 
