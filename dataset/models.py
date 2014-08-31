@@ -88,7 +88,7 @@ class BiogpsDataset(models.Model):
     #serialize object data for es index setup
     def es_index_serialize(self):
         return {"name": self.name,\
-                "summary": self.summary, "id": self.id}
+                "summary": self.summary, "id": str(self.id)}
 
     @property
     def name_wrapped(self):
