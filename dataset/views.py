@@ -11,7 +11,6 @@ from elasticsearch import Elasticsearch
 import math
 from dataset.util import general_json_response, GENERAL_ERRORS
 import StringIO
-import mygene
 
 
 def adopt_dataset(ds_id):
@@ -237,30 +236,37 @@ def dataset_chart(request, ds_id, reporter_id):
     return response
 
 
-def es_get_count(q):
-    body = {"query": {"match": {"_all": q}}}
-    es = Elasticsearch()
-    res = es.search(index="blogs", doc_type="biogps", body=body)
-    return res["hits"]["total"]
-
-
 #接受查询的字段组合query和获取的第几页page
 @csrf_exempt
 def dataset_search(request):
     query = request.GET.get("query", None)
     page = request.GET.get("page", 0)
     page_by = request.GET.get("page_by", 8)
+    plt_form = request.GET.get("platform", None)
+
+    if query == None or plt_form == None:
+        return HttpResponse('{"code":4004, "detail":"query or platform not \
+            found"}', content_type="application/json")
 
     page = int(page) - 1
     page_by = int(page_by)
     body = {"from": page * page_by, "size": page_by}
-    if query is not None:
-        body["query"] = {"match": {"_all": query}}
-    es = Elasticsearch()
-    ret = es.search(index="blogs", doc_type="biogps", body=body)
-    count = ret["hits"]["total"]
+    body["query"] = {"match": {"_all": query}}
+    body["filter"] = {"has_parent": {"parent_type": "platform",
+            "query": {"match": {"_all": plt_form}}}}
+
+    data = json.dumps(body)
+    print data
+    url = r"http://127.0.0.1:9200/blogs/dataset/_search"
+    request = urllib2.Request(url, data = data)
+    request.get_method = lambda: 'POST'
+    search_back = urllib2.urlopen(request)
+
+    search_dic = json.loads(search_back.read())
+    count = search_dic["hits"]["total"]
+    total_page = int(math.ceil(float(count) / float(page_by)))
     res = []
-    for item in ret["hits"]["hits"]:
+    for item in search_dic["hits"]["hits"]:
         try:
             ds = models.BiogpsDataset.objects.get(id=int(item["_id"]))
         except Exception, e:
@@ -272,11 +278,12 @@ def dataset_search(request):
             fac_list.append({"name": fac_item})
         temp_dic["factors"] = fac_list
         res.append(temp_dic)
-    total_page = int(math.ceil(float(count) / float(page_by)))
+
     res = {"current_page": page + 1, "total_page": total_page, "count": count,\
             "results": res}
     return HttpResponse('{"code":0, "details":%s}' % json.dumps(res),\
                         content_type="appliction/json")
+
 
 
 def dataset_csv(request, ds_id, gene_id):
