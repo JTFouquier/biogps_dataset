@@ -74,6 +74,8 @@ def _get_reporter_from_gene(gene):
     mg = mygene.MyGeneInfo()
     res = mg.querymany([gene], scopes='_id', fields='reporter')
     data_json = res[0]
+    if 'notfound' in data_json:
+        return None
     reporters = []
     for i in data_json['reporter'].values():
         if type(i) is not list:
@@ -255,7 +257,9 @@ def dataset_search(request):
     if gene is None:
         gene = settings.DEFAULT_GENE_ID
     reporters = _get_reporter_from_gene(gene)
-
+    if reporters is None:
+        return general_json_response(code=GENERAL_ERRORS.ERROR_NOT_FOUND,\
+                         detail='no matched data for gene %s.' % gene)
     page = int(page) - 1
     page_by = int(page_by)
     body = {"from": page * page_by, "size": page_by}
@@ -263,8 +267,9 @@ def dataset_search(request):
         body["query"] = {"match": {"_all": query}}
     else:
         body["query"] = {"match_all": {}}
+    rep = ' '.join(reporters)
     body["filter"] = {"has_parent": {"parent_type": "platform",
-            "query": {"match": {"reporters": json.dumps(reporters)}}}}
+            "query": {"match": {"reporters": rep}}}}
     data = json.dumps(body)
     url = r"http://127.0.0.1:9200/biogps/dataset/_search"
     request = urllib2.Request(url, data=data)
