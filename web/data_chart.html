@@ -1061,7 +1061,7 @@
                                         DC_026887848.geneID = dataJson.details.gene;
                                         DC_026887848.dsID = dataJson.details.dataset;
                                         if (dsID)
-                                            DC_026887848.dsID
+                                            DC_026887848.dsID = dsID;
                                         DC_026887848.setDatasetCookie();
                                         DC_026887848.loadProbes();
                                     }
