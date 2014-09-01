@@ -11,6 +11,8 @@ from elasticsearch import Elasticsearch
 import math
 from dataset.util import general_json_response, GENERAL_ERRORS
 import StringIO
+import mygene
+import urllib2
 
 
 def adopt_dataset(ds_id):
@@ -68,16 +70,22 @@ def dataset_info(request, ds_id):
                         content_type="application/json")
 
 
+def _get_reporter_from_gene(gene):
+    mg = mygene.MyGeneInfo()
+    res = mg.querymany([gene], scopes='_id', fields='reporter')
+    data_json = res[0]
+    reporters = []
+    for i in data_json['reporter'].values():
+        if type(i) is not list:
+            i = [i]
+        reporters = reporters + i
+    return reporters
+
+
 def  get_dataset_data(ds, gene_id=None, reporter_id=None):
     reporters = []
     if gene_id is not None:
-        mg = mygene.MyGeneInfo()
-        res = mg.querymany([gene_id], scopes='_id', fields='reporter')
-        data_json = res[0]
-        for i in data_json['reporter'].values():
-            if type(i) is not list:
-                i = [i]
-            reporters = reporters + i
+        reporters = _get_reporter_from_gene(gene_id)
     elif reporter_id is not None:
         reporters.append(reporter_id)
     else:
@@ -240,25 +248,26 @@ def dataset_chart(request, ds_id, reporter_id):
 @csrf_exempt
 def dataset_search(request):
     query = request.GET.get("query", None)
+    gene = request.GET.get("gene", None)
     page = request.GET.get("page", 0)
     page_by = request.GET.get("page_by", 8)
-    plt_form = request.GET.get("platform", None)
 
-    if query == None or plt_form == None:
-        return HttpResponse('{"code":4004, "detail":"query or platform not \
-            found"}', content_type="application/json")
+    if gene is None:
+        gene = settings.DEFAULT_GENE_ID
+    reporters = _get_reporter_from_gene(gene)
 
     page = int(page) - 1
     page_by = int(page_by)
     body = {"from": page * page_by, "size": page_by}
-    body["query"] = {"match": {"_all": query}}
+    if query is not None:
+        body["query"] = {"match": {"_all": query}}
+    else:
+        body["query"] = {"match_all": {}}
     body["filter"] = {"has_parent": {"parent_type": "platform",
-            "query": {"match": {"_all": plt_form}}}}
-
+            "query": {"match": {"reporters": json.dumps(reporters)}}}}
     data = json.dumps(body)
-    print data
-    url = r"http://127.0.0.1:9200/blogs/dataset/_search"
-    request = urllib2.Request(url, data = data)
+    url = r"http://127.0.0.1:9200/biogps/dataset/_search"
+    request = urllib2.Request(url, data=data)
     request.get_method = lambda: 'POST'
     search_back = urllib2.urlopen(request)
 
@@ -281,9 +290,7 @@ def dataset_search(request):
 
     res = {"current_page": page + 1, "total_page": total_page, "count": count,\
             "results": res}
-    return HttpResponse('{"code":0, "details":%s}' % json.dumps(res),\
-                        content_type="appliction/json")
-
+    return general_json_response(detail=res)
 
 
 def dataset_csv(request, ds_id, gene_id):
