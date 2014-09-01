@@ -165,7 +165,7 @@
                 getDatasets : function() {
                     // Query SL for relevant datasets, encoding url for use with proxy
                     var _repParam = "%26reporters%3DNM_199501,XM_006240778,XR_355212,1378874_at,1394320_at,D28753_i_at,D28754_s_at,362817";
-                    var _dsLibUrl = "/dataset/search/?page=" + DC_026887848.dsPage;
+                    var _dsLibUrl = "/dataset/search/?gene="+DC_026887848.geneID+"&page=" + DC_026887848.dsPage;
                     var _dsDefaultUrl = "/data_chart/gnf_json_proxy.cgi?url=http://biogps.org/dataset/search/%3FdefaultDS%3Dt" + _repParam;
                     if (DC_026887848.dsSearchTerm !== "") {
                         _qTerm =    DC_026887848.dsSearchTerm;
