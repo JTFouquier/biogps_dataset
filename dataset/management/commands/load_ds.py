@@ -59,6 +59,7 @@ class Command(BaseCommand):
                 po.save()
                 if po.exps is None:
                     continue
+                logging.info('%d experiments in total' % len(po.exps))
                 for exp in po.exps:
                     if exp in skips:
                         logging.info('skip %s' % exp)
