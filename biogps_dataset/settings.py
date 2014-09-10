@@ -96,6 +96,7 @@ STATICFILES_FINDERS = (
 )
 
 from settings_dev import *
+from settings_dev_sample import *
 
 ES_URL = r"http://localhost:9200/biogps/platform/_mapping"
 ES_PLAT = r"http://localhost:9200/biogps/platform/"
