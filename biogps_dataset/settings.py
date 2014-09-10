@@ -95,10 +95,14 @@ STATICFILES_FINDERS = (
     # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
-from settings_dev import *
-from settings_dev_sample import *
 
-ES_URL = r"http://localhost:9200/biogps/platform/_mapping"
-ES_PLAT = r"http://localhost:9200/biogps/platform/"
-ES_DATASET = r"http://localhost:9200/biogps/dataset/"
-ES_BIOGPS = r"http://localhost:9200/biogps/"
+ES_URLS = {
+    'BGPS': "http://localhost:9200/biogps/",
+    'PF_C': "http://localhost:9200/biogps/platform/_mapping",
+    'DS_C': "http://localhost:9200/biogps/dataset/_mapping",
+    'PF': "http://localhost:9200/biogps/platform/",
+    'DS': "http://localhost:9200/biogps/dataset/",
+    'SCH': "http://localhost:9200/biogps/dataset/_search",
+}
+
+from settings_dev import *
