@@ -29,13 +29,25 @@ def adopt_dataset(ds_id):
 def get_ds_factors_keys(ds):
     factors = []
     for f in ds.metadata['factors']:
-        comment = f[f.keys()[0]]['comment']
-        temp = comment.get('Sample_title', None)
-        if temp == None:
+        order_idx = color_idx = None
+        if 'comment' in f[f.keys()[0]]:
+            comment = f[f.keys()[0]]['comment']
             temp = comment.get('Sample_title', None)
             if temp == None:
-                temp = f.keys()[0]
-        factors.append(temp)
+                temp = comment.get('Sample_title', None)
+                if temp == None:
+                    temp = f.keys()[0]
+        else: #default ds here
+            temp = f.keys()[0]
+            content = f[temp]
+            if 'order_idx' in content and 'color_idx' in content:
+                order_idx = content['order_idx']
+                color_idx = content['color_idx']
+        if order_idx is None:
+            item = {'name': temp}
+        else:
+            item = {'name': temp, 'order_idx': order_idx, 'color_idx': color_idx} 
+        factors.append(item)
     return factors
 
 
@@ -52,19 +64,23 @@ def dataset_info(request, ds_id):
              {'color': ['color_idx'], 'sort': ['order_idx'], 'aggregate': \
               ['title']}
      }
+    if type(ds.metadata['geo_gpl_id']) is dict:
+        geo_gpl_id = ds.metadata['geo_gpl_id']['accession']
+    else:
+        geo_gpl_id = ds.metadata['geo_gpl_id']
     ret = {'id': ds.id, 'name_wrapped': ds.name, 'name': ds.name, \
            'owner': ds.ownerprofile_id, 'lastmodified':\
            ds.lastmodified.strftime('%Y-%m-%d %H:%M:%S'),\
            'pubmed_id': ds.metadata['pubmed_id'], 'summary': ds.summary,\
            'geo_gse_id': ds.geo_gse_id, 'created':\
-           ds.created.strftime('%Y-%m-%d %H:%M:%S'),
-            'geo_gpl_id': ds.metadata['geo_gpl_id']['accession'], \
-            'species': [ds.species]
+           ds.created.strftime('%Y-%m-%d %H:%M:%S'),\
+           'geo_gpl_id': geo_gpl_id, 'species': [ds.species]
     }
     factors = []
     fa = get_ds_factors_keys(ds)
     for f in fa:
-        factors.append({f: {"color_idx": 31,  "order_idx": 76, "title": f}})
+        factors.append({"color_idx": f.get('color_idx', 0),  "order_idx": \
+            f.get('order_idx', 0), "title": f['name']})
     ret.update(preset)
     ret.update({'factors': factors})
     #print factors
