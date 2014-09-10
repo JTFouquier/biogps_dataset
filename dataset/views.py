@@ -79,8 +79,8 @@ def dataset_info(request, ds_id):
     factors = []
     fa = get_ds_factors_keys(ds)
     for f in fa:
-        factors.append({"color_idx": f.get('color_idx', 0),  "order_idx": \
-            f.get('order_idx', 0), "title": f['name']})
+        factors.append({f['name']: {"color_idx": f.get('color_idx', 0),  \
+            "order_idx": f.get('order_idx', 0), "title": f['name']}})
     ret.update(preset)
     ret.update({'factors': factors})
     #print factors
@@ -130,7 +130,8 @@ def dataset_chart(request, ds_id, reporter_id):
     for item in data_list:
         temp = float(item)
         val_list.append(temp)
-    name_list = get_ds_factors_keys(ds)
+    factors = get_ds_factors_keys(ds)
+    name_list = [obj['name'] for obj in factors]
 
     label_maxlen = 0
     for item in name_list:
