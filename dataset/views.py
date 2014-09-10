@@ -303,10 +303,8 @@ def dataset_search(request):
             print e
             continue
         temp_dic = {"id": ds.id, "name": ds.name}
-        fac_list = []
-        for fac_item in get_ds_factors_keys(ds):
-            fac_list.append({"name": fac_item})
-        temp_dic["factors"] = fac_list
+        factors = get_ds_factors_keys(ds)
+        temp_dic["factors"] = [obj['name'] for obj in factors]
         res.append(temp_dic)
 
     res = {"current_page": page + 1, "total_page": total_page, "count": count,\
