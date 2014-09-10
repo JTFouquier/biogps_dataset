@@ -52,6 +52,9 @@ class DP_E_GEOD_4006(Pattern):
         sdrf = sdrf.sort(columns=sample_key)
         #filter by platform
         sdrf = sdrf[sdrf[platform_key].isin([platform])]
+        if len(sdrf[sample_key]) > 100:
+            logging.info('more than 100 samples, ignore')
+            return None
         print sample_key
         print list(sdrf[sample_key])
         print list(df.columns)
@@ -85,6 +88,9 @@ class DP_E_GEOD_26688(Pattern):
         if platform_key is None:
             return None
         sdrf = sdrf[sdrf[platform_key].isin([platform])]
+        if len(sdrf[sample_key]) > 100:
+            logging.info('more than 100 samples, ignore')
+            return None
         li = list(sdrf[sample_key])
         df_total = None
         for e in data:
