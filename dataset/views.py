@@ -271,14 +271,8 @@ def dataset_search(request):
     body["filter"] = {"has_parent": {"parent_type": "platform",
             "query": {"match": {"reporters": rep}}}}
     data = json.dumps(body)
-    url = settings.ES_DATASET + r"_search"
-    #request = urllib2.Request(url, data=data)
-    #request.get_method = lambda: 'POST'
-    #search_back = urllib2.urlopen(request)
-    r = requests.post(url, data=data)
-
+    r = requests.post(settings.ES_URLS['SCH'], data=data)
     search_dic = r.json()
-    print search_dic
     count = search_dic["hits"]["total"]
     total_page = int(math.ceil(float(count) / float(page_by)))
     res = []
