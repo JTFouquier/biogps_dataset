@@ -96,3 +96,8 @@ STATICFILES_FINDERS = (
 )
 
 from settings_dev import *
+
+ES_URL = r"http://localhost:9200/biogps/platform/_mapping"
+ES_PLAT = r"http://localhost:9200/biogps/platform/"
+ES_DATASET = r"http://localhost:9200/biogps/dataset/"
+ES_BIOGPS = r"http://localhost:9200/biogps/"
