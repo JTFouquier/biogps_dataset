@@ -105,4 +105,6 @@ ES_URLS = {
     'SCH': "http://localhost:9200/biogps/dataset/_search",
 }
 
+DEFAULT_DS_TOKEN = ['GSE952']
+
 from settings_dev import *
