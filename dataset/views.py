@@ -245,10 +245,10 @@ def dataset_chart(request, ds_id, reporter_id):
     for j in devi_list:
         if j - 0 > 0.0001:
             list_x = [val_list[i], val_list[i] + j]
-            list_y = [y_pos[i] + 0.6, y_pos[i] + 0.6]
+            list_y = [y_pos[i] + 0.5, y_pos[i] + 0.5]
             plt.plot(list_x, list_y, "k", linewidth=4)
             list_x = [val_list[i] + j, val_list[i] + j]
-            list_y = [y_pos[i] + 0.3, y_pos[i] + 0.9]
+            list_y = [y_pos[i] + 0.2, y_pos[i] + 0.8]
             plt.plot(list_x, list_y, "k", linewidth=4)
         i = i + 1
 
