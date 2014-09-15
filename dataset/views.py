@@ -243,12 +243,12 @@ def dataset_chart(request, ds_id, reporter_id):
 #画标准差
     i = 1
     for j in devi_list:
-        if j != 0:
+        if j - 0 > 0.0001:
             list_x = [val_list[i], val_list[i] + j]
-            list_y = [y_pos[i] + 0.25, y_pos[i] + 0.25]
+            list_y = [y_pos[i] + 0.6, y_pos[i] + 0.6]
             plt.plot(list_x, list_y, "k", linewidth=4)
             list_x = [val_list[i] + j, val_list[i] + j]
-            list_y = [y_pos[i] + 0.1, y_pos[i] + 0.4]
+            list_y = [y_pos[i] + 0.3, y_pos[i] + 0.9]
             plt.plot(list_x, list_y, "k", linewidth=4)
         i = i + 1
 
