@@ -120,6 +120,7 @@ def  get_dataset_data(ds, gene_id=None, reporter_id=None):
 def chart_data(val_list, name_list):
     length = len(name_list[0].split('.'))
     back_dic = {}
+#当不存在要处理的数据的时候,构造全部为0的标准差list
     if length == 1:
         back_dic["val_list"] = val_list
         back_dic["name_list"] = name_list
@@ -129,25 +130,30 @@ def chart_data(val_list, name_list):
         temp_name = []
         dev_list = []
         i = 0
+#遍历list,合并'.'前面名字相同的项
         while i < len(name_list):
             arry = name_list[i].split('.')
             count = 0
             total = 0
             temp_dev = []
+#当相邻两个元素之间的名字相同且数组没越界,者保持该值,并求和
             while i < len(name_list) and arry[0] == name_list[i].split('.')[0]:
                 count = count + 1
                 total = total + val_list[i]
                 temp_dev.append(val_list[i])
                 i = i + 1
+#根据和求平均值
             average = round(float(total) / count, 2)
             temp_val.append(average)
             temp_name.append(arry[0])
             total = 0
-            print temp_dev
-            for j in temp_dev:
-                total = total + (j - average) ** 2
-            print "total=", total
-            dev_list.append(round(math.sqrt(float(total) / count), 3))
+#判断,当只有一个元素的时候,标准差直接为0
+            if len(temp_dev) == 1:
+                dev_list.append(0)
+            else:
+                for j in temp_dev:
+                    total = total + (j - average) ** 2
+                dev_list.append(round(math.sqrt(float(total) / count), 3))
         back_dic["val_list"] = temp_val
         back_dic["name_list"] = temp_name
         back_dic["deviation"] = dev_list
@@ -243,7 +249,7 @@ def dataset_chart(request, ds_id, reporter_id):
 #画标准差
     i = 1
     for j in devi_list:
-        if j - 0 > 0.0001:
+        if j - 0 > 0.001:
             list_x = [val_list[i], val_list[i] + j]
             list_y = [y_pos[i] + 0.5, y_pos[i] + 0.5]
             plt.plot(list_x, list_y, "k", linewidth=4)
