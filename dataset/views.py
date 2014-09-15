@@ -269,8 +269,14 @@ def dataset_chart(request, ds_id, reporter_id):
     while i <= 4:
         x_label = x_median * x_per_list[i - 1]
         str_temp = '%.2f' % x_label
-        plt.text(x_label - 0.5 * x_max / 30, 0.1,\
-                 "median(" + str_temp + ")", fontsize=40)
+        if x_label < x_max:
+            if i == 1:
+                temp_text = "median(" + str_temp + ")"
+            else:
+                temp_text = "%dM(" + str_temp + ")"
+                temp_text = temp_text % x_per_list[i - 1]
+            plt.text(x_label - 0.5 * x_max / 30, 0.1,\
+                     temp_text, fontsize=40)
         #plt.text(x_label,length,str_temp,fontsize=80)
         list_temp = []
         list_temp.append(x_label)
