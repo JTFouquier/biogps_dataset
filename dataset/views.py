@@ -117,6 +117,41 @@ def  get_dataset_data(ds, gene_id=None, reporter_id=None):
         data_list.append({d.reporter: {'values': d.data}})
     return {'id': ds.id, 'name': ds.name, 'data': data_list}
 
+def chart_data(val_list, name_list):
+    length = len(name_list[0].split('.'))
+    back_dic = {}
+    if length == 1:
+        back_dic["val_list"] = val_list
+        back_dic["name_list"] = name_list
+        back_dic["deviation"] = [0] * len(val_list)
+    else:
+        temp_val = []
+        temp_name = []
+        dev_list = []
+        i = 0
+        while i < len(name_list):
+            arry = name_list[i].split('.')
+            count = 0
+            total = 0
+            temp_dev = []
+            while i < len(name_list) and arry[0] in name_list[i]:
+                count = count + 1
+                total = total + val_list[i]
+                temp_dev.append(val_list[i])
+                i = i + 1
+            average = round(float(total) / count, 2)
+            temp_val.append(average)
+            temp_name.append(arry[0])
+            total = 0
+            print temp_dev
+            for j in temp_dev:
+                total = total + (j - average) ** 2
+            print "total=", total
+            dev_list.append(round(math.sqrt(float(total) / count), 3))
+        back_dic["val_list"] = temp_val
+        back_dic["name_list"] = temp_name
+        back_dic["deviation"] = dev_list
+    return back_dic
 
 #显示柱状图，但是需要接受id和at参数
 def dataset_chart(request, ds_id, reporter_id):
@@ -132,6 +167,11 @@ def dataset_chart(request, ds_id, reporter_id):
         val_list.append(temp)
     factors = get_ds_factors_keys(ds)
     name_list = [obj['name'] for obj in factors]
+
+    back = chart_data(val_list, name_list)
+    val_list = back["val_list"]
+    name_list = back["name_list"]
+    devi_list = back["deviation"]
 
     label_maxlen = 0
     for item in name_list:
@@ -198,6 +238,15 @@ def dataset_chart(request, ds_id, reporter_id):
         mystr = "%s-" % name_item
         plt.text(0, y_pos[i], mystr, fontsize=40,\
                  horizontalalignment='right')
+        i = i + 1
+
+#画标准差
+    i = 1
+    for j in devi_list:
+        if j != 0:
+            list_x = [val_list[i - 1], j]
+            list_y = [y_pos[i], y_pos[i]]
+            plt.plot(list_x, list_y, "k", linewidth=4)
         i = i + 1
 
     #画x坐标    x位3,10,30程中位数
