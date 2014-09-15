@@ -1,0 +1,74 @@
+
+.icon-load {
+    background-image: url(./images/arrow_join.png) !important;
+}
+
+p.ds-error {
+    margin: 5px;
+    font-size: 20px;
+    color: red;
+}
+
+.ds-dialog {
+    text-decoration: none;
+}
+
+li.ds-dialog {
+    padding: .5em;
+}
+
+li.ds-dialog.odd-li {
+    background-color: #F0F8FF;
+}
+
+.ds-dialog-nav {
+    text-decoration: none;
+}
+
+a.ds-name {
+    text-decoration: none;
+}
+
+#pagingNav {
+    background-color: #FFFFFF;
+    position: absolute;
+}
+
+#searchBar {
+    background-color: #FFFFFF;
+    padding: 1em 0em .5em .5em;
+}
+
+.ui-accordion-header {
+    /* IE8 */
+    background-color: #9497B8;
+    padding: 1em 0em .5em .5em;
+}
+
+div.ui-accordion-content {
+    /* IE8 */
+    background-color: #FFFFFF;
+}
+
+.ui-dialog-title {
+    font-size: 14px;
+}
+
+.ui-dialog-titlebar {
+    /* IE8 */
+    background-color: #CCCCCC;
+}
+
+a.ui-dialog-titlebar-close {
+    /* IE8 */
+    float: right;
+}
+
+.ui-widget-overlay {
+    /* IE8 */
+    position: fixed;
+}
+
+.span-reset-search a{
+    text-decoration:none;
+}
