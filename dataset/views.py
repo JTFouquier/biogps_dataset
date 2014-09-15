@@ -246,10 +246,10 @@ def dataset_chart(request, ds_id, reporter_id):
         if j != 0:
             list_x = [val_list[i], val_list[i] + j]
             list_y = [y_pos[i] + 0.25, y_pos[i] + 0.25]
-            plt.plot(list_x, list_y, "k", linewidth=2)
+            plt.plot(list_x, list_y, "k", linewidth=4)
             list_x = [val_list[i] + j, val_list[i] + j]
             list_y = [y_pos[i] + 0.1, y_pos[i] + 0.4]
-            plt.plot(list_x, list_y, "k", linewidth=2)
+            plt.plot(list_x, list_y, "k", linewidth=4)
         i = i + 1
 
     #画x坐标    x位3,10,30程中位数
