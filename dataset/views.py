@@ -134,7 +134,7 @@ def chart_data(val_list, name_list):
             count = 0
             total = 0
             temp_dev = []
-            while i < len(name_list) and arry[0] in name_list[i]:
+            while i < len(name_list) and arry[0] == name_list[i].split('.')[0]:
                 count = count + 1
                 total = total + val_list[i]
                 temp_dev.append(val_list[i])
@@ -244,9 +244,12 @@ def dataset_chart(request, ds_id, reporter_id):
     i = 1
     for j in devi_list:
         if j != 0:
-            list_x = [val_list[i - 1], j]
-            list_y = [y_pos[i], y_pos[i]]
-            plt.plot(list_x, list_y, "k", linewidth=4)
+            list_x = [val_list[i - 1], val_list[i - 1] + j]
+            list_y = [y_pos[i] + 0.25, y_pos[i] + 0.25]
+            plt.plot(list_x, list_y, "k", linewidth=2)
+            list_x = [val_list[i - 1] + j, val_list[i - 1] + j]
+            list_y = [y_pos[i] + 0.1, y_pos[i] + 0.4]
+            plt.plot(list_x, list_y, "k", linewidth=2)
         i = i + 1
 
     #画x坐标    x位3,10,30程中位数
