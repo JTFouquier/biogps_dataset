@@ -241,3 +241,12 @@ class BiogpsDatasetProcessing(models.Model):
        datasets are currently being loaded, to allow for multi-threaded
        processing."""
     datasets = JSONField(blank=False, editable=True)
+
+
+class BiogpsDatasetFailed(models.Model):
+    """Model definition for BiogpsDatasetFailed. This model records datasets that
+        failed to load.
+    """
+    platform = models.CharField(max_length=20, null=True)
+    dataset = models.CharField(max_length=20, null=True)
+    reason = models.TextField(null=True)
