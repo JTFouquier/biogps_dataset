@@ -62,12 +62,8 @@ class Command(BaseCommand):
                 bio_count = bio_count + 1
 
         print "from default,added %d platform , added %d dataset" % (plt_count, bio_count)
-
-        #load data from default_ds database
-        ds_data = [6, 8, 9, 10, 11, 12, 13, 14, 3, 4, 5, 1,\
-                    2428, 2, 2427, 2430, 7]
         dataset = models.BiogpsDataset.objects.using("default_ds").\
-        filter(id__in=ds_data)
+        filter(id__in=settings.DEFAULT_DS_ID)
         plt_ds, bio_ds = plt_count, bio_count
 
         plt_dic = {}
