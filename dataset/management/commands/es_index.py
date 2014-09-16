@@ -56,7 +56,7 @@ class Command(BaseCommand):
             for ds in item.dataset_platform.all():
                 data = json.dumps(ds.es_index_serialize())
                 url = settings.ES_URLS['DS'] + \
-                    str(bio_count) + "?parent=" + (plt_count - 1)
+                    str(bio_count) + "?parent=" + str(plt_count - 1)
                 requests.put(url, data=data)
                 bio_count = bio_count + 1
 
@@ -80,7 +80,7 @@ class Command(BaseCommand):
 
             data = json.dumps(ds_item.es_index_serialize())
             url = settings.ES_URLS['DS'] + \
-                    str(bio_count) + "?parent=" + (plt_count - 1)
+                    str(bio_count) + "?parent=" + str(plt_count - 1)
             requests.put(url, data=data)
             bio_count = bio_count + 1
         print "from default_ds,added %d platform , added %d dataset"\
