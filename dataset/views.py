@@ -130,24 +130,24 @@ def chart_data(val_list, name_list):
         temp_name = []
         dev_list = []
         i = 0
-#遍历list,合并'.'前面名字相同的项
+       #遍历list,合并'.'前面名字相同的项
         while i < len(name_list):
             arry = name_list[i].split('.')
             count = 0
             total = 0
             temp_dev = []
-#当相邻两个元素之间的名字相同且数组没越界,者保持该值,并求和
+            #当相邻两个元素之间的名字相同且数组没越界,者保持该值,并求和
             while i < len(name_list) and arry[0] == name_list[i].split('.')[0]:
                 count = count + 1
                 total = total + val_list[i]
                 temp_dev.append(val_list[i])
                 i = i + 1
-#根据和求平均值
+            #根据和求平均值
             average = round(float(total) / count, 2)
             temp_val.append(average)
             temp_name.append(arry[0])
             total = 0
-#判断,当只有一个元素的时候,标准差直接为0
+            #判断,当只有一个元素的时候,标准差直接为0
             if len(temp_dev) == 1:
                 dev_list.append(0)
             else:
@@ -339,7 +339,7 @@ def dataset_chart(request, ds_id, reporter_id):
 def dataset_search(request):
     query = request.GET.get("query", None)
     gene = request.GET.get("gene", None)
-    page = request.GET.get("page", 0)
+    page = request.GET.get("page", 1)
     page_by = request.GET.get("page_by", 8)
 
     if gene is None:
