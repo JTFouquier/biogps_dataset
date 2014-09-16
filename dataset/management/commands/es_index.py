@@ -1,3 +1,4 @@
+#-*-coding: utf-8 -*-
 from dataset import models
 from elasticsearch import  Elasticsearch
 from django.core.management.base import BaseCommand
@@ -62,7 +63,7 @@ class Command(BaseCommand):
 
         print "from default,added %d platform , added %d dataset" % (plt_count, bio_count)
 
-#load data from default_ds database
+        #load data from default_ds database
         ds_data = [6, 8, 9, 10, 11, 12, 13, 14, 3, 4, 5, 1,\
                     2428, 2, 2427, 2430, 7]
         dataset = models.BiogpsDataset.objects.using("default_ds").\
@@ -75,7 +76,7 @@ class Command(BaseCommand):
             plt_body["id"] = str(plt_temp.id)
             plt_body["reporters"] = plt_temp.reporters
             plt_body["platform"] = plt_temp.platform
-#plt_id用于保存插入dataset时对应的plt的id(esindex)
+            #plt_id用于保存插入dataset时对应的plt的id(esindex)
             plt_id = plt_count
             if plt_dic.get(str(plt_temp.id), None) == None:
                 data = json.dumps(plt_body)
