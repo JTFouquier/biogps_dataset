@@ -18,7 +18,7 @@ import urllib2
 def adopt_dataset(ds_id):
     if ds_id in settings.DEFAULT_DS_TOKEN:
         return models.BiogpsDataset.objects.using('default_ds')\
-            .get(geo_gse_id=ds_id)
+            .get(geo_gse_id=ds_id, id__in=settings.DEFAULT_DS_ID)
     try:
         return models.BiogpsDataset.objects.get(id=ds_id)
     except Exception:
@@ -333,7 +333,20 @@ def dataset_chart(request, ds_id, reporter_id):
     canvas.print_png(response)
     return response
 
-
+@csrf_exempt
+def dataset_search_default(request):
+    query = request.GET.get("query", None)
+    gene = request.GET.get("gene", None)
+    qs = models.BiogpsDataset.objects.using('default_ds')\
+            .filter(id__in=settings.DEFAULT_DS_ID)
+    res = []
+    for ds in qs:
+        temp_dic = {"id": ds.id, "name": ds.name}
+        factors = get_ds_factors_keys(ds)
+        temp_dic["factors"] = [obj['name'] for obj in factors]
+        res.append(temp_dic)
+    res = {"count": qs.count(),   "results": res}
+    return general_json_response(detail=res)
 #接受查询的字段组合query和获取的第几页page
 @csrf_exempt
 def dataset_search(request):
