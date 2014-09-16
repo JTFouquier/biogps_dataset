@@ -68,19 +68,27 @@ class Command(BaseCommand):
         dataset = models.BiogpsDataset.objects.using("default_ds").\
         filter(id__in=ds_data)
         plt_ds, bio_ds = plt_count, bio_count
+
+        plt_dic = {}
         for ds_item in dataset:
             plt_temp = ds_item.platform
             plt_body["id"] = str(plt_temp.id)
             plt_body["reporters"] = plt_temp.reporters
             plt_body["platform"] = plt_temp.platform
-            data = json.dumps(plt_body)
-            plt_url = settings.ES_URLS['PF'] + str(plt_count)
-            requests.post(plt_url, data=data)
-            plt_count = plt_count + 1
+#plt_id用于保存插入dataset时对应的plt的id(esindex)
+            plt_id = plt_count
+            if plt_dic.get(str(plt_temp.id), None) == None:
+                data = json.dumps(plt_body)
+                plt_url = settings.ES_URLS['PF'] + str(plt_count)
+                requests.post(plt_url, data=data)
+                plt_count = plt_count + 1
+                plt_dic[str(plt_temp.id)] = plt_id
+            else:
+                plt_id = plt_dic.get(str(plt_temp.id))
 
             data = json.dumps(ds_item.es_index_serialize())
             url = settings.ES_URLS['DS'] + \
-                    str(bio_count) + "?parent=" + str(plt_count - 1)
+                    str(bio_count) + "?parent=" + str(plt_id)
             requests.put(url, data=data)
             bio_count = bio_count + 1
         print "from default_ds,added %d platform , added %d dataset"\
