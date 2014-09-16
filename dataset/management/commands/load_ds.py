@@ -39,7 +39,6 @@ class Command(BaseCommand):
       action="store", type="string", dest="platform",
       help='use data from specified platform, go with -e, -t',),)
 
-    ERROR_FILE = 'exp_error.txt'
 
     def handle(self, *args, **options):
         if options['test'] is not None:
@@ -74,8 +73,7 @@ class Command(BaseCommand):
                         self.save_dataset(exp, p)
                     except Exception, e:
                         logging.error('Exception: %s' % e)
-                        with open(self.ERROR_FILE, 'a') as f:
-                            f.write('%s #%s\n' % (exp, e))
+                        models.BiogpsDatasetFailed.objects.create(platform=p, dataset=exp, reason=e)
                         continue
         elif options['exp'] is not None:
             if options['platform'] is None:
