@@ -50,14 +50,38 @@ class Command(BaseCommand):
             plt_body["reporters"] = item.reporters
             plt_body["platform"] = item.platform
             data = json.dumps(plt_body)
-            plt_url = settings.ES_URLS['PF'] + str(item.id)
+            plt_url = settings.ES_URLS['PF'] + str(plt_count)
             requests.post(plt_url, data=data)
             plt_count = plt_count + 1
             for ds in item.dataset_platform.all():
                 data = json.dumps(ds.es_index_serialize())
                 url = settings.ES_URLS['DS'] + \
-                    str(ds.id) + "?parent=" + plt_body["id"]
+                    str(bio_count) + "?parent=" + (plt_count - 1)
                 requests.put(url, data=data)
                 bio_count = bio_count + 1
 
-        print "added %d platform , added %d dataset" % (plt_count, bio_count)
+        print "from default,added %d platform , added %d dataset" % (plt_count, bio_count)
+
+#load data from default_ds database
+        ds_data = [6, 8, 9, 10, 11, 12, 13, 14, 3, 4, 5, 1,\
+                    2428, 2, 2427, 2430, 7]
+        dataset = models.BiogpsDataset.objects.using("default_ds").\
+        filter(id__in=ds_data)
+        plt_ds, bio_ds = plt_count, bio_count
+        for ds_item in dataset:
+            plt_temp = ds_item.platform
+            plt_body["id"] = str(plt_temp.id)
+            plt_body["reporters"] = plt_temp.reporters
+            plt_body["platform"] = plt_temp.platform
+            data = json.dumps(plt_body)
+            plt_url = settings.ES_URLS['PF'] + str(plt_count)
+            requests.post(plt_url, data=data)
+            plt_count = plt_count + 1
+
+            data = json.dumps(ds_item.es_index_serialize())
+            url = settings.ES_URLS['DS'] + \
+                    str(bio_count) + "?parent=" + (plt_count - 1)
+            requests.put(url, data=data)
+            bio_count = bio_count + 1
+        print "from default_ds,added %d platform , added %d dataset"\
+             % (plt_count - plt_ds, bio_count - bio_ds)
