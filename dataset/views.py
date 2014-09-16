@@ -179,6 +179,10 @@ def dataset_chart(request, ds_id, reporter_id):
     name_list = back["name_list"]
     devi_list = back["deviation"]
 
+    val_list.reverse()
+    name_list.reverse()
+    devi_list.reverse()
+
     label_maxlen = 0
     for item in name_list:
         if len(item) > label_maxlen:
