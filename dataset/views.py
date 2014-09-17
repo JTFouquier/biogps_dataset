@@ -135,7 +135,7 @@ def chart_data(val_list, factors):
         total = 0
         temp_dev = []
         #查找order相同的元素，求值的和，和个数，并把每一个值放入temp_dev中
-        while  i < len(val_list) and factors[i]["order_idx"] == order_indx:
+        while  i < len(val_list) and factors[i]["order_idx"] == order_idx:
             count = count + 1
             total = total + val_list[i]
             temp_dev.append(val_list[i])
