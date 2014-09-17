@@ -145,6 +145,7 @@ def chart_data(val_list, factors):
         temp_val.append(average)
         temp_name.append(name)
         #判断,当只有一个元素的时候,标准差直接为0
+        total = 0
         if count == 1:
             dev_list.append(0)
         else:
