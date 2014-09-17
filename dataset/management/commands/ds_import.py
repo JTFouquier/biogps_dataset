@@ -6,7 +6,7 @@ from django.conf import settings
 
 class Command(BaseCommand):             
     def handle(self, *args, **options): 
-        ds_set = models.BiogpsDataset.objects.using("default_ds")
+        ds_set = models.BiogpsDataset.objects.using("default_ds").\
         filter(id__in = settings.DEFAULT_DS_ID)
         #存储plt的id                  
         plt_dic = []
