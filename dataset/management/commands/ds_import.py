@@ -8,9 +8,9 @@ class Command(BaseCommand):
         ds_plat = models.BiogpsDatasetPlatform.objects.using("default_ds").all()
         for  plt_item in ds_plat:
             ds_sets = plt_item.dataset_platform
-            plt_item.using("default_dataset").save()
+            plt_item.save(using = "default_dataset")
             for set_item in ds_sets:
                 ds_datas = set_item.dataset_data
-                set_item.using("default_dataset").save()
+                set_item.save(using = "default_dataset")
                 for data_item in ds_datas:
-                    data_item.using("default_dataset").save()
+                    data_item.save(using = "default_dataset")
