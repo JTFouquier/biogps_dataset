@@ -117,46 +117,44 @@ def  get_dataset_data(ds, gene_id=None, reporter_id=None):
         data_list.append({d.reporter: {'values': d.data}})
     return {'id': ds.id, 'name': ds.name, 'data': data_list}
 
-def chart_data(val_list, name_list):
-    length = len(name_list[0].split('.'))
+def chart_data(val_list, factors):
+    #back_dic存储返回结果的list
     back_dic = {}
-#当不存在要处理的数据的时候,构造全部为0的标准差list
-    if length == 1:
-        back_dic["val_list"] = val_list
-        back_dic["name_list"] = name_list
-        back_dic["deviation"] = [0] * len(val_list)
-    else:
-        temp_val = []
-        temp_name = []
-        dev_list = []
-        i = 0
-       #遍历list,合并'.'前面名字相同的项
-        while i < len(name_list):
-            arry = name_list[i].split('.')
-            count = 0
-            total = 0
-            temp_dev = []
-            #当相邻两个元素之间的名字相同且数组没越界,者保持该值,并求和
-            while i < len(name_list) and arry[0] == name_list[i].split('.')[0]:
-                count = count + 1
-                total = total + val_list[i]
-                temp_dev.append(val_list[i])
-                i = i + 1
-            #根据和求平均值
-            average = round(float(total) / count, 2)
-            temp_val.append(average)
-            temp_name.append(arry[0])
-            total = 0
-            #判断,当只有一个元素的时候,标准差直接为0
-            if len(temp_dev) == 1:
-                dev_list.append(0)
-            else:
-                for j in temp_dev:
-                    total = total + (j - average) ** 2
-                dev_list.append(round(math.sqrt(float(total) / count), 3))
-        back_dic["val_list"] = temp_val
-        back_dic["name_list"] = temp_name
-        back_dic["deviation"] = dev_list
+    #存储要返回的val的值
+    temp_val = []
+    #存储要返回的name
+    temp_name = []
+    #存储要返回的标准差的值
+    dev_list = []
+    i = 0
+    #遍历list，合并order值相同的字段
+    while i < len(val_list):
+        order_idx = factors[i]["order_idx"]
+        name = factors[i]["name"].split('.')[0]
+        count = 0
+        total = 0
+        temp_dev = []
+        #查找order相同的元素，求值的和，和个数，并把每一个值放入temp_dev中
+        while  i < len(val_list) and factors[i]["order_idx"] == order_indx:
+            count = count + 1
+            total = total + val_list[i]
+            temp_dev.append(val_list[i])
+            i = i + 1
+        #根据和求平均值
+        average = round(float(total) / count, 2)
+        temp_val.append(average)
+        temp_name.append(name)
+        #判断,当只有一个元素的时候,标准差直接为0
+        if count == 1:
+            dev_list.append(0)
+        else:
+            #否则，先求每个元素与平均数的差的平方的和
+            for j in temp_dev:
+                total = total + (j - average) ** 2
+            dev_list.append(round(math.sqrt(float(total) / count), 3))
+    back_dic["val_list"] = temp_val
+    back_dic["name_list"] = temp_name
+    back_dic["deviation"] = dev_list
     return back_dic
 
 #显示柱状图，但是需要接受id和at参数
@@ -172,9 +170,9 @@ def dataset_chart(request, ds_id, reporter_id):
         temp = float(item)
         val_list.append(temp)
     factors = get_ds_factors_keys(ds)
-    name_list = [obj['name'] for obj in factors]
+    #name_list = [obj['name'] for obj in factors]
 
-    back = chart_data(val_list, name_list)
+    back = chart_data(val_list, factors)
     val_list = back["val_list"]
     name_list = back["name_list"]
     devi_list = back["deviation"]
