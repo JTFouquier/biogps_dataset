@@ -91,7 +91,8 @@ def dataset_info(request, ds_id):
 
 def _get_reporter_from_gene(gene):
     mg = mygene.MyGeneInfo()
-    res = mg.querymany([gene], scopes='_id', fields='reporter')
+    #res = mg.querymany([gene], scopes='_id', fields='reporter')
+    res = mg.getgene(gene,fields='reporter')
     data_json = res[0]
     if 'notfound' in data_json:
         return None
@@ -376,7 +377,7 @@ def dataset_search(request):
     count = search_dic["hits"]["total"]
     total_page = int(math.ceil(float(count) / float(page_by)))
     res = []
-    for item in search_dic["hits"]["hits"]:
+    '''for item in search_dic["hits"]["hits"]:
         try:
             ds = models.BiogpsDataset.objects.get(id=int(item["_id"]))
         except Exception, e:
@@ -385,7 +386,17 @@ def dataset_search(request):
         temp_dic = {"id": ds.id, "name": ds.name}
         factors = get_ds_factors_keys(ds)
         temp_dic["factors"] = [obj['name'] for obj in factors]
+        res.append(temp_dic)'''
+    list_id = []
+    for item in search_dic["hits"]["hits"]:
+        list_id.append(int(item["_id"]))
+    ds_query = models.BiogpsDataset.objects.filter(id__in=list_id)
+    for ds_item in ds_query:
+        temp_dic = {"id": ds.id, "name": ds.name}
+        factors = get_ds_factors_keys(ds_item)
+        temp_dic["factors"] = [obj['name'] for obj in factors]
         res.append(temp_dic)
+    
 
     res = {"current_page": page + 1, "total_page": total_page, "count": count,\
             "results": res}
