@@ -392,7 +392,7 @@ def dataset_search(request):
         list_id.append(int(item["_id"]))
     ds_query = models.BiogpsDataset.objects.filter(id__in=list_id)
     for ds_item in ds_query:
-        temp_dic = {"id": ds.id, "name": ds.name}
+        temp_dic = {"id": ds_item.id, "name": ds_item.name}
         factors = get_ds_factors_keys(ds_item)
         temp_dic["factors"] = [obj['name'] for obj in factors]
         res.append(temp_dic)
