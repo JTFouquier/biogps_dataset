@@ -92,9 +92,8 @@ def dataset_info(request, ds_id):
 def _get_reporter_from_gene(gene):
     mg = mygene.MyGeneInfo()
     #res = mg.querymany([gene], scopes='_id', fields='reporter')
-    res = mg.getgene(gene,fields='reporter')
-    data_json = res[0]
-    if 'notfound' in data_json:
+    data_json = mg.getgene(gene,fields='reporter')
+    if 'reporter' not in data_json:
         return None
     reporters = []
     for i in data_json['reporter'].values():
