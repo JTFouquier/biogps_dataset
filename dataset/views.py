@@ -28,6 +28,7 @@ def adopt_dataset(ds_id):
 #return an array of keys that stand for samples in ds
 def get_ds_factors_keys(ds):
     factors = []
+    i = 1
     for f in ds.metadata['factors']:
         order_idx = color_idx = None
         if 'comment' in f[f.keys()[0]]:
@@ -44,7 +45,8 @@ def get_ds_factors_keys(ds):
                 order_idx = content['order_idx']
                 color_idx = content['color_idx']
         if order_idx is None:
-            item = {'name': temp}
+            item = {'name': temp, 'order_idx': i, 'color_idx': i}
+            i = i + 1
         else:
             item = {'name': temp, 'order_idx': order_idx, 'color_idx': color_idx} 
         factors.append(item)
