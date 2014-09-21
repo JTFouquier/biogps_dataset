@@ -27,17 +27,22 @@ class Command(BaseCommand):
       help='Specify file containing array types.',),)
     option_list = option_list + (make_option("-s", "--skip", \
       action="store", type="string", dest="skip_file", \
-      help='Specify file containing array types to skip, only \
-      effect with -a',),)
+      help='Specify file containing experiments to skip, only \
+      works with -a',),)
     option_list = option_list + (make_option("-t", "--test", action="store",\
       type="string", dest="test", help='Test the specified experiment. \
       No database writing.',),)
+    option_list = option_list + (make_option("-p", "--platform", \
+      action="store", type="string", dest="platform",
+      help='load experiment(s) of specified platform, can load one \
+      experiment by -e, or all experiments.',),)
     option_list = option_list + (make_option("-e", "--exp", action="store", \
       type="string", dest="exp", help='Load the specified experiment.\
       must specify platform name using -p option',),)
-    option_list = option_list + (make_option("-p", "--platform", \
-      action="store", type="string", dest="platform",
-      help='use data from specified platform, go with -e, -t',),)
+    option_list = option_list + (make_option("-s", "--start", action="store", \
+      type="string", dest="start", help='Load the first Nth experiments.\
+      must specify platform name using -p option',),)
+
 
 
     def handle(self, *args, **options):
@@ -52,45 +57,24 @@ class Command(BaseCommand):
             #skips = get_list_from_file(options['skip_file'])
             platforms = self.get_list_from_file(options['array_file'])
             skips = self.get_list_from_file(options['skip_file'])
-            start = self.get_list_from_file(options['start_index'])
             for p in platforms:
-                po = Platform(p)
-                po.load()
-                po.save()
-                if po.exps is None:
-                    continue
-                logging.info('%d experiments in total' % len(po.exps))
-                po.exps.sort()
-                for exp in po.exps:
-                    logging.info('No.%d experiment of total %d, %s' %\
-                                  (po.exps.index(exp), len(po.exps), exp))
-                    if exp in skips:
-                        logging.info('skip %s' % exp)
-                        continue
-                    if self.is_already_loaded(exp):
-                        logging.info('existed %s' % exp)
-                        continue
-                    try:
-                        self.save_dataset(exp, p)
-                    except Exception, e:
-                        logging.error('Exception: %s' % e)
-                        res = models.BiogpsDatasetFailed.objects.get_or_create(\
-                            platform=p, dataset=exp)
-                        res[0].reason=e
-                        res[0].save()
-                        continue
-        elif options['exp'] is not None:
-            if options['platform'] is None:
-                logging.error('specify a plotform name by -p')
+                load_exps_of_platform(p)
+        elif options['platform'] is not None:
+            #load one experiment of this platform
+            if options['exp'] is not None:
+                p = Platform(options['platform'])
+                p.load()
+                if options['exp'] not in p.exps:
+                    logging.info('experiment and platform not match')
+                    return
+                p.save()
+                self.save_dataset(options['exp'], options['platform'], True)
                 return
-            p = Platform(options['platform'])
-            p.load()
-            if options['exp'] not in p.exps:
-                logging.info('experiment and platform not match')
-                return
-            p.save()
-            self.save_dataset(options['exp'], options['platform'], True)
-            return
+            #load whole experiments of this platform
+            else:
+                start = options.get('start', 0)
+                load_exps_of_platform(options['platform'], start)
+                start
 
     def save_dataset(self, name, platform, dump=False):
         logging.info('--- start %s ---' % name)
@@ -132,3 +116,30 @@ class Command(BaseCommand):
             return True
         except ObjectDoesNotExist:
             return False
+        
+    def load_exps_of_platform(self, p, start=0):
+        po = Platform(p)
+        po.load()
+        po.save()
+        if po.exps is None:
+            continue
+        logging.info('%d experiments in total' % len(po.exps))
+        po.exps.sort()
+        for exp in po.exps[start:]:
+            logging.info('No.%d experiment of total %d, %s' %\
+                          (po.exps.index(exp), len(po.exps), exp))
+            if exp in skips:
+                logging.info('skip %s' % exp)
+                continue
+            if self.is_already_loaded(exp):
+                logging.info('existed %s' % exp)
+                continue
+            try:
+                self.save_dataset(exp, p)
+            except Exception, e:
+                logging.error('Exception: %s' % e)
+                res = models.BiogpsDatasetFailed.objects.get_or_create(\
+                    platform=p, dataset=exp)
+                res[0].reason=e
+                res[0].save()
+                continue        
