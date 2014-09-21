@@ -58,7 +58,7 @@ class Command(BaseCommand):
             platforms = self.get_list_from_file(options['array_file'])
             skips = self.get_list_from_file(options['skip_file'])
             for p in platforms:
-                load_exps_of_platform(p)
+                self.load_exps_of_platform(p)
         elif options['platform'] is not None:
             #load one experiment of this platform
             if options['exp'] is not None:
@@ -73,7 +73,7 @@ class Command(BaseCommand):
             #load whole experiments of this platform
             else:
                 start = options.get('start', 0)
-                load_exps_of_platform(options['platform'], start)
+                self.load_exps_of_platform(options['platform'], start)
                 start
 
     def save_dataset(self, name, platform, dump=False):
