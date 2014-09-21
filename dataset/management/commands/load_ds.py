@@ -122,7 +122,8 @@ class Command(BaseCommand):
         po.load()
         po.save()
         if po.exps is None:
-            continue
+            logging.info('no experiments in this platform')
+            return
         logging.info('%d experiments in total' % len(po.exps))
         po.exps.sort()
         for exp in po.exps[start:]:
