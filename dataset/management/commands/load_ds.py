@@ -72,9 +72,9 @@ class Command(BaseCommand):
                 return
             #load whole experiments of this platform
             else:
-                start = options.get('start', 0)
+                start = options['start']
+                start = int(start) if start is not None else 0
                 self.load_exps_of_platform(options['platform'], start)
-                start
 
     def save_dataset(self, name, platform, dump=False):
         logging.info('--- start %s ---' % name)
