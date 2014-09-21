@@ -39,7 +39,7 @@ class Command(BaseCommand):
     option_list = option_list + (make_option("-e", "--exp", action="store", \
       type="string", dest="exp", help='Load the specified experiment.\
       must specify platform name using -p option',),)
-    option_list = option_list + (make_option("-s", "--start", action="store", \
+    option_list = option_list + (make_option("-i", "--start", action="store", \
       type="string", dest="start", help='Load the first Nth experiments.\
       must specify platform name using -p option',),)
 
@@ -142,4 +142,3 @@ class Command(BaseCommand):
                     platform=p, dataset=exp)
                 res[0].reason=e
                 res[0].save()
-                continue        
