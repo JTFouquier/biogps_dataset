@@ -52,6 +52,7 @@ class Command(BaseCommand):
             #skips = get_list_from_file(options['skip_file'])
             platforms = self.get_list_from_file(options['array_file'])
             skips = self.get_list_from_file(options['skip_file'])
+            start = self.get_list_from_file(options['start_index'])
             for p in platforms:
                 po = Platform(p)
                 po.load()
@@ -73,7 +74,10 @@ class Command(BaseCommand):
                         self.save_dataset(exp, p)
                     except Exception, e:
                         logging.error('Exception: %s' % e)
-                        models.BiogpsDatasetFailed.objects.create(platform=p, dataset=exp, reason=e)
+                        res = models.BiogpsDatasetFailed.objects.get_or_create(\
+                            platform=p, dataset=exp)
+                        res[0].reason=e
+                        res[0].save()
                         continue
         elif options['exp'] is not None:
             if options['platform'] is None:
