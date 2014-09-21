@@ -56,8 +56,9 @@ class Command(BaseCommand):
         elif options['array_file'] is not None:
             #skips = get_list_from_file(options['skip_file'])
             platforms = self.get_list_from_file(options['array_file'])
+            skips = self.get_list_from_file(options['skip_file'])
             for p in platforms:
-                self.load_exps_of_platform(p)
+                self.load_exps_of_platform(p, skips=skips)
         elif options['platform'] is not None:
             #load one experiment of this platform
             if options['exp'] is not None:
@@ -116,7 +117,7 @@ class Command(BaseCommand):
         except ObjectDoesNotExist:
             return False
         
-    def load_exps_of_platform(self, p, start=0):
+    def load_exps_of_platform(self, p, start=0, skips=[]):
         po = Platform(p)
         po.load()
         po.save()
@@ -125,7 +126,6 @@ class Command(BaseCommand):
             return
         logging.info('%d experiments in total' % len(po.exps))
         po.exps.sort()
-        skips = self.get_list_from_file(options['skip_file'])
         for exp in po.exps[start:]:
             logging.info('No.%d experiment of total %d, %s' %\
                           (po.exps.index(exp), len(po.exps), exp))
