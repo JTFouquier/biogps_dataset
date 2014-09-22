@@ -16,9 +16,10 @@ import urllib2
 
 
 def adopt_dataset(ds_id):
-    if ds_id in settings.DEFAULT_DS_TOKEN:
+    #TODO: use geo_gse_id latter, , id__in=settings.DEFAULT_DS_ID
+    if ds_id in settings.DEFAULT_DS_ID:
         return models.BiogpsDataset.objects.using('default_ds')\
-            .get(geo_gse_id=ds_id, id__in=settings.DEFAULT_DS_ID)
+            .get(id=ds_id)
     try:
         return models.BiogpsDataset.objects.get(id=ds_id)
     except Exception:
