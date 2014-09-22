@@ -164,9 +164,8 @@
 
                 getDatasets : function() {
                     // Query SL for relevant datasets, encoding url for use with proxy
-                    var _repParam = "%26reporters%3DNM_199501,XM_006240778,XR_355212,1378874_at,1394320_at,D28753_i_at,D28754_s_at,362817";
                     var _dsLibUrl = "/dataset/search/?gene="+DC_026887848.geneID+"&page=" + DC_026887848.dsPage;
-                    var _dsDefaultUrl = "/data_chart/gnf_json_proxy.cgi?url=http://biogps.org/dataset/search/%3FdefaultDS%3Dt" + _repParam;
+                    var _dsDefaultUrl = "/dataset/search/default/?gene=" + DC_026887848.geneID;
                     if (DC_026887848.dsSearchTerm !== "") {
                         _qTerm =    DC_026887848.dsSearchTerm;
                         _dsLibUrl += '&query='+_qTerm;
@@ -179,15 +178,14 @@
                             // Error getting json from server
                             DCCG.buildCanvasError(DC_026887848.getCanvas());
                         } else {
-                            DC_026887848.updateDialog(allDatasets.details, true);
-                            return
+                            //DC_026887848.updateDialog(allDatasets.details, true);
                             // Default datasets
                             $.getJSON(_dsDefaultUrl, function(defaultDatasets, code) {
                                 if (code != "success") {
                                     // Error getting json from server
                                     DCCG.buildCanvasError(DC_026887848.getCanvas());
                                 } else {
-                                    DC_026887848.updateDialog(allDatasets, defaultDatasets);
+                                    DC_026887848.updateDialog(allDatasets.details, defaultDatasets.details);
                                 }
                             });
                         }
@@ -230,8 +228,8 @@
                         return;
                         // Update default datasets
                         $("#dsDefaultsList").empty();
-                        $("#dsDefaultTotal").html(defaultDatasets.length);
-                        $.each(defaultDatasets, function(idx, ds) {
+                        $("#dsDefaultTotal").html(defaultDatasets.count);
+                        $.each(defaultDatasets.results, function(idx, ds) {
                             var _dsClass = (idx % 2 == 0 ? "odd-li" : "even-li");
                             var _dsTitle = (ds.name.length > _titleWidth ? ds.name.substring(0, _titleWidth - 3) + "..." : ds.name);
                             _dsTitle += "  (" + ds.factors.length + " samples)";
