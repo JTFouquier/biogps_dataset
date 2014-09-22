@@ -225,7 +225,6 @@
                             _dsTitle += "  (" + ds.factors.length + " samples)";
                             $("#dsList").append('<a class="ds-dialog" href="javascript:void(0)" onclick="DC_026887848.loadDataset(' + ds.id + ')"><li class="ds-dialog ' + _dsClass + '" id="ds' + ds.id + '">' + _dsTitle + '</li></a>');
                         });
-                        return;
                         // Update default datasets
                         $("#dsDefaultsList").empty();
                         $("#dsDefaultTotal").html(defaultDatasets.count);
