@@ -539,3 +539,8 @@ def dataset_correlation(request, ds_id, reporter_id, min_corr):
 
     return general_json_response(GENERAL_ERRORS.ERROR_BAD_ARGS, \
                 "Reporter %s not in dataset: %s." % (reporter_id, ds_id))
+
+#just for test 503 error page redirect
+def dataset_503_test(request):
+    return general_json_response(GENERAL_ERRORS.ERROR_NO_PERMISSION, \
+                "To enable persistent request, add \"X-Email\" HTTP header with your email address")
