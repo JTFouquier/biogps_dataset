@@ -399,6 +399,7 @@ def dataset_search(request):
     print body
     r = requests.post(settings.ES_URLS['SCH'], data=data)
     search_dic = r.json()
+    print search_dic
     count = search_dic["hits"]["total"]
     total_page = int(math.ceil(float(count) / float(page_by)))
     res = []
