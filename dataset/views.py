@@ -396,11 +396,11 @@ def dataset_search(request):
                         }}]}} }}
     
     data = json.dumps(body)
-    print body
+    
     r = requests.post(settings.ES_URLS['SCH'], data=data)
     search_dic = r.json()
     count = search_dic["hits"]["total"]
-    print count
+
     total_page = int(math.ceil(float(count) / float(page_by)))
     res = []
     '''for item in search_dic["hits"]["hits"]:
@@ -414,20 +414,33 @@ def dataset_search(request):
         temp_dic["factors"] = [obj['name'] for obj in factors]
         res.append(temp_dic)'''
     list_id = []
+    list_default = []
     for item in search_dic["hits"]["hits"]:
         if item["_source"]["default"] == 1:
             list_id.append(item["_source"]["geo_gse_id"])
+        else:
+            list_default.append(item["_source"]["geo_gse_id"])
     print list_id
+    print list_default
     ds_query = models.BiogpsDataset.objects.filter(geo_gse_id__in=list_id)
     for ds_item in ds_query:
         temp_dic = {"id": ds_item.id, "name": ds_item.name}
         factors = get_ds_factors_keys(ds_item)
         temp_dic["factors"] = [obj['name'] for obj in factors]
         res.append(temp_dic)
+   
+    res_default = []     
+    ds_query = models.BiogpsDataset.objects.filter(geo_gse_id__in=list_default)
+    for ds_item in ds_query:
+        temp_dic = {"id": ds_item.id, "name": ds_item.name}
+        factors = get_ds_factors_keys(ds_item)
+        temp_dic["factors"] = [obj['name'] for obj in factors]
+        res_default.append(temp_dic)
     
 
     res = {"current_page": page + 1, "total_page": total_page, "count": count,\
-            "results": res}
+            "results": res,"result_default":res_default}
+    print res
     return general_json_response(detail=res)
 
 
