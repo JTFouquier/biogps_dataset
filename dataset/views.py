@@ -416,7 +416,7 @@ def dataset_search(request):
     list_id = []
     for item in search_dic["hits"]["hits"]:
         if item["_source"]["default"] == 1:
-            list_id.append(int(item["_source"]["geo_gse_id"]))
+            list_id.append(item["_source"]["geo_gse_id"])
     print list_id
     ds_query = models.BiogpsDataset.objects.filter(id__in=list_id)
     for ds_item in ds_query:
