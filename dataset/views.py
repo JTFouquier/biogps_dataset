@@ -414,9 +414,10 @@ def dataset_search(request):
         temp_dic["factors"] = [obj['name'] for obj in factors]
         res.append(temp_dic)'''
     list_id = []
-    print search_dic["hits"]["hits"]
     for item in search_dic["hits"]["hits"]:
         if item["default"] == 1:
+            print 'aaaaaaaaaaaaa'
+            print item["geo_gse_id"]
             list_id.append(int(item["geo_gse_id"]))
     print list_id
     ds_query = models.BiogpsDataset.objects.filter(id__in=list_id)
