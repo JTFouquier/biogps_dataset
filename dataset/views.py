@@ -367,12 +367,34 @@ def dataset_search(request):
     page_by = int(page_by)
     body = {"from": page * page_by, "size": page_by}
     if query is not None:
-        body["query"] = {"match": {"_all": query}}
+       #body["query"] = {"match": {"_all": query}}
+       body["query"] =   {"bool": {
+      "should": [
+        { "match": { "summary":  "hello" }},
+        { "match": { "name": "hello"   }}
+      ]
+    }}
     else:
         body["query"] = {"match_all": {}}
     rep = ' '.join(reporters)
-    body["filter"] = {"has_parent": {"parent_type": "platform",
-            "query": {"match": {"reporters": rep}}}}
+    """ body["filter"] = {"has_parent": {"parent_type": "platform",
+            "query": {"match": {"reporters": rep}}}}"""
+    body["filter"] = {
+    "has_parent": {
+        "parent_type": "platform",
+        "query": {
+            "bool": {
+                "should": [
+                    {
+                        "match": {
+                            "reporters": rep
+                        }
+                    },
+                    {
+                        "match": {
+                            "platform": rep
+                        }}]}} }}
+    
     data = json.dumps(body)
     r = requests.post(settings.ES_URLS['SCH'], data=data)
     search_dic = r.json()
@@ -391,7 +413,8 @@ def dataset_search(request):
         res.append(temp_dic)'''
     list_id = []
     for item in search_dic["hits"]["hits"]:
-        list_id.append(int(item["_id"]))
+        if item["default"] == 1:
+            list_id.append(int(item["geo_gse_id"]))
     ds_query = models.BiogpsDataset.objects.filter(id__in=list_id)
     for ds_item in ds_query:
         temp_dic = {"id": ds_item.id, "name": ds_item.name}
