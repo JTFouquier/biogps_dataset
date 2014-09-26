@@ -415,6 +415,7 @@ def dataset_search(request):
         res.append(temp_dic)'''
     list_id = []
     for item in search_dic["hits"]["hits"]:
+        print item
         if item["default"] == 1:
             print 'aaaaaaaaaaaaa'
             print item["geo_gse_id"]
