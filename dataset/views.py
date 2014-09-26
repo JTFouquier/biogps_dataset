@@ -399,8 +399,8 @@ def dataset_search(request):
     print body
     r = requests.post(settings.ES_URLS['SCH'], data=data)
     search_dic = r.json()
-    print search_dic
     count = search_dic["hits"]["total"]
+    print count
     total_page = int(math.ceil(float(count) / float(page_by)))
     res = []
     '''for item in search_dic["hits"]["hits"]:
@@ -417,6 +417,7 @@ def dataset_search(request):
     for item in search_dic["hits"]["hits"]:
         if item["default"] == 1:
             list_id.append(int(item["geo_gse_id"]))
+    print list_id
     ds_query = models.BiogpsDataset.objects.filter(id__in=list_id)
     for ds_item in ds_query:
         temp_dic = {"id": ds_item.id, "name": ds_item.name}
