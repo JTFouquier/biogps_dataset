@@ -440,7 +440,7 @@ def dataset_search(request):
 
     res = {"current_page": page + 1, "total_page": total_page, "count": count,\
             "results": res,"result_default":res_default}
-    print res
+
     return general_json_response(detail=res)
 
 
