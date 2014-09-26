@@ -396,6 +396,7 @@ def dataset_search(request):
                         }}]}} }}
     
     data = json.dumps(body)
+    print body
     r = requests.post(settings.ES_URLS['SCH'], data=data)
     search_dic = r.json()
     count = search_dic["hits"]["total"]
