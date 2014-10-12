@@ -373,7 +373,7 @@ def dataset_search(request):
     page = int(page)
     page_by = int(page_by)
     rep = ' '.join(reporters)
-    search_res = _es_search(rep, query, dft=0, (page-1)*page_by, page_by)
+    search_res = _es_search(rep, query, 0, (page-1)*page_by, page_by)
     count = search_res["hits"]["total"]
 
     total_page = int(math.ceil(float(count) / float(page_by)))
@@ -405,7 +405,7 @@ def dataset_search_default(request):
         return general_json_response(code=GENERAL_ERRORS.ERROR_NOT_FOUND,\
                          detail='no matched data for gene %s.' % gene)
     #retrive all results
-    search_res = _es_search(' '.join(reporters), query, dft=1, 0, 9999)
+    search_res = _es_search(' '.join(reporters), query, 1, 0, 9999)
     ids = [item["_source"]["geo_gse_id"] for item in search_res["hits"]["hits"]]
     qs = models.BiogpsDataset.objects.using('default_ds')\
             .filter(geo_gse_id__in=ids)
