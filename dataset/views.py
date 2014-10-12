@@ -335,23 +335,10 @@ def dataset_chart(request, ds_id, reporter_id):
     canvas.print_png(response)
     return response
 
-@csrf_exempt
-def dataset_search_default(request):
-    query = request.GET.get("query", None)
-    gene = request.GET.get("gene", None)
-    qs = models.BiogpsDataset.objects.using('default_ds')\
-            .filter(id__in=settings.DEFAULT_DS_ID)
-    res = []
-    for ds in qs:
-        temp_dic = {"id": ds.id, "name": ds.name}
-        factors = get_ds_factors_keys(ds)
-        temp_dic["factors"] = [obj['name'] for obj in factors]
-        res.append(temp_dic)
-    res = {"count": qs.count(),   "results": res}
-    return general_json_response(detail=res)
 
-
-def _es_search(rpt, q=None, dft=False, start=0, size=8):
+#filter by "default" field and "platform" and query by keywords
+#if specified
+def _es_search(rpt, q=None, dft=0, start=0, size=8):
     body = {"from": start, "size": size}
     #setup filter, filter is faster that query
     body['query'] = {"filtered": {"filter":{ "bool":{
@@ -383,67 +370,52 @@ def dataset_search(request):
     if reporters is None:
         return general_json_response(code=GENERAL_ERRORS.ERROR_NOT_FOUND,\
                          detail='no matched data for gene %s.' % gene)
-    page = int(page) - 1
+    page = int(page)
     page_by = int(page_by)
-    body = {"from": page * page_by, "size": page_by}
-    if query is not None:
-       #body["query"] = {"match": {"_all": query}}
-       body["query"] =   {"bool": {
-      "should": [
-        { "match": { "summary":  "hello" }},
-        { "match": { "name": "hello"   }}
-      ]
-    }}
-    else:
-        body["query"] = {"match_all": {}}
     rep = ' '.join(reporters)
-    body["filter"] = {"has_parent": {"parent_type": "platform",
-            "query": {"match": {"reporters": rep}}}}
-    data = json.dumps(body)
-    r = requests.post(settings.ES_URLS['SCH'], data=data)
-    search_dic = r.json()
-    count = search_dic["hits"]["total"]
+    search_res = _es_search(rep, query, dft=0, (page-1)*page_by, page_by)
+    count = search_res["hits"]["total"]
 
     total_page = int(math.ceil(float(count) / float(page_by)))
     res = []
-    '''for item in search_dic["hits"]["hits"]:
-        try:
-            ds = models.BiogpsDataset.objects.get(id=int(item["_id"]))
-        except Exception, e:
-            print e
-            continue
-        temp_dic = {"id": ds.id, "name": ds.name}
-        factors = get_ds_factors_keys(ds)
-        temp_dic["factors"] = [obj['name'] for obj in factors]
-        res.append(temp_dic)'''
-    list_id = []
-    list_default = []
-    for item in search_dic["hits"]["hits"]:
-        if item["_source"]["default"] == 1:
-            list_id.append(item["_source"]["geo_gse_id"])
-        else:
-            list_default.append(item["_source"]["geo_gse_id"])
-    print list_id
-    print list_default
-    ds_query = models.BiogpsDataset.objects.filter(geo_gse_id__in=list_id)
+    ids = []
+    for item in search_res["hits"]["hits"]:
+        ids.append(item["_source"]["geo_gse_id"])
+    print ids
+    ds_query = models.BiogpsDataset.objects.filter(geo_gse_id__in=ids)
     for ds_item in ds_query:
         temp_dic = {"id": ds_item.id, "name": ds_item.name}
         factors = get_ds_factors_keys(ds_item)
         temp_dic["factors"] = [obj['name'] for obj in factors]
         res.append(temp_dic)
-   
-    res_default = []     
-    ds_query = models.BiogpsDataset.objects.filter(geo_gse_id__in=list_default)
-    for ds_item in ds_query:
-        temp_dic = {"id": ds_item.id, "name": ds_item.name}
-        factors = get_ds_factors_keys(ds_item)
+
+    res = {"current_page": page, "total_page": total_page, "count": count,\
+            "results": res}
+    return general_json_response(detail=res)
+
+
+@csrf_exempt
+def dataset_search_default(request):
+    query = request.GET.get("query", None)
+    gene = request.GET.get("gene", None)
+    if gene is None:
+        gene = settings.DEFAULT_GENE_ID
+    reporters = _get_reporter_from_gene(gene)
+    if reporters is None:
+        return general_json_response(code=GENERAL_ERRORS.ERROR_NOT_FOUND,\
+                         detail='no matched data for gene %s.' % gene)
+    #retrive all results
+    search_res = _es_search(' '.join(reporters), query, dft=1, 0, 9999)
+    ids = [item["_source"]["geo_gse_id"] for item in search_res["hits"]["hits"]]
+    qs = models.BiogpsDataset.objects.using('default_ds')\
+            .filter(geo_gse_id__in=ids)
+    res = []
+    for ds in qs:
+        temp_dic = {"id": ds.id, "name": ds.name}
+        factors = get_ds_factors_keys(ds)
         temp_dic["factors"] = [obj['name'] for obj in factors]
-        res_default.append(temp_dic)
-    
-
-    res = {"current_page": page + 1, "total_page": total_page, "count": count,\
-            "results": res,"result_default":res_default}
-
+        res.append(temp_dic)
+    res = {"count": qs.count(),   "results": res}
     return general_json_response(detail=res)
 
 
