@@ -349,6 +349,26 @@ def dataset_search_default(request):
         res.append(temp_dic)
     res = {"count": qs.count(),   "results": res}
     return general_json_response(detail=res)
+
+
+def _es_search(rpt, q=None, dft=False, start=0, size=8):
+    body = {"from": start, "size": size}
+    #setup filter, filter is faster that query
+    body['query'] = {"filtered": {"filter":{ "bool":{
+        "must":[{"term":{"default":dft}},
+                {"has_parent": {"parent_type": "platform","query": 
+                {"match": {"reporters": rpt}}}}] }}
+    }}
+    #set query if query word is not None
+    if query is not None:
+        body["query"]["filtered"]["query"] = {"multi_match":{"query": q, 
+            "fields": [ "summary", "name" ] }}
+
+    data = json.dumps(body)
+    r = requests.post(settings.ES_URLS['SCH'], data=data)
+    return r.json()
+
+
 #接受查询的字段组合query和获取的第几页page
 @csrf_exempt
 def dataset_search(request):
@@ -377,26 +397,9 @@ def dataset_search(request):
     else:
         body["query"] = {"match_all": {}}
     rep = ' '.join(reporters)
-    """ body["filter"] = {"has_parent": {"parent_type": "platform",
-            "query": {"match": {"reporters": rep}}}}"""
-    body["filter"] = {
-    "has_parent": {
-        "parent_type": "platform",
-        "query": {
-            "bool": {
-                "should": [
-                    {
-                        "match": {
-                            "reporters": rep
-                        }
-                    },
-                    {
-                        "match": {
-                            "platform": rep
-                        }}]}} }}
-    
+    body["filter"] = {"has_parent": {"parent_type": "platform",
+            "query": {"match": {"reporters": rep}}}}
     data = json.dumps(body)
-    
     r = requests.post(settings.ES_URLS['SCH'], data=data)
     search_dic = r.json()
     count = search_dic["hits"]["total"]

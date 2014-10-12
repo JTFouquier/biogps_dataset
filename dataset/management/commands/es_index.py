@@ -63,7 +63,8 @@ class Command(BaseCommand):
                 requests.put(url, data=data)
                 bio_count = bio_count + 1
 
-        print "from default,added %d platform , added %d dataset" % (plt_count, bio_count)
+        print "from 'default' database,added %d platform , added %d dataset" % (plt_count, bio_count)
+
         dataset = models.BiogpsDataset.objects.using("default_ds").\
         filter(id__in=settings.DEFAULT_DS_ID)
         plt_ds, bio_ds = plt_count, bio_count
@@ -92,5 +93,5 @@ class Command(BaseCommand):
                     str(bio_count) + "?parent=" + str(plt_id)
             requests.put(url, data=data)
             bio_count = bio_count + 1
-        print "from default_ds,added %d platform , added %d dataset"\
+        print "from 'default_ds' database, added %d platform, added %d dataset"\
              % (plt_count - plt_ds, bio_count - bio_ds)
