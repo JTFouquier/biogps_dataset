@@ -21,9 +21,13 @@ def adopt_dataset(ds_id):
         return models.BiogpsDataset.objects.using('default_dataset')\
             .get(id=ds_id)
     try:
-        return models.BiogpsDataset.objects.get(id=ds_id)
+        return models.BiogpsDataset.objects.using('default_dataset')\
+            .get(geo_gse_id=ds_id)
     except Exception:
-        return None
+        try:
+            return models.BiogpsDataset.objects.get(geo_gse_id=ds_id)
+        except Exception:
+            return None
 
 
 #return an array of keys that stand for samples in ds
