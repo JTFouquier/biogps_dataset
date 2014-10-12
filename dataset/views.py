@@ -347,7 +347,7 @@ def _es_search(rpt, q=None, dft=0, start=0, size=8):
                 {"match": {"reporters": rpt}}}}] }}
     }}
     #set query if query word is not None
-    if query is not None:
+    if q is not None:
         body["query"]["filtered"]["query"] = {"multi_match":{"query": q, 
             "fields": [ "summary", "name" ] }}
 
