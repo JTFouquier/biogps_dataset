@@ -56,7 +56,7 @@ class Command(BaseCommand):
             #temp_data中的default字段表面了该document来自那个数据库，整数1表明来自默认数据库
             for ds in item.dataset_platform.all():
                 temp_data = ds.es_index_serialize()
-                temp_data["default"] =  1
+                temp_data["default"] =  0
                 data = json.dumps(temp_data)
                 url = settings.ES_URLS['DS'] + \
                     str(bio_count) + "?parent=" + str(plt_count - 1)
@@ -87,7 +87,7 @@ class Command(BaseCommand):
 
             #temp_data中的default字段表面了该document来自那个数据库，整数0表明来自数据库default_ds
             temp_data = ds.es_index_serialize()
-            temp_data["default"] =  0
+            temp_data["default"] =  1
             data = json.dumps(temp_data)
             url = settings.ES_URLS['DS'] + \
                     str(bio_count) + "?parent=" + str(plt_id)
