@@ -5,7 +5,7 @@ import base64
 import types
 import textwrap
 from django.db import models
-#from django.utils.encoding import smart_unicode
+# from django.utils.encoding import smart_unicode
 from django.template.defaultfilters import slugify
 from django_extensions.db.fields import AutoSlugField
 # https://github.com/bradjasper/django-jsonfield
@@ -52,7 +52,7 @@ class BiogpsDataset(models.Model):
     """Model definition for BiogpsDataset"""
     name = models.CharField(max_length=500)
     summary = models.CharField(blank=True, max_length=10000)
-    #ownerprofile = models.ForeignKey(UserProfile, to_field='sid')
+    # ownerprofile = models.ForeignKey(UserProfile, to_field='sid')
     ownerprofile_id = models.CharField(max_length=100)
     platform = models.ForeignKey('BiogpsDatasetPlatform',
                                  related_name='dataset_platform', null=True)
@@ -85,7 +85,7 @@ class BiogpsDataset(models.Model):
 #                     for v in format_factor(val):
 #                         _fac_txt.add(v)
 #         return ' '.join(_fac_txt)
-    #serialize object data for es index setup
+    # serialize object data for es index setup
     def es_index_serialize(self):
         return {"name": self.name,\
                 "summary": self.summary, "geo_gse_id": str(self.geo_gse_id)}
@@ -114,7 +114,7 @@ class BiogpsDataset(models.Model):
         return wrap_str(self.summary, 140)
 
     # Custom manager
-    #objects = BiogpsDatasetManager()
+    # objects = BiogpsDatasetManager()
 
     # Required setting for ModelWithPermission and PermissionManager working
     object_type = 'D'
@@ -167,7 +167,8 @@ class BiogpsDataset(models.Model):
                 'summary': ds.metadata['summary']
             })
         elif mode == 'es':
-            extra_attrs = {'AS_IS': ['factors_text', 'geo_gds_id',
+            extra_attrs = {'AS_IS': [
+                           'factors_text', 'geo_gds_id',
                            'geo_gse_id', 'name', 'name_wrapped',
                            'name_wrapped_short', 'platform_id',
                            'popularity', 'sample_count', 'sample_ids',

@@ -8,6 +8,10 @@ from django.db.models.base import Model
 
 
 class ComplexEncoder(JSONEncoder):
+    """
+        encoder for transit between object and json
+    """
+
     def default(self, obj):
         if isinstance(obj, Model):
             return json.loads(serialize('json', [obj])[1:-1])['fields']
@@ -31,6 +35,9 @@ class ComplexEncoder(JSONEncoder):
 
 
 class GENERAL_ERRORS:
+    """
+        define some common errors
+    """
     ERROR_SUCCESS = 0
     ERROR_BAD_ARGS = 4000
     ERROR_NO_PERMISSION = 4001
@@ -49,7 +56,7 @@ class GENERAL_ERRORS:
     def default_error_message(cls, code):
         try:
             return GENERAL_ERRORS.ERRO_STRING[code]
-        except:
+        except IndexError:
             return 'unknown error'
 
 
@@ -57,5 +64,5 @@ def general_json_response(code=0, detail=None):
     if detail is None:
         detail = GENERAL_ERRORS.default_error_message(code)
     res = {'code': code, 'details': detail}
-    return HttpResponse(json.dumps(res, cls=ComplexEncoder),\
-                         content_type="application/json")
+    return HttpResponse(json.dumps(res, cls=ComplexEncoder),
+                        content_type="application/json")
