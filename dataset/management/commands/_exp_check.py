@@ -41,13 +41,13 @@ class DP_E_GEOD_4006(Pattern):
 
         f = data.values()[0]
         f.seek(0)
-        header = f.readline().strip().split('\t')
+        header = f.readline().strip().split('\s')
         if self.match_any(self.data_keys, header) == None:
             return None
         f.seek(0)
         header[0] = 'REPORTERS'
         df = pandas.read_table(f, names=header, skiprows=2, \
-                               index_col=['REPORTERS'], delimiter='\t')
+                               index_col=['REPORTERS'], delimiter='\s')
         df = df.sort_index(axis=1).sort_index(axis=0)
         sdrf = sdrf.sort(columns=sample_key)
         #filter by platform
@@ -81,7 +81,7 @@ class DP_E_GEOD_26688(Pattern):
             return None
         f = data.values()[0]
         f.seek(0)
-        header = f.readline().split('\t')
+        header = f.readline().split('\s')
         if self.match_any(self.data_keys, header) == None:
             return None
         platform_key = self.match_any(self.platform_keys, sdrf.columns)
