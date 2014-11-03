@@ -87,7 +87,7 @@ class BiogpsDataset(models.Model):
 #         return ' '.join(_fac_txt)
     # serialize object data for es index setup
     def es_index_serialize(self):
-        return {"name": self.name,\
+        return {"name": self.name,
                 "summary": self.summary, "geo_gse_id": str(self.geo_gse_id)}
 
     @property

@@ -106,7 +106,8 @@ ES_URLS = {
 }
 
 DEFAULT_DS_TOKEN = ['GSE952', 'GSE10246']
-#[ds.id for ds in BiogpsDataset.objects.all() if ds.metadata['default']]
-DEFAULT_DS_ID = [6, 8, 9, 10, 11, 12, 13, 14, 3, 4, 5, 1, 2428, 2, 2427, 2430, 7]
+# [ds.id for ds in BiogpsDataset.objects.all() if ds.metadata['default']]
+DEFAULT_DS_ID = [6, 8, 9, 10, 11, 12, 13, 14, 3, 4, 5, 1, 2428,
+                 2, 2427, 2430, 7]
 
 from settings_dev import *

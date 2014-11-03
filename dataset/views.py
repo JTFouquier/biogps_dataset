@@ -428,7 +428,7 @@ def dataset_search_default(request):
     search_res = _es_search(' '.join(reporters), query, 1, 0, 9999)
     ids = [item["_source"]["geo_gse_id"]
            for item in search_res["hits"]["hits"]]
-    qs = models.BiogpsDataset.objects.using('default_dataset')\
+    qs = models.BiogpsDataset.objects.using('default_ds')\
         .filter(geo_gse_id__in=ids)
     res = []
     for ds in qs:
