@@ -11,20 +11,21 @@ import math
 from dataset.util import general_json_response, GENERAL_ERRORS
 import StringIO
 import mygene
+from django.core.exceptions import ObjectDoesNotExist
 
 
 def adopt_dataset(ds_id):
     if ds_id in settings.DEFAULT_DS_ID:
-        return models.BiogpsDataset.objects.using('default_dataset')\
-            .get(id=ds_id)
-    try:
-        return models.BiogpsDataset.objects.using('default_dataset')\
-            .get(geo_gse_id=ds_id)
-    except Exception:
         try:
-            return models.BiogpsDataset.objects.get(geo_gse_id=ds_id)
-        except Exception:
+            return models.BiogpsDataset.objects.using('default_ds')\
+                .get(geo_gse_id=ds_id)
+        except ObjectDoesNotExist:
             return None
+
+    try:
+        return models.BiogpsDataset.objects.get(geo_gse_id=ds_id)
+    except ObjectDoesNotExist:
+        return None
 
 
 def get_ds_factors_keys(ds):
@@ -502,7 +503,7 @@ def dataset_default(request):
     species = data_json['taxid']
     try:
         ds_id = settings.DEFAULT_DATASET_MAPPING[species]
-    except:
+    except IndexError:
         return general_json_response(
             GENERAL_ERRORS.ERROR_INTERNAL, "Cannot get default \
             dataset with gene id: %s." % gene_id)
