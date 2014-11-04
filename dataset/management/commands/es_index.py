@@ -66,7 +66,7 @@ class Command(BaseCommand):
             (plt_count, bio_count)
 
         dataset = models.BiogpsDataset.objects.using("default_ds").\
-            filter(id__in=settings.DEFAULT_DS_ID)
+            filter(geo_gse_id__in=settings.DEFAULT_DS_ACCESSION)
         plt_ds, bio_ds = plt_count, bio_count
 
         plt_dic = {}

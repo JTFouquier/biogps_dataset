@@ -15,7 +15,7 @@ from django.core.exceptions import ObjectDoesNotExist
 
 
 def adopt_dataset(ds_id):
-    if ds_id in settings.DEFAULT_DS_ID:
+    if ds_id in settings.DEFAULT_DS_ACCESSION:
         try:
             return models.BiogpsDataset.objects.using('default_ds')\
                 .get(geo_gse_id=ds_id)
@@ -67,8 +67,9 @@ def dataset_info(request, ds_id):
     """
     ds = adopt_dataset(ds_id)
     if ds is None:
-        return HttpResponse('{"code":4004, "detail":"dataset with this id not \
-            found"}', content_type="application/json")
+        return HttpResponse('{"code":4004, \
+                            "detail":"dataset with this id not found"}',
+                            content_type="application/json")
     preset = {'default': True, 'permission_style': 'public',
               'role_permission': ['biogpsusers'], 'rating_data':
               {'total': 5, 'avg_stars': 10, 'avg': 5}, 'display_params':
