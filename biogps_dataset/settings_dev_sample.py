@@ -1,13 +1,15 @@
-#put your local settings here, like DB config
-#and others
+# put your local settings here, like DB config
+# and others
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 DATABASES = {
+    # DB for this project
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     },
+    # DB to retrive default dataset
     'default_ds': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'xxxx',
@@ -18,18 +20,18 @@ DATABASES = {
     }
 }
 
-#if cache http responses when fetch data
-#used in ds load
+# weather cache http responses when fetch data
+# used in ds load
 CACHE_HTTP_DATA = False
 
-#dataset mining takes long time, debug mode may leak memory
-#set False then
+# dataset mining takes long time, debug mode may leak memory
+# set False then
 DEBUG = True
 
-#default gene id
+# default gene id
 DEFAULT_GENE_ID = 1017
 
-#gene taxid, dataset default id mapping
+# gene taxid, dataset default id mapping
 DEFAULT_DATASET_MAPPING = {
     # human
     9606: 10,
