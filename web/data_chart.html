@@ -223,7 +223,7 @@
                             var _dsClass = (idx % 2 == 0 ? "odd-li" : "even-li");
                             var _dsTitle = (ds.name.length > _titleWidth ? ds.name.substring(0, _titleWidth - 3) + "..." : ds.name);
                             _dsTitle += "  (" + ds.factors.length + " samples)";
-                            $("#dsList").append('<a class="ds-dialog" href="javascript:void(0)" onclick="DC_026887848.loadDataset(' + ds.id + ')"><li class="ds-dialog ' + _dsClass + '" id="ds' + ds.id + '">' + _dsTitle + '</li></a>');
+                            $("#dsList").append('<a class="ds-dialog" href="javascript:void(0)" onclick="DC_026887848.loadDataset(' + ds.geo_gse_id + ')"><li class="ds-dialog ' + _dsClass + '" id="ds' + ds.id + '">' + _dsTitle + '</li></a>');
                         });
                         // Update default datasets
                         $("#dsDefaultsList").empty();
@@ -232,7 +232,7 @@
                             var _dsClass = (idx % 2 == 0 ? "odd-li" : "even-li");
                             var _dsTitle = (ds.name.length > _titleWidth ? ds.name.substring(0, _titleWidth - 3) + "..." : ds.name);
                             _dsTitle += "  (" + ds.factors.length + " samples)";
-                            $("#dsDefaultsList").append('<a class="ds-dialog" href="javascript:void(0)" onclick="DC_026887848.loadDataset(' + ds.id + ')"><li class="ds-dialog ' + _dsClass + '" id="ds' + ds.id + '">' + _dsTitle + '</li></a>');
+                            $("#dsDefaultsList").append('<a class="ds-dialog" href="javascript:void(0)" onclick="DC_026887848.loadDataset(' + ds.geo_gse_id + ')"><li class="ds-dialog ' + _dsClass + '" id="ds' + ds.id + '">' + _dsTitle + '</li></a>');
                         });
                     }
                 },
