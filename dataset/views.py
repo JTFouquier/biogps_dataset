@@ -402,9 +402,10 @@ def dataset_search(request):
         ids.append(item["_source"]["geo_gse_id"])
     print ids
     ds_query = models.BiogpsDataset.objects.filter(geo_gse_id__in=ids)
-    for ds_item in ds_query:
-        temp_dic = {"id": ds_item.id, "name": ds_item.name}
-        factors = get_ds_factors_keys(ds_item)
+    for ds in ds_query:
+        temp_dic = {"id": ds.id, "name": ds.name, 'geo_gse_id':
+                    ds.geo_gse_id}
+        factors = get_ds_factors_keys(ds)
         temp_dic["factors"] = [obj['name'] for obj in factors]
         res.append(temp_dic)
 
@@ -432,7 +433,8 @@ def dataset_search_default(request):
         .filter(geo_gse_id__in=ids)
     res = []
     for ds in qs:
-        temp_dic = {"id": ds.id, "name": ds.name}
+        temp_dic = {"id": ds.id, "name": ds.name, 'geo_gse_id':
+                    ds.geo_gse_id}
         factors = get_ds_factors_keys(ds)
         temp_dic["factors"] = [obj['name'] for obj in factors]
         res.append(temp_dic)
