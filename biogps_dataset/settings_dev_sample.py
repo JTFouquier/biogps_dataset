@@ -34,22 +34,27 @@ DEFAULT_GENE_ID = 1017
 # gene taxid, dataset default id mapping
 DEFAULT_DATASET_MAPPING = {
     # human
-    9606: 10,
+    9606: 'E-GEOD-28079',
     # mouse
-    10090: 10,
+    10090: 'BDS_00002',
     # rat
-    10116: 10,
+    10116: 'GSE952',
     # fruit fly
-    7227: 10,
+    7227: 'X-XXXX-XXXX',
     # nematode
-    6239: 10,
+    6239: 'X-XXXX-XXXX',
     # zebrafish
-    7955: 10,
+    7955: 'X-XXXX-XXXX',
     # thale-cress
-    3702: 10,
+    3702: 'X-XXXX-XXXX',
     # frog
-    8364: 10,
+    8364: 'X-XXXX-XXXX',
     # pig
-    9823: 10,
+    9823: 'X-XXXX-XXXX',
 }
 
+DEFAULT_DS_ACCESSION = [u'BDS_00001', u'BDS_00002', u'BDS_00003', u'BDS_00004',
+                        u'BDS_00005', u'BDS_00006', u'BDS_00007', u'BDS_00008',
+                        u'BDS_00009', u'GSE10246', u'GSE952', u'GSE1133',
+                        u'BDS_00010', u'BDS_00011', u'BDS_00012', u'BDS_00013',
+                        u'BDS_00014']
