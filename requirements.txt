@@ -11,3 +11,4 @@ requests-cache==0.4.4
 mygene==2.2.0
 # numpy is better installed globally as "apt-get install python-numpy"
 #numpy>=1.7.1
+six==1.8.0
