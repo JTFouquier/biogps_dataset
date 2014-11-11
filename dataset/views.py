@@ -145,14 +145,14 @@ def _avg_with_deviation(li):
 def prepare_chart_data(val_list, factors):
     for idx, e in enumerate(factors):
         e['value'] = val_list[idx]
-    factors.sort(key='order')
+    factors.sort(key=lambda e: e['order_idx'], reverse=True)
     res = [factors[0]]
     for e in factors[1:]:
         # a new ordered element
-        if e['order'] != res[-1]['order']:
+        if e['order_idx'] != res[-1]['order_idx']:
             # last element is 'list-value' element
             if type(res[-1]['value']) is list:
-                ad = _avg_with_deviation(res[-2]['value'])
+                ad = _avg_with_deviation(res[-1]['value'])
                 res[-1]['dev'] = ad[1]
                 res[-1]['value'] = ad[0]
             else:
@@ -167,13 +167,20 @@ def prepare_chart_data(val_list, factors):
             if type(last_value) is list:
                 last_value.append(e['value'])
             else:
-                last_value = [last_value, e['value']]
+                res[-1]['value'] = [last_value, e['value']]
+    # last element in res
+    if type(res[-1]['value']) is list:
+        ad = _avg_with_deviation(res[-1]['value'])
+        res[-1]['dev'] = ad[1]
+        res[-1]['value'] = ad[0]
+    else:
+        res[-1]['dev'] = 0
     return res
 
 
 def dataset_chart(request, ds_id, reporter_id):
     """
-        显示柱状图，但是需要接受id和at参数
+        return a static bar chart for this ds on this reporter
     """
     ds = adopt_dataset(ds_id)
     if ds is None:
@@ -194,20 +201,35 @@ def dataset_chart(request, ds_id, reporter_id):
 
     import matplotlib.pyplot as plt
     fig, ax = plt.subplots()
+    fig.set_size_inches(12, len(back) * 0.14)
     # draw bars
     # bar width
     width = 0.8
-    ax.barh(y_pos, vals, '0,8', color='m', xerr=devs)
+    ax.barh(y_pos, vals, width, color='m', edgecolor='m', xerr=devs)
     # x=0, draw y axis
     ax.plot([0, 0], [0, len(back)], 'k')
     # draw median line and label
+    # M
     median = np.median(val_list)
-    ax.plot([median, median], [0, len(back)], 'b')
-    ax.text(median, len(back), 'Median',
-            ha='center', va='bottom')
+    ax.plot([median, median], [0, len(back)], 'k')
+    ax.text(median, len(back), 'median(%s)' % median,
+            ha='center', va='bottom', fontsize=8)
+    # try Mx3
+    if median > 0 and median*3 < max(vals) or \
+       median < 0 and median*3 > min(vals):
+        ax.plot([median*3, median*3], [0, len(back)], 'k')
+        ax.text(median, len(back), 'Mx3',
+                ha='center', va='bottom', fontsize=8)
+    # try Mx10
+    if median > 0 and median*10 < max(vals) or \
+       median < 0 and median*10 > min(vals):
+        ax.plot([median*10, median*10], [0, len(back)], 'k')
+        ax.text(median, len(back), 'Mx10',
+                ha='center', va='bottom', fontsize=8)
+
     # draw y ticks and label
     ax.set_yticks(y_pos + width / 2)
-    ax.set_yticklabels([e['name'] for e in back])
+    ax.set_yticklabels([e['name'] for e in back], fontsize=8)
     response = HttpResponse(content_type='image/png')
     fig.savefig(response, format='png', facecolor='w',
                 bbox_inches='tight', pad_inches=0.2)

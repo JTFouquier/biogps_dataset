@@ -58,3 +58,5 @@ DEFAULT_DS_ACCESSION = [u'BDS_00001', u'BDS_00002', u'BDS_00003', u'BDS_00004',
                         u'BDS_00009', u'GSE10246', u'GSE952', u'GSE1133',
                         u'BDS_00010', u'BDS_00011', u'BDS_00012', u'BDS_00013',
                         u'BDS_00014']
+
+MAX_SUPPORTED_SAMPLES = 50
