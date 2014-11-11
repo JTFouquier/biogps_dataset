@@ -226,7 +226,11 @@ def dataset_chart(request, ds_id, reporter_id):
         ax.plot([median*10, median*10], [0, len(back)], 'k', linewidth=0.5)
         ax.text(median*10, len(back), 'Mx10',
                 ha='center', va='bottom', fontsize=7)
-
+    # set ticks attributes
+    plt.tick_params(axis='x', which='both', bottom='off', top='off')
+    plt.tick_params(axis='y', which='both', left='on', right='off')
+    for tick in ax.xaxis.get_major_ticks():
+        tick.label.set_fontsize(8)
     # draw y ticks and label
     ax.set_yticks(y_pos + width / 2)
     ax.set_yticklabels([e['name'] for e in back], fontsize=8)
