@@ -94,7 +94,7 @@ class Command(BaseCommand):
         logging.info('--- done ---')
         return
 
-    #read lines from a file, and support # comment
+    # read lines from a file, and support # comment
     def get_list_from_file(self, path):
         ret = []
         if path is None:
