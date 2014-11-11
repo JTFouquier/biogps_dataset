@@ -207,25 +207,25 @@ def dataset_chart(request, ds_id, reporter_id):
     width = 0.8
     ax.barh(y_pos, vals, width, color='m', edgecolor='m', xerr=devs)
     # x=0, draw y axis
-    ax.plot([0, 0], [0, len(back)], 'k')
+    ax.plot([0, 0], [0, len(back)], 'k', linewidth=0.5)
     # draw median line and label
     # M
     median = np.median(val_list)
-    ax.plot([median, median], [0, len(back)], 'k')
+    ax.plot([median, median], [0, len(back)], 'k', linewidth=0.5)
     ax.text(median, len(back), 'median(%s)' % median,
-            ha='center', va='bottom', fontsize=8)
+            ha='center', va='bottom', fontsize=7)
     # try Mx3
     if median > 0 and median*3 < max(vals) or \
        median < 0 and median*3 > min(vals):
-        ax.plot([median*3, median*3], [0, len(back)], 'k')
+        ax.plot([median*3, median*3], [0, len(back)], 'k', linewidth=0.5)
         ax.text(median, len(back), 'Mx3',
-                ha='center', va='bottom', fontsize=8)
+                ha='center', va='bottom', fontsize=7)
     # try Mx10
     if median > 0 and median*10 < max(vals) or \
        median < 0 and median*10 > min(vals):
-        ax.plot([median*10, median*10], [0, len(back)], 'k')
+        ax.plot([median*10, median*10], [0, len(back)], 'k', linewidth=0.5)
         ax.text(median, len(back), 'Mx10',
-                ha='center', va='bottom', fontsize=8)
+                ha='center', va='bottom', fontsize=7)
 
     # draw y ticks and label
     ax.set_yticks(y_pos + width / 2)
