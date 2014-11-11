@@ -1,5 +1,6 @@
 import logging
 import pandas
+from django.conf import settings
 
 
 class Pattern():
@@ -90,7 +91,7 @@ class DP_E_GEOD_26688(Pattern):
         if platform_key is None:
             return None
         sdrf = sdrf[sdrf[platform_key].isin([platform])]
-        if len(sdrf[sample_key]) > 100:
+        if len(sdrf[sample_key]) > settings.MAX_SUPPORTED_SAMPLES:
             logging.info('more than 100 samples, ignore')
             return None
         li = list(sdrf[sample_key])
