@@ -218,13 +218,13 @@ def dataset_chart(request, ds_id, reporter_id):
     if median > 0 and median*3 < max(vals) or \
        median < 0 and median*3 > min(vals):
         ax.plot([median*3, median*3], [0, len(back)], 'k', linewidth=0.5)
-        ax.text(median, len(back), 'Mx3',
+        ax.text(median*3, len(back), 'Mx3',
                 ha='center', va='bottom', fontsize=7)
     # try Mx10
     if median > 0 and median*10 < max(vals) or \
        median < 0 and median*10 > min(vals):
         ax.plot([median*10, median*10], [0, len(back)], 'k', linewidth=0.5)
-        ax.text(median, len(back), 'Mx10',
+        ax.text(median*10, len(back), 'Mx10',
                 ha='center', va='bottom', fontsize=7)
 
     # draw y ticks and label
