@@ -3,9 +3,10 @@ import pandas
 
 
 class Pattern():
-
-    #judge if any element in src martch
-    #element in target
+    """
+        judge if any element in src martch
+        element in target
+    """
     def match_any(self, src, target):
         for k in src:
             if k in target:

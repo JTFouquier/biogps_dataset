@@ -5,16 +5,20 @@ from django.core.exceptions import ObjectDoesNotExist
 import StringIO
 
 
-#given experiment sdrf, infomation, processed data,
-#save to biogps db, note: experiment may contains
-#more than one platform data, select one you want.
 class ExperimentSave:
+    """
+        given experiment sdrf, infomation, processed data,
+        save to biogps db, note: experiment may contains
+        more than one platform data, select one you want.
+    """
 
-    SPECIES_MAP = {'Homo sapiens': 'human', 'Mus musculus': 'mouse',\
-      'Rattus norvegicus': 'rat', 'Drosophila melanogaster': 'fruitfly', \
-        'Caenorhabditis elegans': 'nematode', 'Danio rerio': 'zebrafish',\
-        'Arabidopsis thaliana': 'thale-cress', 'Xenopus tropicalis': 'frog',\
-         'Sus scrofa': 'pig'}
+    SPECIES_MAP = {
+        'Homo sapiens': 'human', 'Mus musculus': 'mouse',
+        'Rattus norvegicus': 'rat', 'Drosophila melanogaster': 'fruitfly',
+        'Caenorhabditis elegans': 'nematode', 'Danio rerio': 'zebrafish',
+        'Arabidopsis thaliana': 'thale-cress', 'Xenopus tropicalis': 'frog',
+        'Sus scrofa': 'pig'
+    }
 
     def __init__(self, ep):
         self.name = ep.name
@@ -28,70 +32,75 @@ class ExperimentSave:
         self.get_dataset_info()
         try:
             pf = models.BiogpsDatasetPlatform.objects\
-              .get(platform=self.platform)
+                .get(platform=self.platform)
         except ObjectDoesNotExist:
             raise Exception('platform does not exist.')
-        #dataset
+        # dataset
         dataset = self.dataset
         if type(dataset['arraytype']) is list:
             for e in dataset['arraytype']:
                 if e['accession'] == self.platform:
                     dataset['arraytype'] = e
-        meta = {'geo_gds_id': '', 'name': dataset['name'], 'factors': {}, \
-                 'default': False, 'display_params': {}, \
-                 'summary': dataset['summary'], 'source':\
-               "http://www.ebi.ac.uk/arrayexpress/json/v2/experiments/"\
-                + self.name, 'geo_gse_id': self.name, 'pubmed_id':\
-                dataset['pubmed_id'], 'owner': 'ArrayExpress Uploader', \
-               'geo_gpl_id': dataset['arraytype'], 'secondaryaccession':\
-                dataset['secondaryaccession'], 'factors': dataset['factors']}
-        ds = models.BiogpsDataset.objects.create(\
-                             name=dataset['name'],
-                             summary=dataset['summary'],
-                             ownerprofile_id='arrayexpress_sid',
-                             platform=pf,
-                             geo_gds_id='',
-                             geo_gse_id=self.name,
-                             geo_id_plat=self.name + '_' + self.platform,
-                             metadata=meta,
-                             species=self.SPECIES_MAP[dataset['species']])
-        #dataset data
+        meta = {
+            'geo_gds_id': '', 'name': dataset['name'],
+            'default': False, 'display_params': {},
+            'summary': dataset['summary'], 'source':
+            "http://www.ebi.ac.uk/arrayexpress/json/v2/experiments/"
+            + self.name, 'geo_gse_id': self.name, 'pubmed_id':
+            dataset['pubmed_id'], 'owner': 'ArrayExpress Uploader',
+            'geo_gpl_id': dataset['arraytype'], 'secondaryaccession':
+            dataset['secondaryaccession'], 'factors': dataset['factors']}
+        ds = models.BiogpsDataset.objects.create(
+            name=dataset['name'],
+            summary=dataset['summary'],
+            ownerprofile_id='arrayexpress_sid',
+            platform=pf,
+            geo_gds_id='',
+            geo_gse_id=self.name,
+            geo_id_plat=self.name + '_' + self.platform,
+            metadata=meta,
+            species=self.SPECIES_MAP[dataset['species']])
+        # dataset data
         datasetdata = []
         for idx in self.data.index:
-            datasetdata.append(models.BiogpsDatasetData(dataset=ds,\
-              reporter=idx, data=list(self.data.loc[idx, :].values)))
+            datasetdata.append(models.BiogpsDatasetData(
+                dataset=ds, reporter=idx,
+                data=list(self.data.loc[idx, :].values)))
         models.BiogpsDatasetData.objects.bulk_create(datasetdata)
-        #tmp file
+        # tmp file
         s = StringIO.StringIO()
         np.save(s, self.data.values)
         s.seek(0)
-        mat = models.BiogpsDatasetMatrix(dataset=ds,\
-                        reporters=list(self.data.index), matrix=s.read())
+        mat = models.BiogpsDatasetMatrix(
+            dataset=ds,
+            reporters=list(self.data.index), matrix=s.read())
         mat.save()
-        #finish, mark as loaded
-        models.BiogpsDatasetGeoLoaded.objects.create(geo_type=self.name, \
-                                    with_platform=self.platform, dataset=ds)
+        # finish, mark as loaded
+        models.BiogpsDatasetGeoLoaded.objects.create(
+            geo_type=self.name,
+            with_platform=self.platform, dataset=ds)
         logging.info('--- save experiment success ---')
         return
 
-    #get experiment infomation from info and sdrf
+    # get experiment infomation from info and sdrf
     def get_dataset_info(self):
         dataset = {}
         data_json = self.info
         dataset['name'] = data_json["experiments"]["experiment"]["name"]
-        dataset['summary'] = \
-          data_json["experiments"]["experiment"]["description"]["text"]
+        dataset['summary'] =\
+            data_json["experiments"]["experiment"]["description"]["text"]
         dataset['species'] = data_json["experiments"]["experiment"]["organism"]
         dataset['arraytype'] =\
-          data_json["experiments"]["experiment"]["arraydesign"]
+            data_json["experiments"]["experiment"]["arraydesign"]
         try:
             dataset['secondaryaccession'] =\
-              data_json["experiments"]["experiment"]["secondaryaccession"]
+                data_json["experiments"]["experiment"]["secondaryaccession"]
         except Exception:
             dataset['secondaryaccession'] = ''
         try:
             dataset['pubmed_id'] =\
-              data_json["experiments"]["experiment"]["bibliography"]["accession"]
+                data_json["experiments"]["experiment"]\
+                ["bibliography"]["accession"]
         except Exception:
             dataset['pubmed_id'] = ''
         dataset['factors'] = []

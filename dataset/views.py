@@ -133,46 +133,42 @@ def get_dataset_data(ds, gene_id=None, reporter_id=None):
     return {'id': ds.id, 'name': ds.name, 'data': data_list}
 
 
-def chart_data(val_list, factors):
-    # back_dic存储返回结果的list
-    back_dic = {}
-    # 存储要返回的val的值
-    temp_val = []
-    # 存储要返回的name
-    temp_name = []
-    # 存储要返回的标准差的值
-    dev_list = []
-    i = 0
-    # 遍历list，合并order值相同的字段
-    while i < len(val_list):
-        order_idx = factors[i]["order_idx"]
-        name = factors[i]["name"].split('.')[0]
-        count = 0
-        total = 0
-        temp_dev = []
-        # 查找order相同的元素，求值的和，和个数，并把每一个值放入temp_dev中
-        while i < len(val_list) and factors[i]["order_idx"] == order_idx:
-            count = count + 1
-            total = total + val_list[i]
-            temp_dev.append(val_list[i])
-            i = i + 1
-        # 根据和求平均值
-        average = round(float(total) / count, 2)
-        temp_val.append(average)
-        temp_name.append(name)
-        # 判断,当只有一个元素的时候,标准差直接为0
-        total = 0
-        if count == 1:
-            dev_list.append(0)
+def _avg_with_deviation(li):
+    average = round(float(sum(li)) / len(li), 2)
+    t = 0
+    for e in li:
+        total = t + (e - average) ** 2
+    dev = round(math.sqrt(float(total) / len(li)), 3)
+    return (average, dev)
+
+
+def prepare_chart_data(val_list, factors):
+    for idx, e in enumerate(factors):
+        e['value'] = val_list[idx]
+    factors.sort(key='order')
+    res = [factors[0]]
+    for e in factors[1:]:
+        # a new ordered element
+        if e['order'] != res[-1]['order']:
+            # last element is 'list-value' element
+            if type(res[-1]['value']) is list:
+                ad = _avg_with_deviation(res[-2]['value'])
+                res[-1]['dev'] = ad[1]
+                res[-1]['value'] = ad[0]
+            else:
+                res[-1]['dev'] = 0
+            # remove '.xxx' surfix in element name
+            e['name'] = e["name"].split('.')[0]
+            res.append(e)
+        # same ordered element, put value to last element together
         else:
-            # 否则，先求每个元素与平均数的差的平方的和
-            for j in temp_dev:
-                total = total + (j - average) ** 2
-            dev_list.append(round(math.sqrt(float(total) / count), 3))
-    back_dic["val_list"] = temp_val
-    back_dic["name_list"] = temp_name
-    back_dic["deviation"] = dev_list
-    return back_dic
+            # already have same ordered element
+            last_value = res[-1]['value']
+            if type(last_value) is list:
+                last_value.append(e['value'])
+            else:
+                last_value = [last_value, e['value']]
+    return res
 
 
 def dataset_chart(request, ds_id, reporter_id):
@@ -183,172 +179,38 @@ def dataset_chart(request, ds_id, reporter_id):
     if ds is None:
         return HttpResponse('{"code":4004, "detail":"dataset with this id not \
             found"}', content_type="application/json")
-    data_list = get_dataset_data(ds, reporter_id=reporter_id)['data']
-    data_list = data_list[0][reporter_id]['values']
-    val_list = []
-    for item in data_list:
-        temp = float(item)
-        val_list.append(temp)
+    data_list = get_dataset_data(
+        ds, reporter_id=reporter_id)['data'][0][reporter_id]['values']
+    val_list = [float(item) for item in data_list]
+
     factors = get_ds_factors_keys(ds)
-    # name_list = [obj['name'] for obj in factors]
+    back = prepare_chart_data(val_list, factors)
 
-    back = chart_data(val_list, factors)
-    val_list = back["val_list"]
-    name_list = back["name_list"]
-    devi_list = back["deviation"]
-
-    val_list.reverse()
-    name_list.reverse()
-    devi_list.reverse()
-
-    label_maxlen = 0
-    for item in name_list:
-        if len(item) > label_maxlen:
-            label_maxlen = len(item)
-
-    from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
-    import matplotlib.pyplot as plt
+    # start render part
     import numpy as np
-    # 判断要画几根柱状图
-    length = len(name_list)
-    y_pos = [0]
-    i = 1
-    # 由于后面设置上下的间距是０，所有在下面多画一个ｂａｒ，保证图片下面的留白
-    while(i < length + 1):
-        y_pos.append(i)
-        i = i + 1
+    vals = [e['value'] for e in back]
+    devs = [e['dev'] for e in back]
+    y_pos = np.arange(len(back))
 
-    # plt.figure(1, figsize=(80, (3+length * 1.5) / 2), dpi=15).clear()
-
-    fig = plt.gcf()
-    fig.clear()
-    fig.set_dpi(15)
-    fig.set_size_inches(80, (3 + length * 1.5) / 2)
-
-    # 计算x轴的最大值
-    temp_count = 0
-    temp_val = 0
-    # 先算出val_list的最大值
-    x_max = 0
-    for item in val_list:
-        if x_max < item:
-            x_max = item
-    # 由于x_max原先是float，需要转成int放弃小数
-    x_max = int(x_max)
-    while x_max > 0:
-        temp_count = temp_count + 1
-        temp_val = x_max % 10
-        x_max = x_max / 10
-    if temp_count != 1:
-        x_max = int((temp_val + 1) * (10 ** (temp_count - 1)))
-    else:
-        x_max = 10
-
-    # 修改背景色
-    fig1 = plt.figure(1)
-    rect = fig1.patch
-    rect.set_facecolor('white')
-
-    # 画柱状图
-    xylist = [0, 0, 0]
-    xylist.append(length + 2)
-    xylist[1] = x_max
-    plt.axis(xylist)
-    # 多画一个为ｏ的ｂａｒ
-    val_list = [0] + val_list
-    plt.barh(y_pos, val_list, height=1 * 7.0 / 8,
-             color="m")
-    # 取消x轴和y轴
-    plt.axis('off')
-    # 画label
-    i = 1
-    for name_item in name_list:
-        mystr = "%s-" % name_item
-        plt.text(0, y_pos[i], mystr, fontsize=40,
-                 horizontalalignment='right')
-        i = i + 1
-
-    # 画标准差
-    i = 1
-    for j in devi_list:
-        if j - 0 > 0.001:
-            list_x = [val_list[i], val_list[i] + j]
-            list_y = [y_pos[i] + 0.5, y_pos[i] + 0.5]
-            plt.plot(list_x, list_y, "k", linewidth=4)
-            list_x = [val_list[i] + j, val_list[i] + j]
-            list_y = [y_pos[i] + 0.2, y_pos[i] + 0.8]
-            plt.plot(list_x, list_y, "k", linewidth=4)
-        i = i + 1
-
-    # 画x坐标    x为3,10,30乘中位数
-    x_median = np.median(val_list)
-    x_per_list = [1, 3, 10, 30]
-    i = 1
-    y_list = []
-    y_list.append(length + 1 + 0.2)
-    y_list.append(1)
-
-    while i <= 4:
-        x_label = x_median * x_per_list[i - 1]
-        str_temp = '%.2f' % x_label
-        if x_label < x_max:
-            if i == 1:
-                temp_text = "median(" + str_temp + ")"
-            else:
-                temp_text = "%dM(" + str_temp + ")"
-                temp_text = temp_text % x_per_list[i - 1]
-            plt.text(x_label - 0.5 * x_max / 30, 0.1,\
-                     temp_text, fontsize=40)
-        # plt.text(x_label,length,str_temp,fontsize=80)
-        list_temp = []
-        list_temp.append(x_label)
-        list_temp.append(x_label)
-        plt.plot(list_temp, y_list, "k", linewidth=4)
-        i = i + 1
-    # 画框
-    list_temp = []
-    list_temp.append(0)
-    list_temp.append(x_max)
-    y_list = []
-    y_list.append(length + 1)
-    y_list.append(length + 1)
-    plt.plot(list_temp, y_list, "k", linewidth=4)
-    y_list[0] = 1
-    y_list[1] = 1
-    plt.plot(list_temp, y_list, "k", linewidth=4)
-
-    list_temp[0] = x_max
-    list_temp[1] = x_max
-    y_list[0] = 1
-    y_list[1] = length + 1
-    plt.plot(list_temp, y_list, "k", linewidth=10)
-
-    # 画x轴
-    y_list[0] = length + 1
-    y_list[1] = length + 1 - 0.5
-    # 要画的刻度
-    i_range = []
-    if x_max == 10:
-        i_range = range(0, 11)
-    else:
-        i_range = range(0, temp_val + 2)
-    for i in i_range:
-        list_x = []
-        x_val = i * (10 ** (temp_count - 1))
-        list_x.append(x_val)
-        list_x.append(x_val)
-        plt.plot(list_x, y_list, "k", linewidth=3)
-
-        plt.text(x_val - 0.3 * x_max / 30, length + 1 + 0.1,
-                 x_val, fontsize=40)
-    # 设置图形和图片左右的距离
-    plt.subplots_adjust(left=0.05 * (label_maxlen + 5) / 10, right=0.9,
-                        top=1, bottom=0)
-
-    # 返回图片
-    canvas = FigureCanvas(plt.figure(1))
+    import matplotlib.pyplot as plt
+    fig, ax = plt.subplots()
+    # draw bars
+    # bar width
+    width = 0.8
+    ax.barh(y_pos, vals, '0,8', color='m', xerr=devs)
+    # x=0, draw y axis
+    ax.plot([0, 0], [0, len(back)], 'k')
+    # draw median line and label
+    median = np.median(val_list)
+    ax.plot([median, median], [0, len(back)], 'b')
+    ax.text(median, len(back), 'Median',
+            ha='center', va='bottom')
+    # draw y ticks and label
+    ax.set_yticks(y_pos + width / 2)
+    ax.set_yticklabels([e['name'] for e in back])
     response = HttpResponse(content_type='image/png')
-    canvas.print_png(response)
+    fig.savefig(response, format='png', facecolor='w',
+                bbox_inches='tight', pad_inches=0.2)
     return response
 
 
