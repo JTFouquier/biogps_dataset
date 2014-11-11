@@ -212,7 +212,7 @@ def dataset_chart(request, ds_id, reporter_id):
     # M
     median = np.median(val_list)
     ax.plot([median, median], [0, len(back)], 'k', linewidth=0.5)
-    ax.text(median, len(back), 'median(%s)' % median,
+    ax.text(median, len(back), 'M(%s)' % median,
             ha='center', va='bottom', fontsize=7)
     # try Mx3
     if median > 0 and median*3 < max(vals) or \
