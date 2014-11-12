@@ -206,8 +206,15 @@ def dataset_chart(request, ds_id, reporter_id):
     # bar width
     width = 0.8
     # only positive error bar
-    devs = [[0]*len(devs), devs]
-    ax.barh(y_pos, vals, width, color='m', edgecolor='m', xerr=devs,
+    d_n = d_p = []
+    for idx, e in enumerate(vals):
+        if e > 0:
+            d_n.append(0)
+            d_p.append(devs[idx])
+        else:
+            d_p.append(0)
+            d_n.append(devs[idx])
+    ax.barh(y_pos, vals, width, color='m', edgecolor='m', xerr=[d_n, d_p],
             ecolor='k')
     # x=0, draw y axis
     ax.plot([0, 0], [0, len(back)], 'k', linewidth=0.5)
