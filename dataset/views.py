@@ -205,7 +205,10 @@ def dataset_chart(request, ds_id, reporter_id):
     # draw bars
     # bar width
     width = 0.8
-    ax.barh(y_pos, vals, width, color='m', edgecolor='m', xerr=devs)
+    # only positive error bar
+    devs = [[0]*len(devs), devs]
+    ax.barh(y_pos, vals, width, color='m', edgecolor='m', xerr=devs,
+            ecolor='k')
     # x=0, draw y axis
     ax.plot([0, 0], [0, len(back)], 'k', linewidth=0.5)
     # draw median line and label
