@@ -206,7 +206,8 @@ def dataset_chart(request, ds_id, reporter_id):
     # bar width
     width = 0.8
     # only positive error bar
-    d_n = d_p = []
+    d_n = []
+    d_p = []
     for idx, e in enumerate(vals):
         if e > 0:
             d_n.append(0)
