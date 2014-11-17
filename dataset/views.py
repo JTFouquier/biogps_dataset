@@ -195,10 +195,13 @@ def dataset_chart(request, ds_id, reporter_id):
 
     # start render part
     import numpy as np
-    vals = [e['value'] for e in back]
-    devs = [e['dev'] for e in back]
+    color_total = len(settings.BAR_COLORS)
+    vals, devs, colors = [], [], []
+    for idx, e in enumerate(back):
+        vals.append(e['value'])
+        vals.append(e['dev'])
+        colors.append(settings.BAR_COLORS[[e['color_idx'] % color_total]])
     y_pos = np.arange(len(back))
-
     import matplotlib.pyplot as plt
     fig, ax = plt.subplots()
     fig.set_size_inches(12, len(back) * 0.14)
@@ -215,8 +218,8 @@ def dataset_chart(request, ds_id, reporter_id):
         else:
             d_p.append(0)
             d_n.append(devs[idx])
-    ax.barh(y_pos, vals, width, color='m', edgecolor='m', xerr=[d_n, d_p],
-            ecolor='k')
+    ax.barh(y_pos, vals, width, color=colors, edgecolor='none',
+            xerr=[d_n, d_p], ecolor='k')
     # x=0, draw y axis
     ax.plot([0, 0], [0, len(back)], 'k', linewidth=0.5)
     # draw median line and label
