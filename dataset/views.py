@@ -221,7 +221,7 @@ def dataset_chart(request, ds_id, reporter_id):
     ax.plot([0, 0], [0, len(back)], 'k', linewidth=0.5)
     # draw median line and label
     # M
-    median = np.median(val_list)
+    median = np.median(vals)
     ax.plot([median, median], [0, len(back)], 'k', linewidth=0.5)
     ax.text(median, len(back), 'M(%s)' % median,
             ha='center', va='bottom', fontsize=7)
