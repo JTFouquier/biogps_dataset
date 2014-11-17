@@ -717,26 +717,27 @@
                             this.probeData[pID].minVal = Math.min.apply(Math, probeVals);
                             this.probeData[pID].maxVal = Math.max.apply(Math, probeVals);
                             // Calculate median
-                            var tmpArray = probeVals.slice(0);
-                            tmpArray.sort();
-                            var len = tmpArray.length;
-                            var median;
-                            if(len%2 == 0)
-                            {
-                                median = tmpArray[len/2]+tmpArray[len/2-1];
-                            }
-                            else
-                            {
-                                median = tmpArray[Math.floor(len/2)];
-                            }
-                            median = parseFloat(median);
-                            this.probeData[pID].globalMean = median;
+                            // var tmpArray = probeVals.slice(0);
+                            // tmpArray.sort();
+                            // var len = tmpArray.length;
+                            // var median;
+                            // if(len%2 == 0)
+                            // {
+                                // median = tmpArray[len/2]+tmpArray[len/2-1];
+                            // }
+                            // else
+                            // {
+                                // median = tmpArray[Math.floor(len/2)];
+                            // }
+                            // median = parseFloat(median);
+                            // this.probeData[pID].globalMean = median;
 
                             // Combine samples with data and unique factors
                             var sampKeyHash = {};
                             // {"Kidney": {"value": 1.3, ...}, "Tonsil": {...}, etc}
                             // Iterate through probe factors hash
-
+                            // array for calc median
+                            var val_arr=[];
                             for (var sampHash in _dsFactors) {
                                 if ( typeof (_dsFactors[sampHash]) != "object") {
                                     continue;
@@ -799,11 +800,27 @@
                                     }
                                     if (sampKeyHash[sampName]) {
                                         this.probeData[pID].push(sampKeyHash[sampName]);
+                                        // array for calc median
+                                        val_arr.append(this.probeData[pID][idx].mean);
                                     }
                                 }
                             }
+                        // calc median
+                        val_arr.sort();
+                        var len = val_arr.length;
+                        var median=0;
+                        if(len%2 == 0)
+                        {
+                            median = (val_arr[len/2]+val_arr[len/2-1])/2;
+                        }
+                        else
+                        {
+                            median = val_arr[Math.floor(len/2)];
+                        }
+                        this.probeData[pID].globalMean = median;
                         }
                     }
+
 
                     // Calculate max text length, min/max data values for each probe
                     var ctx = this.getCanvas();
