@@ -220,6 +220,8 @@ def dataset_chart(request, ds_id, reporter_id):
             d_n.append(devs[idx])
     ax.barh(y_pos, vals, width, color=colors, edgecolor='none',
             xerr=[d_n, d_p], ecolor='k')
+    # eliminate top padding
+    plt.axis('tight')
     # x=0, draw y axis
     ax.plot([0, 0], [0, len(back)], 'k', linewidth=0.5)
     # draw median line and label
