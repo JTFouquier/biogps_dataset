@@ -801,23 +801,27 @@
                                     if (sampKeyHash[sampName]) {
                                         this.probeData[pID].push(sampKeyHash[sampName]);
                                         // array for calc median
-                                        val_arr.append(sampKeyHash[sampName].mean);
+                                        val_arr.push(sampKeyHash[sampName].mean);
                                     }
                                 }
                             }
                         // calc median
-                        val_arr.sort();
                         var len = val_arr.length;
                         var median=0;
-                        if(len%2 == 0)
+                        if(len>0)
                         {
-                            median = (val_arr[len/2]+val_arr[len/2-1])/2;
+                            val_arr.sort();
+
+                            if(len%2 == 0)
+                            {
+                                median = (val_arr[len/2]+val_arr[len/2-1])/2;
+                            }
+                            else
+                            {
+                                median = val_arr[Math.floor(len/2)];
+                            }
+                            this.probeData[pID].globalMean = median;
                         }
-                        else
-                        {
-                            median = val_arr[Math.floor(len/2)];
-                        }
-                        this.probeData[pID].globalMean = median;
                         }
                     }
 
