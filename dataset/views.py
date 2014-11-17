@@ -200,7 +200,7 @@ def dataset_chart(request, ds_id, reporter_id):
     for idx, e in enumerate(back):
         vals.append(e['value'])
         vals.append(e['dev'])
-        colors.append(settings.BAR_COLORS[[e['color_idx'] % color_total]])
+        colors.append(settings.BAR_COLORS[e['color_idx'] % color_total])
     y_pos = np.arange(len(back))
     import matplotlib.pyplot as plt
     fig, ax = plt.subplots()
