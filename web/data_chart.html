@@ -716,22 +716,6 @@
                             // Calculate probe data statistics
                             this.probeData[pID].minVal = Math.min.apply(Math, probeVals);
                             this.probeData[pID].maxVal = Math.max.apply(Math, probeVals);
-                            // Calculate median
-                            // var tmpArray = probeVals.slice(0);
-                            // tmpArray.sort();
-                            // var len = tmpArray.length;
-                            // var median;
-                            // if(len%2 == 0)
-                            // {
-                                // median = tmpArray[len/2]+tmpArray[len/2-1];
-                            // }
-                            // else
-                            // {
-                                // median = tmpArray[Math.floor(len/2)];
-                            // }
-                            // median = parseFloat(median);
-                            // this.probeData[pID].globalMean = median;
-
                             // Combine samples with data and unique factors
                             var sampKeyHash = {};
                             // {"Kidney": {"value": 1.3, ...}, "Tonsil": {...}, etc}
@@ -794,7 +778,7 @@
                                             // Fake column name for now - fix after implementing grouping
                                             // Pull from metadata, if empty then use column_name
                                             if (facName === "title") {
-                                                sampKeyHash[sampName]["column_name"] = _dsFactors[sampHash][sampID][facName];
+                                                sampKeyHash[sampName]["column_name"] = _dsFactors[sampHash][sampID][facName].split('.')[0];
                                             }
                                         }
                                     }
