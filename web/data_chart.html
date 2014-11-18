@@ -1363,26 +1363,28 @@
                     <div style="float:left"></div>
                 </form>
                 <div id="datasetNameContainer" style="width:99%">
-                    <div style="float: left;width: 90%;">
+                    <div style="float: left;width: 80%;">
                         <b>Dataset: </b><span id="datasetName"><a class="ds-name" href="http://biogps.org/dataset/5" target="_blank"></a></span>
                         <span id="go-ae" style='display: none'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="go-ae btn-use-object requires-js" href="http://www.ebi.ac.uk/">[source]</a></span>
                     </div>
-                    <div style="float: right; display: inline; width: 10%">
+                    <div style="float: right; display: inline; width: 50px">
                         <input type="button" id="change-dataset" value="Change" style="padding-left:10px; padding-right:10px" onclick="DC_026887848.changeDataset()">
                     </div>
                 </div>
-                <div id="datasetProbes" style="display:inline;">
-                    <b>Probeset:</b>
-                    <select id="DC_026887848_probe" onchange="DC_026887848.setProbe(); DC_026887848.clearCorrData()">
+                <div style='width: 99%; display:block'>
+                    <div id="datasetProbes" style="display:inline;">
+                        <b>Probeset:</b>
+                        <select id="DC_026887848_probe" onchange="DC_026887848.setProbe(); DC_026887848.clearCorrData()">
 
-                        <option>D28753_i_at</option><option>D28754_s_at</option>
-                    </select>
-                </div>
-                <div id="datasetFactors" style="display:inline; margin-left:10px">
-                    <b>Factors:</b>
-                    <select id="factors_select" onchange="">
-                        <option>characteristics</option>
-                    </select>
+                            <option>D28753_i_at</option><option>D28754_s_at</option>
+                        </select>
+                    </div>
+                    <div id="datasetFactors" style="display:inline; margin-left:10px">
+                        <b>Factors:</b>
+                        <select id="factors_select" onchange="">
+                            <option>characteristics</option>
+                        </select>
+                    </div>
                 </div>
                 <div id="datasetSummaryContainer" style="width: 99%;">
                     <b>Summary: </b><span id="datasetSummary"></span>&nbsp;<a id="datasetSummaryMoreLink" class="requires-js" href="javascript:void(0)" onclick="DC_026887848.updateSummary(&quot;more&quot;);" style="display: none;">more</a>
