@@ -204,7 +204,7 @@ def dataset_chart(request, ds_id, reporter_id):
     y_pos = np.arange(len(back))
     import matplotlib.pyplot as plt
     fig, ax = plt.subplots()
-    fig.set_size_inches(12, len(back) * 0.14)
+    fig.set_size_inches(10, len(back) * 0.14)
     # draw bars
     # bar width
     width = 0.8
@@ -218,7 +218,6 @@ def dataset_chart(request, ds_id, reporter_id):
         else:
             d_p.append(0)
             d_n.append(devs[idx])
-    plt.subplots_adjust(right=0.5)
     ax.barh(y_pos, vals, width, color=colors, edgecolor='none',
             xerr=[d_n, d_p], ecolor='#CCCCCC')
     # eliminate top padding
@@ -244,7 +243,7 @@ def dataset_chart(request, ds_id, reporter_id):
         ax.text(median*10, len(back), 'Mx10',
                 ha='center', va='bottom', fontsize=7)
     # set ticks attributes
-    plt.tick_params(axis='x', which='both', bottom='off', top='off')
+    plt.tick_params(axis='x', which='both', bottom='on', top='off')
     plt.tick_params(axis='y', which='both', left='on', right='off')
     for tick in ax.xaxis.get_major_ticks():
         tick.label.set_fontsize(8)
