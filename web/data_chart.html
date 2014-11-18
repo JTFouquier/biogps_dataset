@@ -1363,9 +1363,13 @@
                     <div style="float:left"></div>
                 </form>
                 <div id="datasetNameContainer" style="width:99%">
-                    <b>Dataset: </b><span id="datasetName"><a class="ds-name" href="http://biogps.org/dataset/5" target="_blank"></a></span>
-                    <span id="change-dataset">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="change-ds btn-use-object requires-js" href="javascript:void(0)" onclick="DC_026887848.changeDataset();">Change</a></span>
-                    <span id="go-ae" style='display: none'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="go-ae btn-use-object requires-js" href="http://www.ebi.ac.uk/">Array Express</a></span>
+                    <div>
+                        <b>Dataset: </b><span id="datasetName"><a class="ds-name" href="http://biogps.org/dataset/5" target="_blank"></a></span>
+                        <span id="go-ae" style='display: none'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="go-ae btn-use-object requires-js" href="http://www.ebi.ac.uk/">[source]</a></span>
+                    </div>
+                    <div>
+                        <input type="button" id="change-dataset" value="Change" onclick="DC_026887848.changeDataset()">
+                    </div>
                 </div>
                 <div id="datasetProbes" style="width:99%">
                     <b>Probeset:</b>
