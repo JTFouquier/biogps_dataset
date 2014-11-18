@@ -218,8 +218,9 @@ def dataset_chart(request, ds_id, reporter_id):
         else:
             d_p.append(0)
             d_n.append(devs[idx])
+    plt.subplots_adjust(right=0.5)
     ax.barh(y_pos, vals, width, color=colors, edgecolor='none',
-            xerr=[d_n, d_p], ecolor='k')
+            xerr=[d_n, d_p], ecolor='#CCCCCC')
     # eliminate top padding
     plt.axis('tight')
     # x=0, draw y axis
