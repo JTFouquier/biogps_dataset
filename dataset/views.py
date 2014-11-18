@@ -222,6 +222,8 @@ def dataset_chart(request, ds_id, reporter_id):
             xerr=[d_n, d_p], ecolor='#CCCCCC')
     # eliminate top padding
     plt.axis('tight')
+    # x axis range, have some padding space
+    plt.xlim([min(vals)*1.2, max(vals)*1.2])
     # x=0, draw y axis
     ax.plot([0, 0], [0, len(back)], 'k', linewidth=0.5)
     # draw median line and label
@@ -243,10 +245,10 @@ def dataset_chart(request, ds_id, reporter_id):
         ax.text(median*10, len(back), 'Mx10',
                 ha='center', va='bottom', fontsize=7)
     # set ticks attributes
-    plt.tick_params(axis='x', which='both', bottom='on', top='off')
-    plt.tick_params(axis='y', which='both', left='on', right='off')
-    for tick in ax.xaxis.get_major_ticks():
-        tick.label.set_fontsize(8)
+    plt.tick_params(axis='x', which='both', bottom='on', top='off',
+                    labelsize=8)
+    plt.tick_params(axis='y', which='both', left='on', right='off',
+                    direction='out')
     # draw y ticks and label
     ax.set_yticks(y_pos + width / 2)
     ax.set_yticklabels([e['name'] for e in back], fontsize=8)
