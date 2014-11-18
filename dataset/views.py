@@ -223,7 +223,10 @@ def dataset_chart(request, ds_id, reporter_id):
     # eliminate top padding
     plt.axis('tight')
     # x axis range, have some padding space
-    plt.xlim([min(vals)*1.2, max(vals)*1.2])
+    if min(vals) > 0:
+        plt.xlim([0, max(vals)*1.1])
+    else:
+        plt.xlim([min(vals), max(vals)*1.1])
     # x=0, draw y axis
     ax.plot([0, 0], [0, len(back)], 'k', linewidth=0.5)
     # draw median line and label
