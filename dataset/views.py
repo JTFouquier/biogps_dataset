@@ -223,10 +223,9 @@ def dataset_chart(request, ds_id, reporter_id):
     # eliminate top padding
     plt.axis('tight')
     # x axis range, have some padding space
-    if min(vals) > 0:
-        plt.xlim([0, max(vals)*1.1])
-    else:
-        plt.xlim([min(vals), max(vals)*1.1])
+    li = [max(vals)*1.1, 0, min(vals)]
+    plt.xlim([min(li)*1.1, max(li)*1.1])
+
     # x=0, draw y axis
     ax.plot([0, 0], [0, len(back)], 'k', linewidth=0.5)
     # draw median line and label
@@ -235,18 +234,18 @@ def dataset_chart(request, ds_id, reporter_id):
     ax.plot([median, median], [0, len(back)], 'k', linewidth=0.5)
     ax.text(median, len(back), 'M(%s)' % median,
             ha='center', va='bottom', fontsize=7)
+    li = [max(vals), min(vals)]
     # try Mx3
-    if median > 0 and median*3 < max(vals) or \
-       median < 0 and median*3 > min(vals):
-        ax.plot([median*3, median*3], [0, len(back)], 'k', linewidth=0.5)
+    if median*3 < max(li) and median*3 > min(li):
+        ax.plot([median*3, median*3], [0, len(back)], '#960096', linewidth=0.5)
         ax.text(median*3, len(back), 'Mx3',
-                ha='center', va='bottom', fontsize=7)
+                ha='center', va='bottom', fontsize=7, color='#960096')
     # try Mx10
-    if median > 0 and median*10 < max(vals) or \
-       median < 0 and median*10 > min(vals):
-        ax.plot([median*10, median*10], [0, len(back)], 'k', linewidth=0.5)
+    if median*10 < max(li) and median*10 > min(li):
+        ax.plot([median*10, median*10], [0, len(back)], '#960096',
+                linewidth=0.5)
         ax.text(median*10, len(back), 'Mx10',
-                ha='center', va='bottom', fontsize=7)
+                ha='center', va='bottom', fontsize=7, color='#960096')
     # set ticks attributes
     plt.tick_params(axis='x', which='both', bottom='on', top='off',
                     labelsize=8)
@@ -255,6 +254,9 @@ def dataset_chart(request, ds_id, reporter_id):
     # draw y ticks and label
     ax.set_yticks(y_pos + width / 2)
     ax.set_yticklabels([e['name'] for e in back], fontsize=8)
+    # grid on x axis
+    plt.gca().xaxis.grid(linestyle='-', color='#aaaaaa')
+
     response = HttpResponse(content_type='image/png')
     fig.savefig(response, format='png', facecolor='w',
                 bbox_inches='tight', pad_inches=0.2)
