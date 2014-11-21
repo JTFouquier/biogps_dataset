@@ -231,9 +231,9 @@ def dataset_chart(request, ds_id, reporter_id):
     # draw median line and label
     # M
     median = np.median(vals)
-    ax.plot([median, median], [0, len(back)], 'k', linewidth=0.5)
+    ax.plot([median, median], [0, len(back)], '#960096', linewidth=0.5)
     ax.text(median, len(back), 'M(%s)' % median,
-            ha='center', va='bottom', fontsize=7)
+            ha='center', va='bottom', fontsize=7, color='#960096')
     li = [max(vals), min(vals)]
     # try Mx3
     if median*3 < max(li) and median*3 > min(li):
