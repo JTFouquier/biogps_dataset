@@ -244,16 +244,16 @@ def dataset_chart(request, ds_id, reporter_id):
     median = np.median(vals)
     rd = find_round(max(vals))
     draw_median(ax, round(median*rd)/rd, len(back),
-                'M(%s)' % round(median*rd)/rd)
+                'M(%s)' % str(round(median*rd)/rd))
     li = [max(vals), min(vals)]
     # try Mx3
     if median*3 < max(li) and median*3 > min(li):
         draw_median(ax, round(median*3*rd)/rd, len(back),
-                    'Mx3(%s)' % round(median*3*rd)/rd)
+                    'Mx3(%s)' % str(round(median*3*rd)/rd))
     # try Mx10
     if median*10 < max(li) and median*10 > min(li):
         draw_median(ax, round(median*10*rd)/rd, len(back),
-                    'Mx10(%s)' % round(median*10*rd)/rd)
+                    'Mx10(%s)' % str(round(median*10*rd)/rd))
     # set ticks attributes
     plt.tick_params(axis='x', which='both', bottom='off', top='off',
                     labelsize=8)
