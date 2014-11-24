@@ -1124,9 +1124,9 @@
 
                 _getUrlParam : function (name)
                 {
-                var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
-                var r = window.location.search.substr(1).match(reg);
-                if (r!=null) return unescape(r[2]); return null;
+                    var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+                    var r = window.location.search.substr(1).match(reg);
+                    if (r!=null) return unescape(r[2]); return null;
                 },
 
                 Corr_Grid : null, //use to store the correlation data.
@@ -1208,6 +1208,18 @@
                     var corrUrl = DC_026887848.buildCorrURL();
                     corrUrl = corrUrl + "?type=csv";
                     window.open(corrUrl);
+                },
+
+                pageLink : function(){
+                    if ($('#link-content').is(':visible'))
+                    {
+                        $('#link-content').hide();
+                        return;
+                    }
+                    var _url = window.location.href.split('?')[0]+
+                        'dataset='+this.dsID+'&gene='+this.geneID;
+                    $('#link-content').val(_url);
+                    $('#link-content').show();
                 },
 
                 loadCorr : function() {
@@ -1340,18 +1352,18 @@
             });
 
             $(document).ready(function() {
-            var link = $("<link>");
-            link.attr({
-            type: "text/css",
-            rel: "stylesheet",
-            href: "./css/jquery-ui-1.8.5.custom.css"
-            });
-            $("head").append( link );
-            //$.getScript("/data_chart/assets/data_chart_canvas.js?ver=3", function() {
-            $.getScript("js/jquery-ui.js",function() {
-            DC_026887848.init();
-            });
-            //});
+                var link = $("<link>");
+                link.attr({
+                    type: "text/css",
+                    rel: "stylesheet",
+                    href: "./css/jquery-ui-1.8.5.custom.css"
+                });
+                $("head").append( link );
+                //$.getScript("/data_chart/assets/data_chart_canvas.js?ver=3", function() {
+                $.getScript("js/jquery-ui.js",function() {
+                    DC_026887848.init();
+                });
+                //});
             });
         </script>
 
@@ -1390,7 +1402,8 @@
                     <b>Summary: </b><span id="datasetSummary"></span>&nbsp;<a id="datasetSummaryMoreLink" class="requires-js" href="javascript:void(0)" onclick="DC_026887848.updateSummary(&quot;more&quot;);" style="display: none;">more</a>
                 </div>
                 <div id="datasetLinkContainer" style="width: 99%; float:left">
-                    <b>Link: </b><span id="dataset-link"></span>&nbsp;<input id="link-content" type="text" readonly="readonly">http://54.185.249.25/data_chart.html?dataset=E-GEOD-11190&gene=1017</input>
+                    <b>Link: </b><a href="javascript:var _url=DC_026887848.pageLink();"><img src="images/default/button/link.png" style="width: 15px;height: 15px;"></a>&nbsp;
+                    <input id="link-content" type="text" readonly="readonly" style="display: none;"></input>
                 </div>
                 <div id="datasetSourceContainer" style="display: none; width: 99%;">
                     <b>Source: </b><span id="datasetSource"></span>
