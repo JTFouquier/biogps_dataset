@@ -98,7 +98,7 @@ DCCG = {
 
         //Need to have a more robust rounding algorithm - this is used to round all datapoint values.
         roundVal = Math.pow(10,Math.round(Math.log(max_val)/Math.log(10))*-1+3); //This can account for rounding very small numbers
-        if (roundVal < 10){roundVal = 10} //two decimal points at a minimum.
+        if (roundVal < 10){roundVal = 10;} //two decimal points at a minimum.
 
         //build the outside border of the graph.
         ctx.strokeStyle = "rgba(0, 0, 0, 1)";
