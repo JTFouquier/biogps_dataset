@@ -1081,6 +1081,10 @@
                             this.setDatasetCookie();
                             this.loadProbes();
                         }
+                        // set link to this dataset and gene page
+                        var _url = window.location.href.split('?')[0]+
+                            'dataset='+this.dsID+'&gene='+this.geneID;
+                        $('#link-content').val(_url);
                     }
                 },
 
@@ -1211,19 +1215,9 @@
                 },
 
                 pageLink : function(){
-                    if ($('#link-content').is(':visible'))
-                    {
-                        $('#link-content').hide();
-                        $('#copy-hint').hide();
-                        return;
-                    }
-                    var _url = window.location.href.split('?')[0]+
-                        'dataset='+this.dsID+'&gene='+this.geneID;
-                    $('#link-content').val(_url);
-                    $('#link-content').show();
-                    $('#copy-hint').show();
                     $('#link-content').select();
                     $('#link-content').focus();
+                    $('#copy-hint').show();
                 },
 
                 loadCorr : function() {
@@ -1406,9 +1400,12 @@
                     <b>Summary: </b><span id="datasetSummary"></span>&nbsp;<a id="datasetSummaryMoreLink" class="requires-js" href="javascript:void(0)" onclick="DC_026887848.updateSummary(&quot;more&quot;);" style="display: none;">more</a>
                 </div>
                 <div id="datasetLinkContainer" style="width: 99%; float:left">
-                    <b>Link: </b><a href="javascript:var _url=DC_026887848.pageLink();"><img src="images/default/button/link.png" style="width: 15px;height: 15px;"></a>&nbsp;
-                    <input id="link-content" type="text" readonly="readonly" style="display: none; width: 450px" onBlur=></input>
-                    <span style='font-size: small; font-style: italic; color: gray;' id='copy-hint'>press ctrl+c to copy</span>
+                    <b>Link: </b>&nbsp;
+                    <input id="link-content" type="text" readonly="readonly" style="width: 450px" onBlur="$('#copy-hint').hide();">
+                    <a href="javascript:var _url=DC_026887848.pageLink();">
+                        <img src="images/default/button/link.png" style="width: 15px;height: 15px;">
+                    </a>
+                    <span style='display:none; font-size: small; font-style: italic; color: gray;' id='copy-hint'>press ctrl+c to copy</span>
                 </div>
                 <div id="datasetSourceContainer" style="display: none; width: 99%;">
                     <b>Source: </b><span id="datasetSource"></span>
