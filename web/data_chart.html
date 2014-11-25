@@ -299,14 +299,15 @@
                     $("#accordion").before(searchBar);
                 },
                 showFactors: function(){
+
                     _factor_dialog.dialog({
                         draggable : false,
                         modal : true,
                         position : "top",
                         resizable : false,
-                        title : "Available Factors",
-                        width : $("#dataChartTabPanel").width() * 0.3,
-                        open : this.updateFactorDialog()
+                        title : "All Factors",
+                        width : $("#dataChartTabPanel").width() * 0.5,
+                        //open : this.updateFactorDialog()
                     });
                 },
                 clearCorrData : function() {
@@ -1088,7 +1089,6 @@
                                     }
                                 }
                             });
-
                         }
                         else
                         {//dataset changed
@@ -1107,6 +1107,33 @@
                     var _url = window.location.href.split('?')[0]+
                         '?dataset='+this.dsID+'&gene='+this.geneID;
                     $('#link-content').val(_url);
+                    //get factors
+                    $.getJSON('/dataset/factors/'+this.dsID+'/', function(dataJson, code) {
+                        if (code != "success") {
+                            DCCG.buildCanvasError(DC_026887848.getCanvas());
+                        } else {
+                            if (dataJson.code != 0)
+                            {
+                                DCCG.buildCanvasError(DC_026887848.getCanvas());
+                            }
+                            else
+                            {
+                                var table = '<table><tbody>';
+                                for(var f in dataJson.details)
+                                {
+                                    table += '<tr><td><input type="radio" name="factor"><label>'+f+':</label></td>';
+                                    for(var k in dataJson.details[f])
+                                    {
+                                        table += '<td>'+dataJson.details[f][k]+'</td>';
+                                    }
+                                    table += '</tr>';
+                                }
+                                table += '</tbody></table>';
+                                _factor_dialog = '<div id="facter-list" style="font-size: 12px">'+
+                                    table+'</div>';
+                            }
+                        }
+                    });
                 },
                 loadTabs : function() {
                     var start_tab = 1
@@ -1359,8 +1386,8 @@
             </div>\
             </div>").accordion({active: 1, autoHeight: false, icons: false});
 
-            var _factor_dialog = $("<div id='accordion' style='font-size: 12px'>\
-            </div>");
+            //factor dialog will be initialized when ds loaded;
+            var _factor_dialog = "";
 
             // Bind handler to close dialog once ds is selected
             $(document).delegate(".ds-dialog", "click", function(event) {
@@ -1409,7 +1436,7 @@
                         </select>
                     </div>
                     <div id="datasetFactors" style="float:left; padding-left:10px">
-                        <input type="button" id="show-factors" value="Show Factors" style="padding-left:10px; padding-right:10px; float: left; width:80px; height:20px;"
+                        <input type="button" id="show-factors" value="Show Factors" style="padding-left:10px; padding-right:10px; float: left;"
                              onclick="DC_026887848.showFactors()">
                     </div>
                 </div>
