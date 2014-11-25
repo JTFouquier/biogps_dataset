@@ -201,6 +201,9 @@
                         DC_026887848.updateDialog();
                     }
                 },
+                updateFactorDialog : function(){
+
+                },
 
                 updateDialog : function(allDatasets, defaultDatasets) {
                     // Update dialog with dataset results
@@ -295,7 +298,17 @@
                     // Add search bar to dialog
                     $("#accordion").before(searchBar);
                 },
-
+                showFactors: function(){
+                    _factor_dialog.dialog({
+                        draggable : false,
+                        modal : true,
+                        position : "top",
+                        resizable : false,
+                        title : "Available Factors",
+                        width : $("#dataChartTabPanel").width() * 0.3,
+                        open : this.updateFactorDialog()
+                    });
+                },
                 clearCorrData : function() {
                     if (this.Corr_Store !== null) {
                         this.Corr_Store.removeAll();
@@ -1346,9 +1359,12 @@
             </div>\
             </div>").accordion({active: 1, autoHeight: false, icons: false});
 
+            var _factor_dialog = $("<div id='accordion' style='font-size: 12px'>\
+            </div>");
+
             // Bind handler to close dialog once ds is selected
             $(document).delegate(".ds-dialog", "click", function(event) {
-            $(this).closest(".ui-dialog-content").dialog("destroy");
+                $(this).closest(".ui-dialog-content").dialog("destroy");
             });
 
             $(document).ready(function() {
@@ -1393,10 +1409,8 @@
                         </select>
                     </div>
                     <div id="datasetFactors" style="float:left; padding-left:10px">
-                        <b>Factors:</b>
-                        <select id="factors_select" onchange="">
-                            <option>characteristics</option>
-                        </select>
+                        <input type="button" id="show-factors" value="Show Factors" style="padding-left:10px; padding-right:10px; float: left; width:80px; height:20px;"
+                             onclick="DC_026887848.showFactors()">
                     </div>
                 </div>
                 <div id="datasetSummaryContainer" style="width: 99%; float:left">
