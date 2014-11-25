@@ -541,7 +541,7 @@
                     }
                 },
 
-                getProbeData : function() {
+                getProbeData : function(facet) {
                     // Make two queries to SL - one for dataset metadata (factors),
                     // one for dataset values (probeset_list)
                     if (DC_026887848.dsCanvas == true) {
@@ -567,7 +567,11 @@
                     var mygeneReps = this.mygeneReps;
                     var gene = this.geneID;
                     $("#datasetName a").attr('href', "/dataset/meta/"+ds+"/");
-                    $.getJSON("/dataset/meta/"+ds+"/", function(metaJson, code) {
+                    if(facet != null)
+                        var url = "/dataset/meta/"+ds+"/?facet="+facet;
+                    else
+                        var url = "/dataset/meta/"+ds+"/";
+                    $.getJSON(url, function(metaJson, code) {
                         if (code != "success") {
                             // Error getting json from server
                             DCCG.buildCanvasError(DC_026887848.getCanvas());
@@ -1098,11 +1102,14 @@
                         }
                     }
                 },
-
-                loadProbes : function() {
+                changeFacet : function(){
+                    var facet = $('#facter-list input:checked').siblings().text();
+                    this.loadProbes(facet);
+                },
+                loadProbes : function(facet) {
                     // Clear out old probe data, get new
                     this.clearProbeData();
-                    this.getProbeData();
+                    this.getProbeData(facet);
                     // set link to this dataset and gene page
                     var _url = window.location.href.split('?')[0]+
                         '?dataset='+this.dsID+'&gene='+this.geneID;
@@ -1121,7 +1128,7 @@
                                 var table = '<table><tbody>';
                                 for(var f in dataJson.details)
                                 {
-                                    table += '<tr><td><input type="radio" name="factor"><label>'+f+':</label></td>';
+                                    table += '<tr><td><input type="radio" name="factor"><label>'+f+'</label></td>';
                                     for(var i=0; i<dataJson.details[f].length; i++)
                                     {
                                         table += '<td>'+dataJson.details[f][i]+'</td>';
@@ -1130,7 +1137,7 @@
                                 }
                                 table += '</tbody></table>';
                                 _factor_dialog = $('<div id="facter-list" style="font-size: 12px">'+
-                                    table+'<input type="button" value="OK" onclick=></div>');
+                                    table+'<input type="button" value="OK" onclick="DC_026887848.changeFacet();"></div>');
                             }
                         }
                     });
