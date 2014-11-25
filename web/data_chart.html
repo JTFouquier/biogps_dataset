@@ -1122,15 +1122,15 @@
                                 for(var f in dataJson.details)
                                 {
                                     table += '<tr><td><input type="radio" name="factor"><label>'+f+':</label></td>';
-                                    for(var k in dataJson.details[f])
+                                    for(var i=0; i<dataJson.details[f].length; i++)
                                     {
-                                        table += '<td>'+dataJson.details[f][k]+'</td>';
+                                        table += '<td>'+dataJson.details[f][i]+'</td>';
                                     }
                                     table += '</tr>';
                                 }
                                 table += '</tbody></table>';
-                                _factor_dialog = '<div id="facter-list" style="font-size: 12px">'+
-                                    table+'</div>';
+                                _factor_dialog = $('<div id="facter-list" style="font-size: 12px">'+
+                                    table+'</div>');
                             }
                         }
                     });
