@@ -1403,7 +1403,8 @@
                 </div>
                 <div id="datasetLinkContainer" style="width: 99%; float:left; margin-bottom: 3px;">
                     <b>Link: </b>&nbsp;
-                    <input id="link-content" type="text" readonly="readonly" style="width: 100px; color: gray; border: 1px inset;" onmouseover="$('#link-content').css('width','500px');" onmouseout="$('#link-content').css('width','100px');" onblur="$('#copy-hint').hide();">
+                    <input id="link-content" type="text" readonly="readonly" style="width: 100px; color: gray; border: 1px inset;"
+                        onclick="$('#link-content').css('width','500px');" onblur="$('#copy-hint').hide(); $('#link-content').css('width','100px');">
                     <a href="javascript:var _url=DC_026887848.pageLink();">
                         <img src="images/default/button/link.png" style="width: 15px;height: 15px; margin-bottom: -3px">
                     </a>
