@@ -506,6 +506,32 @@ def dataset_correlation(request, ds_id, reporter_id, min_corr):
         in dataset: %s." % (reporter_id, ds_id))
 
 
+def dataset_factors(request, ds_id):
+    ds = adopt_dataset(ds_id)
+    if ds is None:
+        return HttpResponse(
+            '{"code":4004, \
+            "detail":"dataset with this id not found"}',
+            content_type="application/json")
+    smps = ds['metadata']['factors']
+    # no factor value
+    if 'factorvalue' not in smps[0].values()[0]:
+        return general_json_response(detail={})
+
+    keys = smps[0].values()[0]['factorvalue'].keys()
+    factor_keys = {}
+    for f in keys:
+        factor_keys[f] = {}
+    for smp in smps:
+        fv = smp.values()[0]['factorvalue']
+        for f in fv:
+            if f in factor_keys.keys():
+                factor_keys[f].add(fv[f])
+            else:
+                factor_keys[f] = set([fv[f]])
+    return general_json_response(detail=factor_keys)
+
+
 def dataset_503_test(request):
     """
         just for test 503 error page redirect
