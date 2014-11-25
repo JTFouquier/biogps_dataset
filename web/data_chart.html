@@ -1050,10 +1050,12 @@
                             // finally, server end default
                             geneID = this._getUrlParam('gene');
                             var prox_url;
-                            if (geneID != null)
+                            if (geneID != null){
                                 prox_url = "/dataset/default/?gene="+geneID;
-                            else
+                            }
+                            else{
                                 prox_url = "/dataset/default/";
+                            }
                             $.getJSON(prox_url, function(dataJson, code) {
                                 if (code != "success") {
                                     DCCG.buildCanvasError(DC_026887848.getCanvas());
@@ -1081,10 +1083,6 @@
                             this.setDatasetCookie();
                             this.loadProbes();
                         }
-                        // set link to this dataset and gene page
-                        var _url = window.location.href.split('?')[0]+
-                            'dataset='+this.dsID+'&gene='+this.geneID;
-                        $('#link-content').val(_url);
                     }
                 },
 
@@ -1092,6 +1090,10 @@
                     // Clear out old probe data, get new
                     this.clearProbeData();
                     this.getProbeData();
+                    // set link to this dataset and gene page
+                    var _url = window.location.href.split('?')[0]+
+                        '?dataset='+this.dsID+'&gene='+this.geneID;
+                    $('#link-content').val(_url);
                 },
                 loadTabs : function() {
                     var start_tab = 1
