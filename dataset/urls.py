@@ -19,7 +19,7 @@ urlpatterns = patterns(
            min/(?P<min_corr>.+)/$',
         views.dataset_correlation,
         name='dataset correlation'),
-    url(r'^factors/$', views.dataset_factors,
+    url(r'^factors/(?P<ds_id>.+)/$', views.dataset_factors,
         name='dataset factors'),
 
     # url(r'^503_test/$', views.dataset_503_test, name='dataset 503 test'),
