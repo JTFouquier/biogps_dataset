@@ -28,14 +28,17 @@ def adopt_dataset(ds_id):
         return None
 
 
-def get_ds_factors_keys(ds):
+def get_ds_factors_keys(ds, factor_by=None):
     """
         return an array of keys that stand for samples in ds
     """
     factors = []
     i = 1
+    if factor_by is not None:
+        fvs = []
     for f in ds.metadata['factors']:
         order_idx = color_idx = None
+        # get sample name
         if 'comment' in f[f.keys()[0]]:
             comment = f[f.keys()[0]]['comment']
             temp = comment.get('Sample_title', None)
@@ -43,20 +46,28 @@ def get_ds_factors_keys(ds):
                 temp = comment.get('Sample_title', None)
                 if temp is None:
                     temp = f.keys()[0]
-        # default ds here
         else:
             temp = f.keys()[0]
-            content = f[temp]
-            if 'order_idx' in content and 'color_idx' in content:
+
+        # get order and color(grouping) by some certain facet
+        content = f[f.keys()[0]]
+        # by specified factor value 'factor_by'
+        if factor_by is not None:
+            v = content['factorvalue'][factor_by]
+            if v not in fvs:
+                fvs.append(v)
+            color_idx = order_idx = fvs.index(v)
+        # by 'order_idx' and 'color_idx' (default dataset)
+        elif 'order_idx' in content and 'color_idx' in content:
                 order_idx = content['order_idx']
                 color_idx = content['color_idx']
-        if order_idx is None:
-            item = {'name': temp, 'order_idx': i, 'color_idx': i}
-            i = i + 1
+        # finally by index number
         else:
-            item = {'name': temp, 'order_idx': order_idx,
-                    'color_idx': color_idx}
-        factors.append(item)
+            color_idx = order_idx = i
+            i = i + 1
+
+        factors.append({'name': temp, 'order_idx': order_idx,
+                        'color_idx': color_idx})
     return factors
 
 
@@ -88,7 +99,8 @@ def dataset_info(request, ds_id):
            'geo_gpl_id': geo_gpl_id, 'species': [ds.species]
            }
     factors = []
-    fa = get_ds_factors_keys(ds)
+    fb = request.GET.get('facet', None)
+    fa = get_ds_factors_keys(ds, fb)
     for f in fa:
         factors.append({f['name']: {"color_idx": f.get('color_idx', 0),
                         "order_idx": f.get('order_idx', 0), "title": f['name']}
