@@ -213,7 +213,8 @@ def dataset_chart(request, ds_id, reporter_id):
         ds, reporter_id=reporter_id)['data'][0][reporter_id]['values']
     val_list = [float(item) for item in data_list]
 
-    factors = get_ds_factors_keys(ds)
+    facet = request.GET.get('facet', None)
+    factors = get_ds_factors_keys(ds, facet)
     back = prepare_chart_data(val_list, factors)
 
     # start render part
