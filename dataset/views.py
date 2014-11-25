@@ -513,15 +513,12 @@ def dataset_factors(request, ds_id):
             '{"code":4004, \
             "detail":"dataset with this id not found"}',
             content_type="application/json")
-    smps = ds['metadata']['factors']
+    smps = ds.metadata['factors']
     # no factor value
     if 'factorvalue' not in smps[0].values()[0]:
         return general_json_response(detail={})
 
-    keys = smps[0].values()[0]['factorvalue'].keys()
     factor_keys = {}
-    for f in keys:
-        factor_keys[f] = {}
     for smp in smps:
         fv = smp.values()[0]['factorvalue']
         for f in fv:
@@ -529,6 +526,8 @@ def dataset_factors(request, ds_id):
                 factor_keys[f].add(fv[f])
             else:
                 factor_keys[f] = set([fv[f]])
+    for e in factor_keys:
+        factor_keys[e] = list(factor_keys[e])
     return general_json_response(detail=factor_keys)
 
 
