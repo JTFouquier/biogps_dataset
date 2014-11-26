@@ -155,7 +155,7 @@
                         draggable : true,
                         modal : false,
                         position : [pos.left + 5, pos.top + 15],
-                        resizable : false,
+                        resizable : true,
                         title : "Datasets with data for gene 362817",
                         width : $("#dataChartTabPanel").width() * 0.7,
                         open : this.updateDialog()
@@ -289,7 +289,7 @@
                         draggable : false,
                         modal : true,
                         position : "top",
-                        resizable : false,
+                        resizable : true,
                         title : "Select a dataset",
                         width : $("#dataChartTabPanel").width() * 0.7,
                         open : this.updateDialog()
@@ -1456,7 +1456,7 @@
                     <a href="javascript:void(0)"><input id="link-content" type="text" readonly="readonly" style="width: 100px; color: gray; border: 1px inset;"
                         onclick="if($('#link-content').width()>100){$('#link-content').css('width','100px');} else $('#link-content').css('width','500px');"
                         onblur="$('#copy-hint').hide();"></a>
-                    <a href="javascript:var _url=DC_026887848.pageLink();">
+                    <a href="javascript:var _url=DC_026887848.pageLink();" style="text-decoration:none;" title="get permanent link of the current chart">
                         <img src="images/default/button/link.png" style="width: 15px;height: 15px; margin-bottom: -3px">
                     </a>
                     <span style='display:none; font-size: small; font-style: italic; color: gray;' id='copy-hint'>press ctrl+c to copy</span>
