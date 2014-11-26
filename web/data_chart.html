@@ -304,7 +304,7 @@
                         draggable : false,
                         modal : true,
                         position : "top",
-                        resizable : false,
+                        resizable : true,
                         title : "All Factors",
                         width : $("#dataChartTabPanel").width() * 0.5,
                         //open : this.updateFactorDialog()
@@ -1453,10 +1453,11 @@
                 </div>
                 <div id="datasetLinkContainer" style="width: 99%; float:left; margin-bottom: 3px;">
                     <b>Link: </b>&nbsp;
-                    <a href="javascript:void(0)"><input id="link-content" type="text" readonly="readonly" style="width: 100px; color: gray; border: 1px inset;"
+                    <a href="javascript:void(0)" title="get permanent link of the current chart">
+                        <input id="link-content" type="text" readonly="readonly" style="width: 100px; color: gray; border: 1px inset;"
                         onclick="if($('#link-content').width()>100){$('#link-content').css('width','100px');} else $('#link-content').css('width','500px');"
                         onblur="$('#copy-hint').hide();"></a>
-                    <a href="javascript:var _url=DC_026887848.pageLink();" style="text-decoration:none;" title="get permanent link of the current chart">
+                    <a href="javascript:var _url=DC_026887848.pageLink();" style="text-decoration:none;">
                         <img src="images/default/button/link.png" style="width: 15px;height: 15px; margin-bottom: -3px">
                     </a>
                     <span style='display:none; font-size: small; font-style: italic; color: gray;' id='copy-hint'>press ctrl+c to copy</span>
