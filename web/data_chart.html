@@ -138,7 +138,7 @@
 
                 handleNoData : function() {
                     // Update canvas, etc when no data found
-                    var _msg = "No data for gene 362817 in the \"" + DC_026887848.dsName + "\" data set.";
+                    var _msg = "No data for current gene in the \"" + DC_026887848.dsName + "\" data set.";
                     var _htmlMsg = "<p class=\"ds-error\">" + _msg + "</p>";
 
                     var containers = DC_026887848.tabContentContainerIDs;
@@ -156,7 +156,7 @@
                         modal : false,
                         position : [pos.left + 5, pos.top + 15],
                         resizable : true,
-                        title : "Datasets with data for gene 362817",
+                        title : "Datasets with data for current gene",
                         width : $("#dataChartTabPanel").width() * 0.7,
                         open : this.updateDialog()
                     });
@@ -291,7 +291,7 @@
                         position : "top",
                         resizable : true,
                         title : "Select a dataset",
-                        width : $("#dataChartTabPanel").width() * 0.7,
+                        width : $("#DC_026887848_tabs1").width() * 0.7,
                         open : this.updateDialog()
                     });
 
