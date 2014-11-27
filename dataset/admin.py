@@ -1,7 +1,6 @@
 from django.contrib import admin
-from dataset.models import (BiogpsDataset, BiogpsDatasetData,
-                            BiogpsDatasetMatrix, BiogpsDatasetPlatform,
-                            BiogpsDatasetFailed)
+from dataset.models import (BiogpsDataset,
+                            BiogpsDatasetPlatform, BiogpsDatasetFailed)
 
 
 # Register your models here.
@@ -15,9 +14,9 @@ admin.site.register(BiogpsDataset)
 # admin.site.register(BiogpsDatasetData)
 
 
-class BiogpsDatasetMatrixAdmin(admin.ModelAdmin):
-    exclued = ('_matrix', )
-admin.site.register(BiogpsDatasetMatrix)
+# class BiogpsDatasetMatrixAdmin(admin.ModelAdmin):
+#     exclude = ('_matrix', )
+# admin.site.register(BiogpsDatasetMatrix)
 
 
 class BiogpsDatasetPlatformAdmin(admin.ModelAdmin):
