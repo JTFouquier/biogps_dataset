@@ -10,13 +10,13 @@ class BiogpsDatasetAdmin(admin.ModelAdmin):
 admin.site.register(BiogpsDataset)
 
 
-class BiogpsDatasetDataAdmin(admin.ModelAdmin):
-    pass
-admin.site.register(BiogpsDatasetData)
+# class BiogpsDatasetDataAdmin(admin.ModelAdmin):
+#     pass
+# admin.site.register(BiogpsDatasetData)
 
 
 class BiogpsDatasetMatrixAdmin(admin.ModelAdmin):
-    pass
+    exclued = ('_matrix', )
 admin.site.register(BiogpsDatasetMatrix)
 
 
