@@ -3,10 +3,12 @@ from dataset.models import (BiogpsDataset,
                             BiogpsDatasetPlatform, BiogpsDatasetFailed)
 
 
-# Register your models here.
 class BiogpsDatasetAdmin(admin.ModelAdmin):
-    pass
-admin.site.register(BiogpsDataset)
+    list_display = ('geo_gse_id', 'platform',)
+    list_filter = ('platform',)
+    search_fields = ['geo_gse_id']
+
+admin.site.register(BiogpsDataset, BiogpsDatasetAdmin)
 
 
 # class BiogpsDatasetDataAdmin(admin.ModelAdmin):
@@ -20,17 +22,24 @@ admin.site.register(BiogpsDataset)
 
 
 class BiogpsDatasetPlatformAdmin(admin.ModelAdmin):
-    pass
-admin.site.register(BiogpsDatasetPlatform)
+    list_display = ('platform', 'dataset',)
 
-# 
+    def dataset(self, obj):
+        return obj.dataset_platform.count()
+
+admin.site.register(BiogpsDatasetPlatform, BiogpsDatasetPlatformAdmin)
+
+#
 # class BiogpsDatasetGeoLoadedAdmin(admin.ModelAdmin):
 #     pass
 # admin.site.register(BiogpsDatasetGeoLoaded)
 
 
 class BiogpsDatasetFailedAdmin(admin.ModelAdmin):
-    pass
-admin.site.register(BiogpsDatasetFailed)
+    list_display = ('dataset', 'platform', 'reason',)
+    list_filter = ('platform',)
+    search_fields = ['dataset']
+
+admin.site.register(BiogpsDatasetFailed, BiogpsDatasetFailedAdmin)
 
 
