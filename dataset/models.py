@@ -128,9 +128,10 @@ class BiogpsDataset(models.Model):
         )
         ordering = ("name",)
         get_latest_by = 'lastmodified'
+        verbose_name_plural = "Dataset"
 
-#     def __unicode__(self):
-#         return u('"%s" by "%s"' % (self.name, self.ownerprofile_id))
+    def __unicode__(self):
+        return (u'%s (%d samples)' % (self.geo_gse_id, self.sample_count()))
 
     @models.permalink
     def get_absolute_url(self):
@@ -195,6 +196,10 @@ class BiogpsDatasetData(models.Model):
 
     class Meta:
         unique_together = ("dataset", "reporter")
+        verbose_name_plural = "Dataset Data"
+
+    def __unicode__(self):
+        return (u'%s' % (self.reporter))
 
 
 class BiogpsDatasetMatrix(models.Model):
@@ -212,11 +217,23 @@ class BiogpsDatasetMatrix(models.Model):
 
     matrix = property(get_data, set_data)
 
+    class Meta:
+        verbose_name_plural = "Dataset Matrix"
+
+    def __unicode__(self):
+        return (u'Maxtrix of %s' % (self.dataset.geo_gse_id))
+
 
 class BiogpsDatasetPlatform(models.Model):
     """Model definition for BiogpsDatasetPlatform"""
     platform = models.CharField(max_length=100)
     reporters = JSONField(blank=False, editable=True)
+
+    class Meta:
+        verbose_name_plural = "Dataset Platform"
+
+    def __unicode__(self):
+        return (u'%s' % (self.platform))
 
 
 class BiogpsDatasetGeoLoaded(models.Model):
@@ -251,3 +268,9 @@ class BiogpsDatasetFailed(models.Model):
     platform = models.CharField(max_length=20, null=True)
     dataset = models.CharField(max_length=20, null=True)
     reason = models.TextField(null=True)
+
+    class Meta:
+        verbose_name_plural = "Dataset Failed"
+
+    def __unicode__(self):
+        return (u'%s %s' % (self.platform, self.dataset))
