@@ -131,7 +131,7 @@ class BiogpsDataset(models.Model):
         verbose_name_plural = "Dataset"
 
     def __unicode__(self):
-        return (u'%s (%d samples)' % (self.geo_gse_id, self.sample_count()))
+        return (u'%s (%d samples)' % (self.geo_gse_id, self.sample_count)
 
     @models.permalink
     def get_absolute_url(self):
