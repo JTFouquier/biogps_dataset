@@ -592,6 +592,8 @@ def dataset_factors(request, ds_id):
                 factor_keys[f] = set([fv[f]])
     for e in factor_keys:
         factor_keys[e] = list(factor_keys[e])
+    if len(factor_keys) == 0:
+        return general_json_response(code=GENERAL_ERRORS.ERROR_NOT_FOUND)
     return general_json_response(detail=factor_keys)
 
 
