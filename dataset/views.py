@@ -37,17 +37,7 @@ def get_ds_factors_keys(ds, factor_by=None):
     if factor_by is not None:
         fvs = []
     for f in ds.metadata['factors']:
-        order_idx = color_idx = None
-        # get sample name
-        if 'comment' in f[f.keys()[0]]:
-            comment = f[f.keys()[0]]['comment']
-            temp = comment.get('Sample_title', None)
-            if temp is None:
-                temp = comment.get('Sample_title', None)
-                if temp is None:
-                    temp = f.keys()[0]
-        else:
-            temp = f.keys()[0]
+        name = order_idx = color_idx = None
 
         # get order and color(grouping) by some certain facet
         content = f[f.keys()[0]]
@@ -57,6 +47,7 @@ def get_ds_factors_keys(ds, factor_by=None):
             if v not in fvs:
                 fvs.append(v)
             color_idx = order_idx = fvs.index(v)
+            name = v
         # by 'order_idx' and 'color_idx' (default dataset)
         elif 'order_idx' in content and 'color_idx' in content:
                 order_idx = content['order_idx']
@@ -66,7 +57,18 @@ def get_ds_factors_keys(ds, factor_by=None):
             color_idx = order_idx = i
             i = i + 1
 
-        factors.append({'name': temp, 'order_idx': order_idx,
+        # get sample name
+        if name is None:
+            if 'comment' in f[f.keys()[0]]:
+                comment = f[f.keys()[0]]['comment']
+                name = comment.get('Sample_title', None)
+                if name is None:
+                    name = comment.get('Sample_title', None)
+                    if name is None:
+                        name = f.keys()[0]
+            else:
+                name = f.keys()[0]
+        factors.append({'name': name, 'order_idx': order_idx,
                         'color_idx': color_idx})
     return factors
 
@@ -484,14 +486,14 @@ def dataset_default(request):
     data_json = res[0]
     if 'taxid' not in data_json:
         return general_json_response(
-            GENERAL_ERRORS.ERROR_INTERNAL, "Gene id: %s \
+            GENERAL_ERRORS.ERROR_BAD_ARGS, "Gene id: %s \
             may be invalid." % gene_id)
     species = data_json['taxid']
     try:
         ds_id = settings.DEFAULT_DATASET_MAPPING[species]
     except IndexError:
         return general_json_response(
-            GENERAL_ERRORS.ERROR_INTERNAL, "Cannot get default\
+            GENERAL_ERRORS.ERROR_BAD_ARGS, "Cannot get default\
             dataset with gene id: %s." % gene_id)
     return general_json_response(detail={'gene': int(gene_id),
                                          'dataset': ds_id})
