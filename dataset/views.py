@@ -482,12 +482,16 @@ def dataset_default(request):
     mg = mygene.MyGeneInfo()
     res = mg.querymany([gene_id], scopes='_id', fields='taxid')
     data_json = res[0]
+    if 'taxid' not in data_json:
+        return general_json_response(
+            GENERAL_ERRORS.ERROR_INTERNAL, "Gene id: %s \
+            may be invalid." % gene_id)
     species = data_json['taxid']
     try:
         ds_id = settings.DEFAULT_DATASET_MAPPING[species]
     except IndexError:
         return general_json_response(
-            GENERAL_ERRORS.ERROR_INTERNAL, "Cannot get default \
+            GENERAL_ERRORS.ERROR_INTERNAL, "Cannot get default\
             dataset with gene id: %s." % gene_id)
     return general_json_response(detail={'gene': int(gene_id),
                                          'dataset': ds_id})
