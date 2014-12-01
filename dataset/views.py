@@ -28,7 +28,7 @@ def adopt_dataset(ds_id):
         return None
 
 
-def get_ds_factors_keys(ds, factor_by=None):
+def get_ds_factors_keys(ds, factor_by=None, group_up=False):
     """
         return an array of keys that stand for samples in ds
     """
@@ -44,10 +44,15 @@ def get_ds_factors_keys(ds, factor_by=None):
         # by specified factor value 'factor_by'
         if factor_by is not None:
             v = content['factorvalue'][factor_by]
+            name = v
             if v not in fvs:
                 fvs.append(v)
-            color_idx = order_idx = fvs.index(v)
-            name = v
+            color_idx = fvs.index(v)
+            if group_up:
+                order_idx = fvs.index(v)
+            else:
+                order_idx = i
+                i = i + 1
         # by 'order_idx' and 'color_idx' (default dataset)
         elif 'order_idx' in content and 'color_idx' in content:
                 order_idx = content['order_idx']
@@ -102,7 +107,8 @@ def dataset_info(request, ds_id):
            }
     factors = []
     fb = request.GET.get('facet', None)
-    fa = get_ds_factors_keys(ds, fb)
+    group = request.GET.get('group', False)
+    fa = get_ds_factors_keys(ds, fb, group)
     for f in fa:
         factors.append({f['name']: {"color_idx": f.get('color_idx', 0),
                         "order_idx": f.get('order_idx', 0), "title": f['name']}
@@ -216,7 +222,8 @@ def dataset_chart(request, ds_id, reporter_id):
     val_list = [float(item) for item in data_list]
 
     facet = request.GET.get('facet', None)
-    factors = get_ds_factors_keys(ds, facet)
+    group = request.GET.get('group', False)
+    factors = get_ds_factors_keys(ds, facet, group)
     back = prepare_chart_data(val_list, factors)
 
     # start render part
