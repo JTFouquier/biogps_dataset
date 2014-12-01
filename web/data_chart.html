@@ -158,36 +158,40 @@
                         resizable : true,
                         title : "Datasets with data for current gene",
                         width : $("#DC_026887848_tabs1").width() * 0.7,
-                        open : this.updateDialog()
+                        open : this.getDatasets()
                     });
                 },
-
-                getDatasets : function() {
-                    // Query SL for relevant datasets, encoding url for use with proxy
+                //get non-default ds
+                getDatasetsNonDefault: function(){
                     var _dsLibUrl = "/dataset/search/?gene="+DC_026887848.geneID+"&page=" + DC_026887848.dsPage;
-                    var _dsDefaultUrl = "/dataset/search/default/?gene=" + DC_026887848.geneID;
                     if (DC_026887848.dsSearchTerm !== "") {
                         _qTerm =    DC_026887848.dsSearchTerm;
                         _dsLibUrl += '&query='+_qTerm;
-                        _dsDefaultUrl += '&query='+_qTerm;
                     }
-
-                    // All datasets
                     $.getJSON(_dsLibUrl, function(allDatasets, code) {
                         if (code != "success") {
                             // Error getting json from server
                             DCCG.buildCanvasError(DC_026887848.getCanvas());
                         } else {
-                            //DC_026887848.updateDialog(allDatasets.details, true);
-                            // Default datasets
-                            $.getJSON(_dsDefaultUrl, function(defaultDatasets, code) {
-                                if (code != "success") {
-                                    // Error getting json from server
-                                    DCCG.buildCanvasError(DC_026887848.getCanvas());
-                                } else {
-                                    DC_026887848.updateDialog(allDatasets.details, defaultDatasets.details);
-                                }
-                            });
+                            DC_026887848.updateDialog(allDatasets.details, null);
+                        }
+                    });
+                },
+                //get both default and non-default ds
+                getDatasets : function() {
+                    // Query SL for relevant datasets, encoding url for use with proxy
+                    var _dsLibUrl = "/dataset/search/all/?gene="+DC_026887848.geneID;
+                    if (DC_026887848.dsSearchTerm !== "") {
+                        _dsLibUrl += '&query='+DC_026887848.dsSearchTerm;
+                    }
+
+                    // All datasets
+                    $.getJSON(_dsLibUrl, function(res, code) {
+                        if (code != "success") {
+                            // Error getting json from server
+                            DCCG.buildCanvasError(DC_026887848.getCanvas());
+                        } else {
+                            DC_026887848.updateDialog(res.details.non-default, res.details.default);
                         }
                     });
                 },
@@ -198,7 +202,7 @@
                         // Enter button pressed
                         DC_026887848.dsPage = 1;
                         DC_026887848.dsSearchTerm = qTerm.replace(/ /g, "+");
-                        DC_026887848.updateDialog();
+                        DC_026887848.getDatasets();
                     }
                 },
                 updateFactorDialog : function(){
@@ -206,35 +210,31 @@
                 },
 
                 updateDialog : function(allDatasets, defaultDatasets) {
-                    // Update dialog with dataset results
-                    if (!allDatasets || !defaultDatasets) {
-                        // Get list of datasets for reporters
-                        DC_026887848.getDatasets();
-                    } else {
-                        // Set datset info/pages for all datasets,
-                        // returned results are [results count, total pages, page of results]
-                        $("#dsLibTotal").html(allDatasets.count);
-                        $("#dsLibPageNum").html(DC_026887848.dsPage);
-                        var _numPages = allDatasets.total_page;
-                        DC_026887848.dsPages = _numPages;
-                        $("#dsLibPages").html(_numPages);
+                    // Set datset info/pages for all datasets,
+                    $("#dsLibTotal").html(allDatasets.count);
+                    $("#dsLibPageNum").html(DC_026887848.dsPage);
+                    var _numPages = allDatasets.total_page;
+                    DC_026887848.dsPages = _numPages;
+                    $("#dsLibPages").html(_numPages);
 
-                        // Append datasets to list
-                        var _titleWidth = 100;
-                        $("#dsList").empty();
-                        $.each(allDatasets.results, function(idx, ds) {
-                            var _dsClass = (idx % 2 == 0 ? "odd-li" : "even-li");
-                            var _dsTitle = (ds.name.length > _titleWidth ? ds.name.substring(0, _titleWidth - 3) + "..." : ds.name);
-                            _dsTitle += "  (" + ds.factors.length + " samples)";
-                            $("#dsList").append('<a class="ds-dialog" href="javascript:void(0)" onclick="DC_026887848.loadDataset(\'' + ds.geo_gse_id + '\')"><li class="ds-dialog ' + _dsClass + '" id="ds' + ds.id + '">' + _dsTitle + '</li></a>');
-                        });
-                        // Update default datasets
+                    // Append datasets to list
+                    var _titleWidth = 100;
+                    $("#dsList").empty();
+                    $.each(allDatasets.results, function(idx, ds) {
+                        var _dsClass = (idx % 2 == 0 ? "odd-li" : "even-li");
+                        var _dsTitle = (ds.name.length > _titleWidth ? ds.name.substring(0, _titleWidth - 3) + "..." : ds.name);
+                        _dsTitle += "  (" + ds.factors.length + " samples)";
+                        $("#dsList").append('<a class="ds-dialog" href="javascript:void(0)" onclick="DC_026887848.loadDataset(\'' + ds.geo_gse_id + '\')"><li class="ds-dialog ' + _dsClass + '" id="ds' + ds.id + '">' + _dsTitle + '</li></a>');
+                    });
+                    // Update default datasets
+                    if(!defaultDatasets)
+                    {
                         $("#dsDefaultsList").empty();
                         $("#dsDefaultTotal").html(defaultDatasets.count);
                         $.each(defaultDatasets.results, function(idx, ds) {
                             var _dsClass = (idx % 2 == 0 ? "odd-li" : "even-li");
                             var _dsTitle = (ds.name.length > _titleWidth ? ds.name.substring(0, _titleWidth - 3) + "..." : ds.name);
-                            _dsTitle += "  (" + ds.factors.length + " samples)";
+                            _dsTitle += "  (" + ds.sample_count + " samples)";
                             $("#dsDefaultsList").append('<a class="ds-dialog" href="javascript:void(0)" onclick="DC_026887848.loadDataset(\'' + ds.geo_gse_id + '\')"><li class="ds-dialog ' + _dsClass + '" id="ds' + ds.id + '">' + _dsTitle + '</li></a>');
                         });
                     }
@@ -273,7 +273,7 @@
                         } else {
                             DC_026887848.dsPage = 1;
                         }
-                        this.updateDialog();
+                        this.getDatasetsNonDefault();
                     }
                 },
 
@@ -292,7 +292,7 @@
                         resizable : true,
                         title : "Select a dataset",
                         width : $("#DC_026887848_tabs1").width() * 0.7,
-                        open : this.updateDialog()
+                        open : this.getDatasets()
                     });
 
                     // Add search bar to dialog

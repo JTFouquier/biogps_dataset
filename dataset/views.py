@@ -335,10 +335,12 @@ def dataset_search(request):
     print ids
     ds_query = models.BiogpsDataset.objects.filter(geo_gse_id__in=ids)
     for ds in ds_query:
+        # temp_dic = {"id": ds.id, "name": ds.name, 'geo_gse_id':
+        #             ds.geo_gse_id}
+        # factors = get_ds_factors_keys(ds)
+        # temp_dic["factors"] = [obj['name'] for obj in factors]
         temp_dic = {"id": ds.id, "name": ds.name, 'geo_gse_id':
-                    ds.geo_gse_id}
-        factors = get_ds_factors_keys(ds)
-        temp_dic["factors"] = [obj['name'] for obj in factors]
+                    ds.geo_gse_id, "sample_count": len(ds.metadata['factors'])}
         res.append(temp_dic)
 
     res = {"current_page": page, "total_page": total_page, "count": count,
@@ -366,12 +368,62 @@ def dataset_search_default(request):
     res = []
     for ds in qs:
         temp_dic = {"id": ds.id, "name": ds.name, 'geo_gse_id':
-                    ds.geo_gse_id}
-        factors = get_ds_factors_keys(ds)
-        temp_dic["factors"] = [obj['name'] for obj in factors]
+                    ds.geo_gse_id, "sample_count": len(ds.metadata['factors'])}
+#         factors = get_ds_factors_keys(ds)
+#         temp_dic["factors"] = [obj['name'] for obj in factors]
         res.append(temp_dic)
     res = {"count": qs.count(),   "results": res}
     return general_json_response(detail=res)
+
+
+@csrf_exempt
+def dataset_search_all(request):
+    query = request.GET.get("query", None)
+    gene = request.GET.get("gene", None)
+    if gene is None:
+        gene = settings.DEFAULT_GENE_ID
+    reporters = _get_reporter_from_gene(gene)
+    if reporters is None:
+        return general_json_response(
+            code=GENERAL_ERRORS.ERROR_NOT_FOUND, detail='no\
+            matched data for gene %s.' % gene)
+    # retrive all default results(9999)
+    rep = ' '.join(reporters)
+    search_res = _es_search(rep, query, 1, 0, 9999)
+    ids = [item["_source"]["geo_gse_id"]
+           for item in search_res["hits"]["hits"]]
+    qs = models.BiogpsDataset.objects.using('default_ds')\
+        .filter(geo_gse_id__in=ids)
+    res_default = []
+    for ds in qs:
+        temp_dic = {"id": ds.id, "name": ds.name, 'geo_gse_id':
+                    ds.geo_gse_id, "sample_count": len(ds.metadata['factors'])}
+        # factors = get_ds_factors_keys(ds)
+        # temp_dic["factors"] = [obj['name'] for obj in factors]
+        res_default.append(temp_dic)
+    res_default = {"count": qs.count(),   "results": res_default}
+
+    # retrive fist page non-default ds
+    page_by = request.GET.get("page_by", 8)
+    page_by = int(page_by)
+    search_res = _es_search(rep, query, 0, 0, page_by)
+    count = search_res["hits"]["total"]
+    total_page = int(math.ceil(float(count) / float(page_by)))
+    res = []
+    ids = []
+    for item in search_res["hits"]["hits"]:
+        ids.append(item["_source"]["geo_gse_id"])
+    print ids
+    ds_query = models.BiogpsDataset.objects.filter(geo_gse_id__in=ids)
+    for ds in ds_query:
+        temp_dic = {"id": ds.id, "name": ds.name, 'geo_gse_id':
+                    ds.geo_gse_id, "sample_count": len(ds.metadata['factors'])}
+        res.append(temp_dic)
+
+    res = {"current_page": 1, "total_page": total_page, "count": count,
+           "results": res}
+    return general_json_response(detail={'dafult': res_default,
+                                         'non-default': res})
 
 
 def dataset_csv(request, ds_id, gene_id):
