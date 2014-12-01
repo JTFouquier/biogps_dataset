@@ -1117,11 +1117,11 @@
                     //get factors
                     $.getJSON('/dataset/factors/'+this.dsID+'/', function(dataJson, code) {
                         if (code != "success") {
-                            DCCG.buildCanvasError(DC_026887848.getCanvas());
+                            //DCCG.buildCanvasError(DC_026887848.getCanvas());
                         } else {
                             if (dataJson.code != 0)
                             {
-                                DCCG.buildCanvasError(DC_026887848.getCanvas());
+                                //DCCG.buildCanvasError(DC_026887848.getCanvas());
                             }
                             else
                             {
@@ -1138,6 +1138,7 @@
                                 table += '</tbody></table>';
                                 _factor_dialog = $('<div id="facter-list" style="font-size: 12px">'+
                                     table+'<input type="button" value="OK" onclick="DC_026887848.changeFacet();"></div>');
+                                $('#datasetFactors').show();
                             }
                         }
                     });
@@ -1443,7 +1444,7 @@
                             <option>D28753_i_at</option><option>D28754_s_at</option>
                         </select>
                     </div>
-                    <div id="datasetFactors" style="float:left; padding-left:10px">
+                    <div id="datasetFactors" style="float:left; padding-left:10px; display:none">
                         <input type="button" id="show-factors" value="Show Factors" style="padding-left:10px; padding-right:10px; float: left;"
                              onclick="DC_026887848.showFactors()">
                     </div>

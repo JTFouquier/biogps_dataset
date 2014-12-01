@@ -413,7 +413,6 @@ def dataset_search_all(request):
     ids = []
     for item in search_res["hits"]["hits"]:
         ids.append(item["_source"]["geo_gse_id"])
-    print ids
     ds_query = models.BiogpsDataset.objects.filter(geo_gse_id__in=ids)
     for ds in ds_query:
         temp_dic = {"id": ds.id, "name": ds.name, 'geo_gse_id':
@@ -581,7 +580,7 @@ def dataset_factors(request, ds_id):
     smps = ds.metadata['factors']
     # no factor value
     if 'factorvalue' not in smps[0].values()[0]:
-        return general_json_response(detail={})
+        return general_json_response(code=GENERAL_ERRORS.ERROR_NOT_FOUND)
 
     factor_keys = {}
     for smp in smps:
