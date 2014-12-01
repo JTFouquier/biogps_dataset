@@ -422,7 +422,7 @@ def dataset_search_all(request):
 
     res = {"current_page": 1, "total_page": total_page, "count": count,
            "results": res}
-    return general_json_response(detail={'dafult': res_default,
+    return general_json_response(detail={'default': res_default,
                                          'non-default': res})
 
 
