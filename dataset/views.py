@@ -222,7 +222,8 @@ def dataset_chart(request, ds_id, reporter_id):
     val_list = [float(item) for item in data_list]
 
     facet = request.GET.get('facet', None)
-    group = request.GET.get('group', False)
+    group = request.GET.get('group', 'off')
+    group = True if group == 'on' else False
     factors = get_ds_factors_keys(ds, facet, group)
     back = prepare_chart_data(val_list, factors)
 
