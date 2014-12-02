@@ -647,17 +647,50 @@
 
                     this.probeData = {};
                     var probeBox = document.getElementById("DC_026887848_probe");
+                    var ctx = this.getCanvas();
                     for(var e in probeList)
                     {
                         var v = probeList[e];
                         this.probeData[e] = [];
+                        var max_val=min_val=max_txt_len=0;
                         for(var j=0; j<v.length; j++)
                         {
                             var item = v[j];
                             this.probeData[e].push({'Mark':false, 'color_idx':item.color_idx,
                                 'column_name':item.name, 'mean':item.value, 'value':item.value,
                                 'order_idx':item.order_idx, 'stderr':item.dev, 'title':item.name});
+                            //max and min value in array
+                            if(item.value>max_val) max_val=item.value;
+                            if(item.value<min_val) min_val=item.value;
+                            // Calculate maximum text length
+                            var txt_len = (ctx == null ? item.name.length : DCCG.textLen(ctx, item.name));
+                            if (txt_len > max_txt_len) {
+                                max_txt_len = txt_len;
+                            };
                         }
+                        this.probeData[e].maxVal = max_val;
+                        this.probeData[e].minVal = min_val;
+
+                        if (max_val <= 0) {
+                            max_val = 1;
+                        } else {
+                            var tmp = Math.pow(10, Math.floor(Math.log(max_val) / Math.log(10)));
+                            max_val = (Math.floor(max_val / tmp) + 1) * tmp;
+                        }
+                        if (min_val >= 0) {
+                            min_val = 0;
+                        } else {
+                            min_val = min_val * -1;
+                            var tmp = Math.pow(10, Math.floor(Math.log(min_val) / Math.log(10)));
+                            min_val = (Math.floor(min_val / tmp) + 1) * tmp;
+                            min_val = min_val * -1;
+                        }
+
+                        this.probeData[pID].roundedMaxVal = max_val;
+                        this.probeData[pID].roundedMinVal = min_val;
+                        this.probeData[pID].zoomMaxVal = max_val;
+                        this.probeData[pID].zoomMinVal = min_val;
+
                         //init reporter drop down
                         var o = document.createElement("option");
                         o.text = e;
@@ -670,7 +703,6 @@
                         probeBox.options[0].selected = true;
                     }
 
-                    var ctx = this.getCanvas();
                     if (ctx != null) {
                         this.searchGraph(true);
                     }
