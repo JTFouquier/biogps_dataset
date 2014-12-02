@@ -1105,8 +1105,7 @@
                     }
                 },
                 changeFacet : function(){
-                    var facet = $('#facter-list input:checked').siblings().text();
-                    facet = facet.split(' ')[0];
+                    var facet = $('#facter-list input:checked').attr('facet');
                     var group = $('#facter-list input:checked').parents('tr').
                         find('input:checkbox').attr('checked');
                     this.loadProbes(facet, group);
@@ -1143,7 +1142,7 @@
                                     k++;
                                     table += '<tr style="height:20px; background:'+bg+'"><td style="padding:2px">';
                                     if (options>1)
-                                         table += '<input type="radio" name="factor">';
+                                         table += '<input type="radio" name="factor" facet="'+f+'">';
                                     table += '<label><b>'+f+'&nbsp('+dataJson.details[f].length+'&nbspoptions)'
                                        +'</b></label></td><td style="padding:2px">';
                                     var show_options = Math.min(max_option, options);
