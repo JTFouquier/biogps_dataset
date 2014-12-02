@@ -541,7 +541,7 @@
                     }
                 },
 
-                getProbeData : function(facet) {
+                getProbeData : function(facet, group) {
                     // Make two queries to SL - one for dataset metadata (factors),
                     // one for dataset values (probeset_list)
                     if (DC_026887848.dsCanvas == true) {
@@ -567,8 +567,10 @@
                     var mygeneReps = this.mygeneReps;
                     var gene = this.geneID;
                     $("#datasetName a").attr('href', "/dataset/meta/"+ds+"/");
-                    if(facet != null)
+                    if(facet != null){
                         var url = "/dataset/meta/"+ds+"/?facet="+facet;
+                        if(group) url += '&group=on';
+                    }
                     else
                         var url = "/dataset/meta/"+ds+"/";
                     $.getJSON(url, function(metaJson, code) {
@@ -1104,12 +1106,15 @@
                 },
                 changeFacet : function(){
                     var facet = $('#facter-list input:checked').siblings().text();
-                    this.loadProbes(facet);
+                    facet = facet.split(' ')[0];
+                    var group = $('#facter-list input:checked').parents('tr').
+                        find('input:checkbox').attr('checked');
+                    this.loadProbes(facet, group);
                 },
-                loadProbes : function(facet) {
+                loadProbes : function(facet, group) {
                     // Clear out old probe data, get new
                     this.clearProbeData();
-                    this.getProbeData(facet);
+                    this.getProbeData(facet, group);
                     // set link to this dataset and gene page
                     var _url = window.location.href.split('?')[0]+
                         '?dataset='+this.dsID+'&gene='+this.geneID;
