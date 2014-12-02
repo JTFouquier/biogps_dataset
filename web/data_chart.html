@@ -650,13 +650,13 @@
                     for(var e in probeList)
                     {
                         var v = probeList[e];
-                        this.probeData[v] = [];
+                        this.probeData[e] = [];
                         for(var j=0; j<v.length; j++)
                         {
                             var item = v[j];
-                            this.probeData[v].push({'Mark':false, 'color_idx':item.color_idx,
-                            'column_name':item.name, 'mean':item.value, 'value':item.value,
-                            'order_idx':item.order_idx, 'stderr':item.dev, 'title':item.name});
+                            this.probeData[e].push({'Mark':false, 'color_idx':item.color_idx,
+                                'column_name':item.name, 'mean':item.value, 'value':item.value,
+                                'order_idx':item.order_idx, 'stderr':item.dev, 'title':item.name});
                         }
                         //init reporter drop down
                         var o = document.createElement("option");
