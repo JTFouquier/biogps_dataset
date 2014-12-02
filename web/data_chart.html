@@ -661,19 +661,17 @@
                     // {"title": ["In vitro..."], "Time": ["1hr", "1day"]}
                     for (var i = 0; i < _dsFactors.length; i++) {
                         for (var samp in _dsFactors[i]) {
+                            var sh = _dsFactors[i][samp];
                             // Replicates
-                            var repName = samp.split(".")[0];
-                            if (_replicates.hasOwnProperty(repName)) {
+                            var repName = samp;
+                            if (_replicates.hasOwnProperty(sh['order_idx'])) {
                                 // Update last position of this replicate
-                                //_replicates[repName][1] = i;
                                 _replicates[repName].push(i);
                             } else {
-                                //_replicates[repName] = [i, i];
                                 _replicates[repName] = [i];
                             }
 
                             // Factors
-                            var sh = _dsFactors[i][samp];
                             for (var fac in sh) {
                                 if (factorGroups.hasOwnProperty(fac)) {
                                     if ($.inArray(sh[fac], factorGroups[fac]) == -1) {
@@ -681,7 +679,7 @@
                                         factorGroups[fac].push(sh[fac]);
                                     }
                                 } else {
-                                    factorGroups[fac] = [sh[fac]]
+                                    factorGroups[fac] = [sh[fac]];
                                 }
                             }
                         }
