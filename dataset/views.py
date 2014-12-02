@@ -499,7 +499,7 @@ def dataset_full_data(request, ds_id, gene_id):
     factors = get_ds_factors_keys(ds, facet, group)
     res = {}
     for e in data_lists:
-        r = e.values()[0]
+        r = e.keys()[0]
         vals = [float(item) for item in e[r]['values']]
         res[r] = prepare_chart_data(vals, factors)
     return general_json_response(detail=res)
