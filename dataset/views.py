@@ -503,7 +503,9 @@ def dataset_full_data(request, ds_id, gene_id):
         r = e.keys()[0]
         vals = [float(item) for item in e[r]['values']]
         res[r] = prepare_chart_data(vals, factors)
-    return general_json_response(detail=res)
+    ret = _contruct_meta(ds)
+    ret.update({'faceted_values': res})
+    return general_json_response(detail=ret)
 
 
 def dataset_default(request):
