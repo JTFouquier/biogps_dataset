@@ -78,16 +78,7 @@ def get_ds_factors_keys(ds, factor_by=None, group_up=False):
     return factors
 
 
-@require_http_methods(["GET"])
-def dataset_info(request, ds_id):
-    """
-        get information about a dataset
-    """
-    ds = adopt_dataset(ds_id)
-    if ds is None:
-        return HttpResponse('{"code":4004, \
-                            "detail":"dataset with this id not found"}',
-                            content_type="application/json")
+def _contruct_meta(ds):
     preset = {'default': True, 'permission_style': 'public',
               'role_permission': ['biogpsusers'], 'rating_data':
               {'total': 5, 'avg_stars': 10, 'avg': 5}, 'display_params':
@@ -105,6 +96,20 @@ def dataset_info(request, ds_id):
            ds.created.strftime('%Y-%m-%d %H:%M:%S'),
            'geo_gpl_id': geo_gpl_id, 'species': [ds.species]
            }
+    ret.update(preset)
+    return ret
+
+@require_http_methods(["GET"])
+def dataset_info(request, ds_id):
+    """
+        get information about a dataset
+    """
+    ds = adopt_dataset(ds_id)
+    if ds is None:
+        return HttpResponse('{"code":4004, \
+                            "detail":"dataset with this id not found"}',
+                            content_type="application/json")
+    ret = _contruct_meta(ds)
     factors = []
     fb = request.GET.get('facet', None)
     group = request.GET.get('group', False)
@@ -113,12 +118,8 @@ def dataset_info(request, ds_id):
         factors.append({f['name']: {"color_idx": f.get('color_idx', 0),
                         "order_idx": f.get('order_idx', 0), "title": f['name']}
                         })
-    ret.update(preset)
     ret.update({'factors': factors})
-    # print factors
-    ret = json.dumps(ret)
-    return HttpResponse('{"code":0, "detail":%s}' % ret,
-                        content_type="application/json")
+    return general_json_response(detail=ret)
 
 
 def _get_reporter_from_gene(gene):
