@@ -1125,16 +1125,28 @@
                             }
                             else
                             {
-                                var table = '<table><tbody>';
+                                var table = '<table style="width:100%"><tbody>';
+                                var max_option = 5;
                                 for(var f in dataJson.details)
                                 {
-                                    table += '<tr><td><input type="radio" name="factor"><label>'+f+'</label></td>';
-                                    for(var i=0; i<dataJson.details[f].length; i++)
+                                    var options = dataJson.details[f].length;
+                                    table += '<tr><td>';
+                                    if (options>1)
+                                         table += '<input type="radio" name="factor">';
+                                    table += '<label><b>'+f+'&nbsp('+dataJson.details[f].length+'options)'
+                                       +'</b></label></td><td>';
+                                    var show_options = Math.min(max_option, options);
+                                    for(var i=0; i<show_options; i++)
                                     {
-                                        table += '<td>'+dataJson.details[f][i]+'</td>';
+                                        table += ('*'+dataJson.details[f][i]+'&nbsp');
                                     }
-                                    table += '</tr>';
+                                    table += '</td><td>';
+                                    if (options>1)
+                                        table += '<input id="group_check" type=checkbox>';
+                                    table += '</td></tr>';
                                 }
+                                table += '<tr><td><label><input type="radio" name="factor"><b>Default</b></label><td>\
+                                          <td><i>recover default factors</i></td></tr>';
                                 table += '</tbody></table>';
                                 _factor_dialog = $('<div id="facter-list" style="font-size: 12px">'+
                                     table+'<input type="button" value="OK" onclick="DC_026887848.changeFacet();"></div>');
