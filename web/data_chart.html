@@ -567,36 +567,24 @@
                     var mygeneReps = this.mygeneReps;
                     var gene = this.geneID;
                     $("#datasetName a").attr('href', "/dataset/meta/"+ds+"/");
+                    var url = "/dataset/full-data/"+ds+"/gene/"+gene+"/";
                     if(facet != null){
-                        var url = "/dataset/meta/"+ds+"/?facet="+facet;
+                        var url += "?facet="+facet;
                         if(group) url += '&group=on';
                     }
-                    else
-                        var url = "/dataset/meta/"+ds+"/";
-                    $.getJSON(url, function(metaJson, code) {
+                    $.getJSON(url, function(dataJson, code) {
                         if (code != "success") {
                             // Error getting json from server
                             DCCG.buildCanvasError(DC_026887848.getCanvas());
                         } else {
-                            if(metaJson.detail.owner=='arrayexpress_sid')
+                            if (dataJson.code != 0)
+                                 DCCG.buildCanvasError(DC_026887848.getCanvas());
+                            if(dataJson.detail.owner=='arrayexpress_sid')
                             {
-                                //set go to Array Express link
                                 $("#go-ae a").attr('href', "http://www.ebi.ac.uk/arrayexpress/experiments/"+metaJson.detail.geo_gse_id+"/");
                                 $("#go-ae").show();
                             }
-                            // Dataset values
-                            var prox_url = "/dataset/data/"+ds+"/gene/"+gene+"/";
-                            $.getJSON(prox_url, function(dataJson, code) {
-                                if (code != "success") {
-                                    DCCG.buildCanvasError(DC_026887848.getCanvas());
-                                } else {
-                                    // Send dataset factors, values
-                                    if (metaJson.code != 0 || dataJson.code != 0)
-                                        DCCG.buildCanvasError(DC_026887848.getCanvas());
-                                    else
-                                        DC_026887848.setProbeData(metaJson, dataJson);
-                                }
-                            });
+                            DC_026887848.setProbeData(dataJson.details);
                         }
                     });
                 },
@@ -615,10 +603,10 @@
                 /* setProbeData -- Call this after downloading json data for new group of probesets. It will
                  * condition the data and perform minor stat analysis.
                  */
-                setProbeData : function() {
+                setProbeData : function(dataJson) {
                     // Populate dataset metadata fields in plugin
-                    var dsMetadata = arguments[0]['detail'];
-                    var dsValues = arguments[1]['detail'];
+                    var dsMetadata = dataJson;
+                    var dsValues = dataJson.faceted_values;
                     var dsName = dsMetadata["name"];
                     DC_026887848.dsName = dsName;
                     $("#datasetName a").text(dsName);
@@ -698,7 +686,7 @@
                     var probeBox = document.getElementById("DC_026887848_probe");
 
                     // Iterate through probe data hashes
-                    var probeList = dsValues.probeset_list;
+                    var probeList = dsValues;
                     if (probeList.length == 0) {
                         DC_026887848.handleNoData();
                         return;
@@ -755,13 +743,13 @@
                                     if (!sampDataIndex) {
                                         // Extra properties, not samples
                                         delete sampKeyHash[sampName];
-                                        continue
+                                        continue;
                                     }
 
                                     //var sampData = probeVals.slice(sampDataRange[0], sampDataRange[1]+1);
                                     var sampData = [];
                                     for (var r = 0; r < sampDataIndex.length; r++) {
-                                        sampData.push(probeVals[sampDataIndex[r]])
+                                        sampData.push(probeVals[sampDataIndex[r]]);
                                     }
                                     var sampDataSum = 0;
 
@@ -868,7 +856,7 @@
 
                         // Sort samples
                         this.probeData[pID].sort(function(a, b) {
-                            return a[DC_026887848.sortFactor] - b[DC_026887848.sortFactor]
+                            return a[DC_026887848.sortFactor] - b[DC_026887848.sortFactor];
                         });
                     }
                     if (ctx != null) {
