@@ -36,7 +36,7 @@ def get_ds_factors_keys(ds, factor_by=None, group_up=False):
     i = 1
     if factor_by is not None:
         fvs = []
-        if group_up is None:
+        if not group_up:
             t = {}
             interval = len(ds.metadata['factors'])
     for f in ds.metadata['factors']:
@@ -51,7 +51,7 @@ def get_ds_factors_keys(ds, factor_by=None, group_up=False):
             if v not in fvs:
                 fvs.append(v)
             color_idx = fvs.index(v)
-            if group_up is not None:
+            if group_up:
                 order_idx = fvs.index(v)
             else:
                 if color_idx in t:
@@ -83,7 +83,7 @@ def get_ds_factors_keys(ds, factor_by=None, group_up=False):
         factors.append({'name': name, 'order_idx': order_idx,
                         'color_idx': color_idx})
     # compact order
-#     if factor_by is not None and group_up is None:
+#     if factor_by is not None and not group_up:
 #          for e in factors:
     return factors
 
