@@ -1127,29 +1127,35 @@
                             {
                                 var table = '<table style="width:100%"><tbody>';
                                 var max_option = 5;
-                                for(var f in dataJson.details)
+                                var bg;
+                                for(var f=0; f<dataJson.details.length; f++)
                                 {
                                     var options = dataJson.details[f].length;
-                                    table += '<tr><td>';
+                                    if(f%2 == 0) bg = '#eee'; else bg = '#ddd';
+                                    table += '<tr style="height:20px; background:'+bg+'"><td style="padding:2px">';
                                     if (options>1)
                                          table += '<input type="radio" name="factor">';
-                                    table += '<label><b>'+f+'&nbsp('+dataJson.details[f].length+'options)'
-                                       +'</b></label></td><td>';
+                                    table += '<label><b>'+f+'&nbsp('+dataJson.details[f].length+'&nbspoptions)'
+                                       +'</b></label></td><td style="padding:2px">';
                                     var show_options = Math.min(max_option, options);
                                     for(var i=0; i<show_options; i++)
                                     {
                                         table += ('*'+dataJson.details[f][i]+'&nbsp');
                                     }
-                                    table += '</td><td>';
+                                    table += '</td><td style="padding:2px">';
                                     if (options>1)
-                                        table += '<label>group</label><input id="group_check" type=checkbox>';
+                                        table += '<label>Group</label>&nbsp;<input id="group_check" type=checkbox>';
                                     table += '</td></tr>';
                                 }
-                                table += '<tr><td><label><input type="radio" name="factor"><b>Default</b></label></td>\
-                                          <td><i>recover default factors</i></td></tr>';
+                                if(bg == '#eee') bg='#ddd'; else bg='#eee';
+                                table += '<tr style="height:20px; background:'+bg+
+                                    '"><td style="padding:2px"><label><input type="radio" name="factor">\
+                                    <b>Default</b></label></td>\
+                                    <td style="padding:2px"><i>recover default factors</i></td></tr>';
                                 table += '</tbody></table>';
                                 _factor_dialog = $('<div id="facter-list" style="font-size: 12px">'+
-                                    table+'<input type="button" value="OK" onclick="DC_026887848.changeFacet();"></div>');
+                                    table+'<input type="button" value="OK" onclick="DC_026887848.changeFacet();"\
+                                        style="margin-left: 45%; width: 40px; margin-top: 20px;"></div>');
                                 $('#datasetFactors').show();
                             }
                         }
