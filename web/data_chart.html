@@ -668,6 +668,9 @@
                                 max_txt_len = txt_len;
                             };
                         }
+                        this.probeData[e].sort(function(a, b) {
+                            return a['order_idx'] - b['order_idx'];
+                        });
                         this.probeData[e].maxTxtLen = max_txt_len;
                         this.probeData[e].maxVal = max_val;
                         this.probeData[e].minVal = min_val;
