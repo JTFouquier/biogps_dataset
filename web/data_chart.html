@@ -606,7 +606,7 @@
                 setProbeData : function(dataJson) {
                     // Populate dataset metadata fields in plugin
                     var dsMetadata = dataJson;
-                    var dsValues = dataJson.faceted_values;
+                    var probeList = dataJson.faceted_values;
                     var dsName = dsMetadata["name"];
                     DC_026887848.dsName = dsName;
                     $("#datasetName a").text(dsName);
@@ -631,66 +631,11 @@
                         $("#datasetSourceContainer").hide();
                     }
 
-                    // Combine json results from dataset factors and values queries
-                    var minVal = 0;
-                    var maxVal = 0;
-
-                    // Determine replicates, unique factors across samples
-                    var _replicates = {};
-                    // {"Kidney": [Pos1, Pos2, ...]}
-                    var _dsFactors = dsMetadata["factors"];
-                    var _sortFac = dsMetadata["display_params"]["sort"][0];
-                    if (!_sortFac) {
-                        DC_026887848.sortFactor = "";
-                    } else {
-                        DC_026887848.sortFactor = _sortFac;
-                    }
-                    var factorGroups = {};
-                    // {"title": ["In vitro..."], "Time": ["1hr", "1day"]}
-                    for (var i = 0; i < _dsFactors.length; i++) {
-                        for (var samp in _dsFactors[i]) {
-                            var sh = _dsFactors[i][samp];
-                            // Replicates
-                            var repName = samp;
-                            if (_replicates.hasOwnProperty(sh['order_idx'])) {
-                                // Update last position of this replicate
-                                _replicates[repName].push(i);
-                            } else {
-                                _replicates[repName] = [i];
-                            }
-
-                            // Factors
-                            for (var fac in sh) {
-                                if (factorGroups.hasOwnProperty(fac)) {
-                                    if ($.inArray(sh[fac], factorGroups[fac]) == -1) {
-                                        // New value found for factor
-                                        factorGroups[fac].push(sh[fac]);
-                                    }
-                                } else {
-                                    factorGroups[fac] = [sh[fac]];
-                                }
-                            }
-                        }
-                    }
-                    // Ignore factors without variation
-                    var uniqFactors = new Array();
-                    for (var i in factorGroups) {
-                        if (factorGroups[i].length > 1) {
-                            uniqFactors.push(i);
-                        }
-                    }
-
-                    // Combine factors and values
-                    this.probeData = {};
-                    // {"1007_s_at": [{"sample_id": "GSM345", "title": "ABC", "value": 2.7}, {}, ...]}
-                    var probeBox = document.getElementById("DC_026887848_probe");
-
-                    // Iterate through probe data hashes
-                    var probeList = dsValues;
-                    if (probeList.length == 0) {
+                    if(Object.keys(dsValues).length==0)
+                    {
                         DC_026887848.handleNoData();
                         return;
-                    } else {
+                    }else {
                         // In case previous dataset/gene combo had no data, clean up/reset
                         $(".ds-error").remove();
                         var containers = DC_026887848.tabContentContainerIDs;
@@ -699,6 +644,21 @@
                             _content.show();
                         }
                     }
+
+                    this.probeData = {};
+                    for(var e in probeList)
+                    {
+                        var v = probeList[e];
+                        this.probeData[v] = [];
+                        for(var item in v)
+                        {
+                            this.probeData[v].push({'Mark':false, 'color_idx':item.color_idx,
+                            'column_name':item.name, 'mean':item.value, 'value':item.value,
+                            'order_idx':item.order_idx, 'stderr':item.dev, 'title':item.name});
+                        }
+                    }
+                    // {"1007_s_at": [{"sample_id": "GSM345", "title": "ABC", "value": 2.7}, {}, ...]}
+                    var probeBox = document.getElementById("DC_026887848_probe");
 
                     if (ctx != null) {
                         this.searchGraph(true);
