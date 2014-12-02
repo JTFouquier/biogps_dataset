@@ -1108,7 +1108,10 @@
                     var facet = $('#facter-list input:checked').attr('facet');
                     var group = $('#facter-list input:checked').parents('tr').
                         find('input:checkbox').attr('checked');
-                    this.loadProbes(facet, group);
+                    if(facet)
+                        this.loadProbes(facet, group);
+                    else
+                        this.loadProbes();
                 },
                 loadProbes : function(facet, group) {
                     // Clear out old probe data, get new
