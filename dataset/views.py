@@ -492,14 +492,15 @@ def dataset_full_data(request, ds_id, gene_id):
         return general_json_response(
             GENERAL_ERRORS.ERROR_BAD_ARGS,
             "Dataset with this id does not exist.")
-    data_lists = get_dataset_data(ds, gene_id=gene_id)['data'][0]
+    data_lists = get_dataset_data(ds, gene_id=gene_id)['data']
     facet = request.GET.get('facet', None)
     group = request.GET.get('group', 'off')
     group = True if group == 'on' else False
     factors = get_ds_factors_keys(ds, facet, group)
     res = {}
-    for r in data_lists:
-        vals = [float(item) for item in data_lists[r]['values']]
+    for e in data_lists:
+        r = e.values()[0]
+        vals = [float(item) for item in e[r]['values']]
         res[r] = prepare_chart_data(vals, factors)
     return general_json_response(detail=res)
 
