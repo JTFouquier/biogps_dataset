@@ -7,6 +7,9 @@ urlpatterns = patterns(
         name='dataset meta'),
     url(r'^data/(?P<ds_id>.+)/gene/(?P<gene_id>.+)/$',
         views.dataset_data, name='dataset data'),
+    # return meta data, value together with support for facet and grouping
+    url(r'^full-data/(?P<ds_id>.+)/gene/(?P<gene_id>.+)/$',
+        views.dataset_full_data, name='dataset full data'),
     url(r'^chart/(?P<ds_id>.+)/reporter/(?P<reporter_id>.+)/$',
         views.dataset_chart, name='dataset chart'),
     url(r'^csv/(?P<ds_id>.+)/gene/(?P<gene_id>.+)/$',
