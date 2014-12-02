@@ -36,6 +36,9 @@ def get_ds_factors_keys(ds, factor_by=None, group_up=False):
     i = 1
     if factor_by is not None:
         fvs = []
+        if group_up is None:
+            t = {}
+            interval = len(ds.metadata['factors'])
     for f in ds.metadata['factors']:
         name = order_idx = color_idx = None
 
@@ -48,11 +51,15 @@ def get_ds_factors_keys(ds, factor_by=None, group_up=False):
             if v not in fvs:
                 fvs.append(v)
             color_idx = fvs.index(v)
-            if group_up:
+            if group_up is not None:
                 order_idx = fvs.index(v)
             else:
-                order_idx = i
-                i = i + 1
+                if color_idx in t:
+                    order_idx = t[color_idx]+1
+                else:
+                    existed = len(t.keys())
+                    order_idx = interval*existed+1
+                t[color_idx] = order_idx
         # by 'order_idx' and 'color_idx' (default dataset)
         elif 'order_idx' in content and 'color_idx' in content:
                 order_idx = content['order_idx']
@@ -75,6 +82,9 @@ def get_ds_factors_keys(ds, factor_by=None, group_up=False):
                 name = f.keys()[0]
         factors.append({'name': name, 'order_idx': order_idx,
                         'color_idx': color_idx})
+    # compact order
+#     if factor_by is not None and group_up is None:
+#          for e in factors:
     return factors
 
 
@@ -504,7 +514,9 @@ def dataset_full_data(request, ds_id, gene_id):
     for e in data_lists:
         r = e.keys()[0]
         vals = [float(item) for item in e[r]['values']]
-        res[r] = prepare_chart_data(vals, factors)
+        back = prepare_chart_data(vals, factors)
+        # if group
+        res[r] = 
     ret = _contruct_meta(ds)
     ret.update({'faceted_values': res})
     return general_json_response(detail=ret)
