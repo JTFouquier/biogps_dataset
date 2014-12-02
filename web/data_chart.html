@@ -646,6 +646,7 @@
                     }
 
                     this.probeData = {};
+                    var probeBox = document.getElementById("DC_026887848_probe");
                     for(var e in probeList)
                     {
                         var v = probeList[e];
@@ -656,9 +657,18 @@
                             'column_name':item.name, 'mean':item.value, 'value':item.value,
                             'order_idx':item.order_idx, 'stderr':item.dev, 'title':item.name});
                         }
+
+                        var o = document.createElement("option");
+                        o.text = e;
+                        try {
+                            probeBox.add(o,null); // standards compliant
+                        }
+                        catch(ex){
+                            probeBox.add(o); // IE only
+                        }
+                        probeBox.options[0].selected = true;
                     }
-                    // {"1007_s_at": [{"sample_id": "GSM345", "title": "ABC", "value": 2.7}, {}, ...]}
-                    var probeBox = document.getElementById("DC_026887848_probe");
+
                     var ctx = this.getCanvas();
                     if (ctx != null) {
                         this.searchGraph(true);
