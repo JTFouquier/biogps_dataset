@@ -569,7 +569,7 @@
                     $("#datasetName a").attr('href', "/dataset/meta/"+ds+"/");
                     var url = "/dataset/full-data/"+ds+"/gene/"+gene+"/";
                     if(facet != null){
-                        var url += "?facet="+facet;
+                        url += ("?facet="+facet);
                         if(group) url += '&group=on';
                     }
                     $.getJSON(url, function(dataJson, code) {
