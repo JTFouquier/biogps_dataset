@@ -1128,10 +1128,14 @@
                                 var table = '<table style="width:100%"><tbody>';
                                 var max_option = 5;
                                 var bg;
-                                for(var f=0; f<dataJson.details.length; f++)
+                                var k=0;
+                                for(var f in dataJson.details)
                                 {
+                                    if(dataJson.details.hasOwnProperty(f)==false)
+                                        continue;
                                     var options = dataJson.details[f].length;
-                                    if(f%2 == 0) bg = '#eee'; else bg = '#ddd';
+                                    if(k%2 == 0) bg = '#eee'; else bg = '#ddd';
+                                    k++;
                                     table += '<tr style="height:20px; background:'+bg+'"><td style="padding:2px">';
                                     if (options>1)
                                          table += '<input type="radio" name="factor">';
