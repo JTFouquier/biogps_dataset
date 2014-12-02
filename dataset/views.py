@@ -502,7 +502,9 @@ def dataset_full_data(request, ds_id, gene_id):
     for e in data_lists:
         r = e.keys()[0]
         vals = [float(item) for item in e[r]['values']]
-        res[r] = prepare_chart_data(vals, factors)
+        back = prepare_chart_data(vals, factors)
+        import copy
+        res[r] = copy.deepcopy(back)
     ret = _contruct_meta(ds)
     ret.update({'faceted_values': res})
     return general_json_response(detail=ret)
