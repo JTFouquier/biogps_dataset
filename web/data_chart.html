@@ -581,7 +581,7 @@
                                  DCCG.buildCanvasError(DC_026887848.getCanvas());
                             if(dataJson.details.owner=='arrayexpress_sid')
                             {
-                                $("#go-ae a").attr('href', "http://www.ebi.ac.uk/arrayexpress/experiments/"+metaJson.detail.geo_gse_id+"/");
+                                $("#go-ae a").attr('href', "http://www.ebi.ac.uk/arrayexpress/experiments/"+dataJson.details.geo_gse_id+"/");
                                 $("#go-ae").show();
                             }
                             DC_026887848.setProbeData(dataJson.details);
