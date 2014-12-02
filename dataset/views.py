@@ -485,6 +485,25 @@ def dataset_data(request, ds_id, gene_id):
                         content_type="application/json")
 
 
+@require_http_methods(["GET"])
+def dataset_full_data(request, ds_id, gene_id):
+    ds = adopt_dataset(ds_id)
+    if ds is None:
+        return general_json_response(
+            GENERAL_ERRORS.ERROR_BAD_ARGS,
+            "Dataset with this id does not exist.")
+    data_lists = get_dataset_data(ds, gene_id=gene_id)['data'][0]
+    facet = request.GET.get('facet', None)
+    group = request.GET.get('group', 'off')
+    group = True if group == 'on' else False
+    factors = get_ds_factors_keys(ds, facet, group)
+    res = {}
+    for r in data_lists:
+        vals = [float(item) for item in data_lists[r]['values']]
+        res[r] = prepare_chart_data(vals, factors)
+    return general_json_response(detail=res)
+
+
 def dataset_default(request):
     gene_id = request.GET.get('gene', None)
     if gene_id is None:
