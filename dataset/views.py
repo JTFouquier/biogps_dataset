@@ -164,6 +164,8 @@ def _avg_with_deviation(li):
 
 
 def prepare_chart_data(val_list, factors):
+    import copy
+    factors = copy.deepcopy(factors)
     for idx, e in enumerate(factors):
         e['value'] = val_list[idx]
     factors.sort(key=lambda e: e['order_idx'], reverse=True)
