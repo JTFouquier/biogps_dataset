@@ -668,6 +668,24 @@
                                 max_txt_len = txt_len;
                             };
                         }
+
+                        //calculate median
+                        var ln = probeList[e].length;
+                        if(ln>0)
+                        {
+                            probeList[e].sort(function(a,b){return a.value>b.value?1:-1;});
+
+                            if(ln%2 == 0)
+                            {
+                                median = (probeList[e][ln/2]+probeList[e][ln/2-1])/2;
+                            }
+                            else
+                            {
+                                median = probeList[e][Math.floor(ln/2)];
+                            }
+                            this.probeData[e].Median = median;
+                        }
+
                         this.probeData[e].sort(function(a, b) {
                             return a['order_idx'] - b['order_idx'];
                         });
@@ -695,6 +713,7 @@
                         this.probeData[e].zoomMaxVal = max_val;
                         this.probeData[e].zoomMinVal = min_val;
 
+                        this.probeData[e].id = e;
                         //init reporter drop down
                         var o = document.createElement("option");
                         o.text = e;
