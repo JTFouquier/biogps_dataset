@@ -673,15 +673,16 @@
                         var ln = probeList[e].length;
                         if(ln>0)
                         {
+                            var median;
                             probeList[e].sort(function(a,b){return a.value>b.value?1:-1;});
 
                             if(ln%2 == 0)
                             {
-                                median = (probeList[e][ln/2]+probeList[e][ln/2-1])/2;
+                                median = (probeList[e][ln/2].value+probeList[e][ln/2-1].value)/2;
                             }
                             else
                             {
-                                median = probeList[e][Math.floor(ln/2)];
+                                median = probeList[e][Math.floor(ln/2)].value;
                             }
                             this.probeData[e].Median = median;
                         }
