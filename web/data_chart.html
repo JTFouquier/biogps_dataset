@@ -665,7 +665,7 @@
                             //max and min value (with regard to err value)
                             var f_v;
                             if(item.value>0) f_v = item.value+item.dev;
-                            if(item.value<0) f_v = item.value+item.dev;
+                            if(item.value<0) f_v = item.value-item.dev;
                             if(f_v>max_with_err) max_with_err = f_v;
                             if(f_v<min_with_err) min_with_err = f_v;
                             // Calculate maximum text length
