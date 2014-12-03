@@ -652,7 +652,7 @@
                     {
                         var v = probeList[e];
                         this.probeData[e] = [];
-                        var max_val=min_val=max_txt_len=0;
+                        var max_with_err=min_with_err=max_val=min_val=max_txt_len=0;
                         for(var j=0; j<v.length; j++)
                         {
                             var item = v[j];
@@ -662,6 +662,12 @@
                             //max and min value in array
                             if(item.value>max_val) max_val=item.value;
                             if(item.value<min_val) min_val=item.value;
+                            //max and min value (with regard to err value)
+                            var f_v;
+                            if(item.value>0) f_v = item.value+item.dev;
+                            if(item.value<0) f_v = item.value+item.dev;
+                            if(f_v>max_with_err) max_with_err = f_v;
+                            if(f_v<min_with_err) min_with_err = f_v;
                             // Calculate maximum text length
                             var txt_len = (ctx == null ? item.name.length : DCCG.textLen(ctx, item.name));
                             if (txt_len > max_txt_len) {
@@ -694,25 +700,25 @@
                         this.probeData[e].maxVal = max_val;
                         this.probeData[e].minVal = min_val;
 
-                        if (max_val <= 0) {
-                            max_val = 1;
+                        if (max_with_err <= 0) {
+                            max_with_err = 1;
                         } else {
-                            var tmp = Math.pow(10, Math.floor(Math.log(max_val) / Math.log(10)));
-                            max_val = (Math.floor(max_val / tmp) + 1) * tmp;
+                            var tmp = Math.pow(10, Math.floor(Math.log(max_with_err) / Math.log(10)));
+                            max_with_err = (Math.floor(max_with_err / tmp) + 1) * tmp;
                         }
-                        if (min_val >= 0) {
-                            min_val = 0;
+                        if (min_with_err >= 0) {
+                            min_with_err = 0;
                         } else {
-                            min_val = min_val * -1;
-                            var tmp = Math.pow(10, Math.floor(Math.log(min_val) / Math.log(10)));
-                            min_val = (Math.floor(min_val / tmp) + 1) * tmp;
-                            min_val = min_val * -1;
+                            min_with_err = min_with_err * -1;
+                            var tmp = Math.pow(10, Math.floor(Math.log(min_with_err) / Math.log(10)));
+                            min_with_err = (Math.floor(min_with_err / tmp) + 1) * tmp;
+                            min_with_err = min_with_err * -1;
                         }
 
-                        this.probeData[e].roundedMaxVal = max_val;
-                        this.probeData[e].roundedMinVal = min_val;
-                        this.probeData[e].zoomMaxVal = max_val;
-                        this.probeData[e].zoomMinVal = min_val;
+                        this.probeData[e].roundedMaxVal = max_with_err;
+                        this.probeData[e].roundedMinVal = min_with_err;
+                        this.probeData[e].zoomMaxVal = max_with_err;
+                        this.probeData[e].zoomMinVal = min_with_err;
 
                         this.probeData[e].id = e;
                         //init reporter drop down
