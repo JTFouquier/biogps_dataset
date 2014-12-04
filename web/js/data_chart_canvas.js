@@ -93,7 +93,7 @@ DCCG = {
         var chartx = max_text_length+2+this.BAR_TICK_LENGTH;
         var charty = chart_header; //The y value that the chart should start at.
 
-        ctx.canvas.width = $("#dataChartTabPanel").width();
+        ctx.canvas.width = $("#DC_026887848_dataset_canvas").width();
         var chart_width = ctx.canvas.width - chartx - 25;
 
         //Need to have a more robust rounding algorithm - this is used to round all datapoint values.
