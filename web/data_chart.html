@@ -1006,7 +1006,7 @@
                                     table += '<tr style="height:20px; background:'+bg+'"><td style="padding:2px">';
                                     if (options>1)
                                          table += '<input type="radio" name="factor" facet="'+f+'">';
-                                    table += '<label><b>'+f+'&nbsp('+dataJson.details[f].length+'&nbspoptions)'
+                                    table += '<label><b>'+f+'&nbsp('+dataJson.details[f].length+'&nbsp values)'
                                        +'</b></label></td><td style="padding:2px">';
                                     var show_options = Math.min(max_option, options);
                                     for(var i=0; i<show_options; i++)
@@ -1022,7 +1022,7 @@
                                 table += '<tr style="height:20px; background:'+bg+
                                     '"><td style="padding:2px"><label><input type="radio" name="factor">\
                                     <b>Default</b></label></td>\
-                                    <td style="padding:2px"><i>recover default factors</i></td></tr>';
+                                    <td style="padding:2px"><i>remove all grouping by factor</i></td></tr>';
                                 table += '</tbody></table>';
                                 _factor_dialog = $('<div id="facter-list" style="font-size: 12px">'+
                                     table+'<input type="button" value="OK" onclick="DC_026887848.changeFacet(this);"\
