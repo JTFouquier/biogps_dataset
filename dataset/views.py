@@ -243,11 +243,16 @@ def dataset_chart(request, ds_id, reporter_id):
     # start render part
     import numpy as np
     color_total = len(settings.BAR_COLORS)
-    vals, devs, colors = [], [], []
+    vals, devs, colors, val_dev = [], [], [], []
     for idx, e in enumerate(back):
         vals.append(e['value'])
         devs.append(e['dev'])
+        if e['value'] >= 0:
+            val_dev.append(e['value']+e['dev'])
+        else:
+            val_dev.append(e['value']-e['dev'])
         colors.append(settings.BAR_COLORS[e['color_idx'] % color_total])
+
     y_pos = np.arange(len(back))
     import matplotlib.pyplot as plt
     fig, ax = plt.subplots()
@@ -269,8 +274,8 @@ def dataset_chart(request, ds_id, reporter_id):
             xerr=[d_n, d_p], ecolor='#CCCCCC')
     # eliminate top padding
     plt.axis('tight')
-    # x axis range, have some padding space
-    li = [max(vals)*1.1, 0, min(vals)]
+    # x axis range, have some padding space, and take standard dev into account
+    li = [max(val_dev), 0, min(val_dev)]
     plt.xlim([min(li)*1.1, max(li)*1.1])
 
     # x=0, draw y axis
