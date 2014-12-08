@@ -228,6 +228,7 @@ class BiogpsDatasetPlatform(models.Model):
     """Model definition for BiogpsDatasetPlatform"""
     platform = models.CharField(max_length=100)
     reporters = JSONField(blank=False, editable=True)
+    name = models.CharField(max_length=256)
 
     class Meta:
         verbose_name_plural = "Dataset Platform"
