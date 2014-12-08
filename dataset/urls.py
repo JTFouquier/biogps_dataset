@@ -21,8 +21,7 @@ urlpatterns = patterns(
     url(r'^search/all/$', views.dataset_search_all,
         name='dataset search all'),
     url(r'^default/$', views.dataset_default, name='dataset default'),
-    url(r'^correlation/(?P<ds_id>.+)/reporter/(?P<reporter_id>.+)/\
-    min/(?P<min_corr>.+)/$',
+    url(r'^correlation/(?P<ds_id>.+)/reporter/(?P<reporter_id>.+)/min/(?P<min_corr>.+)/$',
         views.dataset_correlation,
         name='dataset correlation'),
     url(r'^factors/(?P<ds_id>.+)/$', views.dataset_factors,
