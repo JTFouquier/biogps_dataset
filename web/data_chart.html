@@ -51,6 +51,8 @@
                 mygeneReps : "NM_199501,XM_006240778,XR_355212,1378874_at,1394320_at,D28753_i_at,D28754_s_at,362817",
                 sortFactor : "",
                 tabContentContainerIDs : ["DC_026887848_dataset_canvas", "DC_026887848_probe_set_image", "DC_026887848_correlationContainer", "DC_026887848_downloadContainer"],
+                facet : null,
+                group : false,
 
                 init : function() {
                     this.loadTabs();
@@ -118,7 +120,17 @@
                     }
                     var datarowname = "" + pval;
                     var datasetid = "" + this.dsID;
-                    document.images["DC_026887848_probe_set_image"].src = ('/dataset/chart/'+datasetid+'/reporter/' + datarowname+'/');
+
+                    var url = '/dataset/chart/'+datasetid+'/reporter/' + datarowname+'/';
+                    if(this.facet!= null)
+                    {
+                        url += ('?facet='+this.facet);
+                        if(this.group)
+                        {
+                            url += '&group=on';
+                        }
+                    }
+                    document.images["DC_026887848_probe_set_image"].src = url;
                 },
 
                 setProbe : function() {
@@ -541,7 +553,7 @@
                     }
                 },
 
-                getProbeData : function(facet, group) {
+                getProbeData : function() {
                     // Make two queries to SL - one for dataset metadata (factors),
                     // one for dataset values (probeset_list)
                     if (DC_026887848.dsCanvas == true) {
@@ -568,7 +580,7 @@
                     var gene = this.geneID;
                     $("#datasetName a").attr('href', "/dataset/meta/"+ds+"/");
                     var url = "/dataset/full-data/"+ds+"/gene/"+gene+"/";
-                    if(facet != null){
+                    if(this.facet != null){
                         url += ("?facet="+facet);
                         if(group) url += '&group=on';
                     }
@@ -736,6 +748,7 @@
                     if (ctx != null) {
                         this.searchGraph(true);
                     }
+                    //static image
                     this.setProbeImage();
                     this.setRawLink();
                 },
@@ -970,10 +983,15 @@
                     var facet = $('#facter-list input:checked').attr('facet');
                     var group = $('#facter-list input:checked').parents('tr').
                         find('input:checkbox').attr('checked');
-                    if(facet)
-                        this.loadProbes(facet, group);
-                    else
-                        this.loadProbes();
+                    if(facet){
+                        this.facet = facet;
+                        this.group = group;
+                    }
+                    else{
+                        this.facet = null;
+                        this.group = false;
+                    }
+                    this.loadProbes();
                 },
                 loadFactors : function(){
                     //get factors
@@ -1027,10 +1045,10 @@
                         }
                     });
                 },
-                loadProbes : function(facet, group) {
+                loadProbes : function() {
                     // Clear out old probe data, get new
                     this.clearProbeData();
-                    this.getProbeData(facet, group);
+                    this.getProbeData();
                     // set link to this dataset and gene page
                     var _url = window.location.href.split('?')[0]+
                         '?dataset='+this.dsID+'&gene='+this.geneID;
