@@ -994,7 +994,7 @@
                     this.loadProbes();
                 },
                 _clear_factor_select : function (obj){
-                    $(obj).parents('table').find('input:checkbox').attr('checked', false);
+                    $(obj).parents('tr').siblings().find('input:checkbox').attr('checked', false);
                 },
                 loadFactors : function(){
                     //get factors
