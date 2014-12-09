@@ -1044,8 +1044,9 @@
                                     var show_options = Math.min(max_option, options);
                                     for(var i=0; i<show_options; i++)
                                     {
-                                        table += ('●'+dataJson.details[f][i]+'&nbsp&nbsp');
+                                        table += ('i+1)'+dataJson.details[f][i]+'&nbsp&nbsp');
                                     }
+                                    if(show_options < options) table += '...';
                                     table += '</td><td style="padding:2px">';
                                     if (options>1)
                                         table += '<label>Group</label>&nbsp;<input id="group_check" type="checkbox" disabled="disabled">';
