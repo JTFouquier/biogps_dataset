@@ -582,7 +582,7 @@
                     var url = "/dataset/full-data/"+ds+"/gene/"+gene+"/";
                     if(this.facet != null){
                         url += ("?facet="+this.facet);
-                        if(group) url += '&group=on';
+                        if(this.group) url += '&group=on';
                     }
                     $.getJSON(url, function(dataJson, code) {
                         if (code != "success") {
