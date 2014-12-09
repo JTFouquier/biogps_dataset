@@ -1008,6 +1008,8 @@
                 },
                 _clear_factor_select : function (obj){
                     $(obj).parents('tr').siblings().find('input:checkbox').attr('checked', false);
+                    $(obj).parents('tr').siblings().find('input:checkbox').attr('disabled', 'disabled');
+                    $(obj).parents('tr').find('input:checkbox').attr('disabled', false);
                 },
                 loadFactors : function(){
                     //get factors
@@ -1042,11 +1044,11 @@
                                     var show_options = Math.min(max_option, options);
                                     for(var i=0; i<show_options; i++)
                                     {
-                                        table += ('*'+dataJson.details[f][i]+'&nbsp');
+                                        table += ('●'+dataJson.details[f][i]+'&nbsp&nbsp');
                                     }
                                     table += '</td><td style="padding:2px">';
                                     if (options>1)
-                                        table += '<label>Group</label>&nbsp;<input id="group_check" type=checkbox>';
+                                        table += '<label>Group</label>&nbsp;<input id="group_check" type="checkbox" disabled="disabled">';
                                     table += '</td></tr>';
                                 }
                                 if(bg == '#eee') bg='#ddd'; else bg='#eee';
