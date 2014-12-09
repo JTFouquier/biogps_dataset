@@ -610,8 +610,7 @@
                     }
                     this.probeData = null;
                     this.setCanvasMouseMap(null);
-                    this.group = false;
-                    this.facet = null;
+                    this.clearFacet();
                 },
 
                 /* setProbeData -- Call this after downloading json data for new group of probesets. It will
@@ -1000,6 +999,12 @@
                     this.probeData = null;
                     this.setCanvasMouseMap(null);
                     this.getProbeData();
+                },
+                clearFacet : function(){
+                    this._factor_dialog = '';
+                    this.group = false;
+                    this.facet = null;
+                    $('#datasetFactors').hide();
                 },
                 _clear_factor_select : function (obj){
                     $(obj).parents('tr').siblings().find('input:checkbox').attr('checked', false);
