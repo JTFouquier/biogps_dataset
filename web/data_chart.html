@@ -659,6 +659,8 @@
 
                     this.probeData = {};
                     var probeBox = document.getElementById("DC_026887848_probe");
+                    var refresh_rep = false;
+                    if(probeBox.options.length=0) refresh_rep = true;
                     var ctx = this.getCanvas();
                     for(var e in probeList)
                     {
@@ -731,18 +733,20 @@
                         this.probeData[e].roundedMinVal = min_with_err;
                         this.probeData[e].zoomMaxVal = max_with_err;
                         this.probeData[e].zoomMinVal = min_with_err;
-
                         this.probeData[e].id = e;
-                        //init reporter drop down
-                        var o = document.createElement("option");
-                        o.text = e;
-                        try {
-                            probeBox.add(o,null); // standards compliant
+
+                        if(refresh_rep){
+                            //init reporter drop down
+                            var o = document.createElement("option");
+                            o.text = e;
+                            try {
+                                probeBox.add(o,null); // standards compliant
+                            }
+                            catch(ex){
+                                probeBox.add(o); // IE only
+                            }
+                            probeBox.options[0].selected = true;
                         }
-                        catch(ex){
-                            probeBox.add(o); // IE only
-                        }
-                        probeBox.options[0].selected = true;
                     }
 
                     if (ctx != null) {
