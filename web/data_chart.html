@@ -1009,6 +1009,11 @@
                                 var max_option = 5;
                                 var bg;
                                 var k=0;
+
+                                function _clear_select(obj){
+
+                                }
+                                //construct factor dialog
                                 for(var f in dataJson.details)
                                 {
                                     if(dataJson.details.hasOwnProperty(f)==false)
@@ -1018,7 +1023,7 @@
                                     k++;
                                     table += '<tr style="height:20px; background:'+bg+'"><td style="padding:2px">';
                                     if (options>1)
-                                         table += '<input type="radio" name="factor" facet="'+f+'">';
+                                         table += '<input type="radio" name="factor" facet="'+f+'" onclick="_clear_select(this)">';
                                     table += '<label><b>'+f+'&nbsp('+dataJson.details[f].length+'&nbsp values)'
                                        +'</b></label></td><td style="padding:2px">';
                                     var show_options = Math.min(max_option, options);
@@ -1035,11 +1040,12 @@
                                 table += '<tr style="height:20px; background:'+bg+
                                     '"><td style="padding:2px"><label><input type="radio" name="factor">\
                                     <b>Default</b></label></td>\
-                                    <td style="padding:2px"><i>remove all grouping by factor</i></td></tr>';
+                                    <td style="padding:2px"><i>remove all grouping by factor</i></td><td></td></tr>';
                                 table += '</tbody></table>';
                                 _factor_dialog = $('<div id="facter-list" style="font-size: 12px">'+
                                     table+'<input type="button" value="OK" onclick="DC_026887848.changeFacet(this);"\
                                         style="margin-left: 45%; width: 40px; margin-top: 20px;"></div>');
+                                //show 'Show Factors' dialog
                                 $('#datasetFactors').show();
                             }
                         }
