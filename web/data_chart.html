@@ -993,6 +993,9 @@
                     }
                     this.loadProbes();
                 },
+                _clear_factor_select : function (obj){
+
+                },
                 loadFactors : function(){
                     //get factors
                     $.getJSON('/dataset/factors/'+this.dsID+'/', function(dataJson, code) {
@@ -1010,9 +1013,6 @@
                                 var bg;
                                 var k=0;
 
-                                function _clear_select(obj){
-
-                                }
                                 //construct factor dialog
                                 for(var f in dataJson.details)
                                 {
@@ -1023,7 +1023,7 @@
                                     k++;
                                     table += '<tr style="height:20px; background:'+bg+'"><td style="padding:2px">';
                                     if (options>1)
-                                         table += '<input type="radio" name="factor" facet="'+f+'" onclick="_clear_select(this)">';
+                                         table += '<input type="radio" name="factor" facet="'+f+'" onclick="DC_026887848._clear_factor_select(this)">';
                                     table += '<label><b>'+f+'&nbsp('+dataJson.details[f].length+'&nbsp values)'
                                        +'</b></label></td><td style="padding:2px">';
                                     var show_options = Math.min(max_option, options);
