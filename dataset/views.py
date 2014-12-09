@@ -273,7 +273,7 @@ def dataset_chart(request, ds_id, reporter_id):
             d_p.append(0)
             d_n.append(devs[idx])
     ax.barh(y_pos, vals, width, color=colors, edgecolor='none',
-            xerr=[d_n, d_p], ecolor='#CCCCCC')
+            xerr=[d_n, d_p], ecolor='#D2691E')
     # eliminate top padding
     plt.axis('tight')
     # x axis range, have some padding space, and take standard dev into account
