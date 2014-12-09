@@ -1024,7 +1024,7 @@
                             else
                             {
                                 var table = '<table style="width:100%"><tbody>';
-                                var max_option = 5;
+                                var max_option = 10;
                                 var bg;
                                 var k=0;
 
@@ -1044,7 +1044,7 @@
                                     var show_options = Math.min(max_option, options);
                                     for(var i=0; i<show_options; i++)
                                     {
-                                        table += ('i+1)'+dataJson.details[f][i]+'&nbsp&nbsp');
+                                        table += ((i+1)+')'+dataJson.details[f][i]+'&nbsp&nbsp');
                                     }
                                     if(show_options < options) table += '...';
                                     table += '</td><td style="padding:2px">';
