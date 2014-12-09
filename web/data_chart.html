@@ -994,7 +994,7 @@
                     this.loadProbes();
                 },
                 _clear_factor_select : function (obj){
-
+                    $(obj).parents('table').find('input:checkbox').attr('checked', false);
                 },
                 loadFactors : function(){
                     //get factors
@@ -1038,7 +1038,7 @@
                                 }
                                 if(bg == '#eee') bg='#ddd'; else bg='#eee';
                                 table += '<tr style="height:20px; background:'+bg+
-                                    '"><td style="padding:2px"><label><input type="radio" name="factor">\
+                                    '"><td style="padding:2px"><label><input type="radio" name="factor" onclick="DC_026887848._clear_factor_select(this)">\
                                     <b>Default</b></label></td>\
                                     <td style="padding:2px"><i>remove all grouping by factor</i></td><td></td></tr>';
                                 table += '</tbody></table>';
