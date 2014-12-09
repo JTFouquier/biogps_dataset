@@ -951,6 +951,7 @@
                                         if (dsID)
                                             DC_026887848.dsID = dsID;
                                         DC_026887848.setDatasetCookie();
+                                        DC_026887848.loadFactors();
                                         DC_026887848.loadProbes();
                                     }
                                 }
@@ -960,6 +961,7 @@
                         {//dataset changed
                             this.dsID = dsID;
                             this.setDatasetCookie();
+                            DC_026887848.loadFactors();
                             this.loadProbes();
                         }
                     }
@@ -973,14 +975,7 @@
                     else
                         this.loadProbes();
                 },
-                loadProbes : function(facet, group) {
-                    // Clear out old probe data, get new
-                    this.clearProbeData();
-                    this.getProbeData(facet, group);
-                    // set link to this dataset and gene page
-                    var _url = window.location.href.split('?')[0]+
-                        '?dataset='+this.dsID+'&gene='+this.geneID;
-                    $('#link-content').val(_url);
+                loadFactors : function(){
                     //get factors
                     $.getJSON('/dataset/factors/'+this.dsID+'/', function(dataJson, code) {
                         if (code != "success") {
@@ -1031,6 +1026,15 @@
                             }
                         }
                     });
+                },
+                loadProbes : function(facet, group) {
+                    // Clear out old probe data, get new
+                    this.clearProbeData();
+                    this.getProbeData(facet, group);
+                    // set link to this dataset and gene page
+                    var _url = window.location.href.split('?')[0]+
+                        '?dataset='+this.dsID+'&gene='+this.geneID;
+                    $('#link-content').val(_url);
                 },
 
                 loadTabs : function() {
