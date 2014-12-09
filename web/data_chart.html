@@ -991,7 +991,9 @@
                         this.facet = null;
                         this.group = false;
                     }
-                    this.loadProbes();
+                    this.probeData = null;
+                    this.setCanvasMouseMap(null);
+                    this.getProbeData();
                 },
                 _clear_factor_select : function (obj){
                     $(obj).parents('tr').siblings().find('input:checkbox').attr('checked', false);
@@ -1060,7 +1062,6 @@
                         '?dataset='+this.dsID+'&gene='+this.geneID;
                     $('#link-content').val(_url);
                 },
-
                 loadTabs : function() {
                     var start_tab = 1
                     if (this.checkForCanvas()) {
