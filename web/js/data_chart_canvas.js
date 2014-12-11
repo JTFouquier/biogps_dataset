@@ -139,7 +139,7 @@ DCCG = {
         ctx.textAlign = "center";
 
         //Draw other gridlines..
-        var gridlines = this.CalcGridLines(min_val,max_val)
+        var gridlines = this.CalcGridLines(min_val,max_val);
 
         for (var i = 0; i < gridlines.length; i++) {
             if (gridlines[i] == 0) {continue; }; //already drew it
@@ -148,7 +148,7 @@ DCCG = {
             if (gperc >= 0 && gperc <= 1) { //Don't display if we are off the chart bounds.
                 this.drawVertGridLine(ctx,chartx,charty-8,chart_width,gperc,chart_height+8,grid_color);
                 var grid_center = Math.round((chart_width) * gperc);
-                var tmp_format_num = new Number(gridlines[i])
+                var tmp_format_num = new Number(gridlines[i]);
                 ctx.fillText(tmp_format_num.toPrecision(3),chartx + grid_center,grid_text_y);
             }
         }
@@ -686,7 +686,7 @@ DCCG = {
     // pError - the percentage distance that the end of the error bar occurs at.
     // color_idx - The array index of the color used for the bar.
     draw_hbar:function(ctx,xstart,ystart,c_width,pStart,pEnd,pError,color_idx) {
-        if (ctx == null) {return false};
+        if (ctx == null) {return false;};
 
 
         var bHeight = this.BAR_HEIGHT; //height of the bar in pixels.
@@ -698,7 +698,7 @@ DCCG = {
         ctx.closePath();
         ctx.fill();
 
-        if (pStart > pEnd) { return false}; //This is a no no..
+        if (pStart > pEnd) { return false;}; //This is a no no..
 
         //Find the pixel position of the left side of the data bar.
         var bStart = xstart; //assume we are less than the left bound to start.
@@ -752,7 +752,7 @@ DCCG = {
 
                 var bErrorRight = xstart+ c_width;
                 if (pError < 1 && pError > 0) {
-                    bErrorRight = Math.round(xstart + (c_width * pError))
+                    bErrorRight = Math.round(xstart + (c_width * pError));
                 }
                 ctx.fillStyle = "rgba(210,105,30,255)"; //"rgba(0, 0, 0, 1)";
                 ctx.beginPath();
@@ -777,7 +777,7 @@ DCCG = {
 
                 var bErrorLeft = xstart;
                 if (pError < 1 && pError > 0) {
-                    bErrorLeft = Math.round(xstart + (c_width * pError))
+                    bErrorLeft = Math.round(xstart + (c_width * pError));
                 }
                 ctx.fillStyle = "rgba(210,105,30,255)"; //"rgba(0, 0, 0, 1)";
                 ctx.beginPath();

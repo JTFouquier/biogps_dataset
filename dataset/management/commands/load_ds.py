@@ -22,28 +22,26 @@ if settings.CACHE_HTTP_DATA:
 
 class Command(BaseCommand):
 
-    option_list = BaseCommand.option_list + (make_option("-a", "--arrays", \
-      action="store", type="string", dest="array_file",\
+    option_list = BaseCommand.option_list + (make_option("-a", "--arrays",
+      action="store", type="string", dest="array_file",
       help='Specify file containing array types.',),)
-    option_list = option_list + (make_option("-s", "--skip", \
-      action="store", type="string", dest="skip_file", \
+    option_list = option_list + (make_option("-s", "--skip",
+      action="store", type="string", dest="skip_file",
       help='Specify file containing experiments to skip, only \
       works with -a',),)
-    option_list = option_list + (make_option("-t", "--test", action="store",\
+    option_list = option_list + (make_option("-t", "--test", action="store",
       type="string", dest="test", help='Test the specified experiment. \
       No database writing.',),)
-    option_list = option_list + (make_option("-p", "--platform", \
+    option_list = option_list + (make_option("-p", "--platform",
       action="store", type="string", dest="platform",
       help='load experiment(s) of specified platform, can load one \
       experiment by -e, or all experiments.',),)
-    option_list = option_list + (make_option("-e", "--exp", action="store", \
+    option_list = option_list + (make_option("-e", "--exp", action="store",
       type="string", dest="exp", help='Load the specified experiment.\
       must specify platform name using -p option',),)
-    option_list = option_list + (make_option("-i", "--start", action="store", \
+    option_list = option_list + (make_option("-i", "--start", action="store",
       type="string", dest="start", help='Load the first Nth experiments.\
       must specify platform name using -p option',),)
-
-
 
     def handle(self, *args, **options):
         if options['test'] is not None:
@@ -54,13 +52,13 @@ class Command(BaseCommand):
             else:
                 logging.info('test over, fail')
         elif options['array_file'] is not None:
-            #skips = get_list_from_file(options['skip_file'])
+            # skips = get_list_from_file(options['skip_file'])
             platforms = self.get_list_from_file(options['array_file'])
             skips = self.get_list_from_file(options['skip_file'])
             for p in platforms:
                 self.load_exps_of_platform(p, skips=skips)
         elif options['platform'] is not None:
-            #load one experiment of this platform
+            # load one experiment of this platform
             if options['exp'] is not None:
                 p = Platform(options['platform'])
                 p.load()
@@ -70,7 +68,7 @@ class Command(BaseCommand):
                 p.save()
                 self.save_dataset(options['exp'], options['platform'], True)
                 return
-            #load whole experiments of this platform
+            # load whole experiments of this platform
             else:
                 start = options['start']
                 start = int(start) if start is not None else 0
@@ -78,7 +76,7 @@ class Command(BaseCommand):
 
     def save_dataset(self, name, platform, dump=False):
         logging.info('--- start %s ---' % name)
-        #clear dataset if already exists
+        # clear dataset if already exists
         ds = models.BiogpsDataset.objects.filter(geo_gse_id=name)
         ds.delete()
         er = ExperimentRaw(name)
