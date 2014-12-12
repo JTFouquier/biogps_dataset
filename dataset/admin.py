@@ -7,6 +7,7 @@ class BiogpsDatasetAdmin(admin.ModelAdmin):
     list_display = ('id', 'geo_gse_id', 'platform',  'sample_count',
                     'factor_count', '_factors')
     list_filter = ('platform',)
+    list_display_links = ('geo_gse_id',)
     search_fields = ['geo_gse_id']
 
     def factor_count(self, obj):
