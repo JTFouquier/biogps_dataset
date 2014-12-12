@@ -30,7 +30,8 @@ def adopt_dataset(ds_id):
 
 def get_ds_factors_keys(ds, factor_by=None, group_up=False):
     """
-        return an array of keys that stand for samples in ds
+        return an array of samples' info(factor value, 
+         name, display order, color order)
     """
     factors = []
     i = 1
@@ -109,6 +110,7 @@ def _contruct_meta(ds):
     ret.update(preset)
     return ret
 
+
 @require_http_methods(["GET"])
 def dataset_info(request, ds_id):
     """
@@ -174,6 +176,9 @@ def _avg_with_deviation(li):
 
 
 def prepare_chart_data(val_list, factors):
+    """
+        combine value and sample info together, order, group by order_index
+    """
     import copy
     factors = copy.deepcopy(factors)
     for idx, e in enumerate(factors):
