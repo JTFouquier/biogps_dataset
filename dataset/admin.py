@@ -5,7 +5,7 @@ from dataset.models import (BiogpsDataset,
 
 class BiogpsDatasetAdmin(admin.ModelAdmin):
     list_display = ('id', 'geo_gse_id', 'platform',  'sample_count',
-                    'factor_count', 'factors')
+                    'factor_count', '_factors')
     list_filter = ('platform',)
     search_fields = ['geo_gse_id']
 
@@ -20,10 +20,11 @@ class BiogpsDatasetAdmin(admin.ModelAdmin):
         return len(factor_keys)
     factor_count.short_description = 'no. of factors'
 
-    def factors(self, obj):
+    def _factors(self, obj):
         if len(obj.factors) == 0:
             return None
         return '|'.join(obj.factors[0].keys())
+    _factors.short_description = 'factors'
 admin.site.register(BiogpsDataset, BiogpsDatasetAdmin)
 
 
