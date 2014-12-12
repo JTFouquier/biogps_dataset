@@ -101,10 +101,6 @@ class BiogpsDataset(models.Model):
         return wrap_str(self.name, 60)
 
     @property
-    def sample_count(self):
-        return len(self.metadata['factors'])
-
-    @property
     def sample_ids(self):
         _samples = []
         for f in self.metadata['factors']:
