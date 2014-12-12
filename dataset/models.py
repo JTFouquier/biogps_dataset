@@ -64,9 +64,12 @@ class BiogpsDataset(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     slug = AutoSlugField(max_length=50, populate_from='name')
     species = models.CharField(max_length=200)
+    # redundant field about samples in this dataset
     sample_count = models.IntegerField(default=0,
                                        verbose_name='no. of samples')
-
+    factor_count = models.IntegerField(default=0,
+                                       verbose_name='no. of factors')
+    factors = JSONField(blank=False, editable=True)
 #     @property
 #     def factors_text(self):
 #         def format_factor(factor):
@@ -129,7 +132,7 @@ class BiogpsDataset(models.Model):
         verbose_name_plural = "Dataset"
 
     def __unicode__(self):
-        return (u'%s (%d samples)' % (self.geo_gse_id, self.sample_count))
+        return self.geo_gse_id
 
     @models.permalink
     def get_absolute_url(self):
