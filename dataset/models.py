@@ -64,6 +64,8 @@ class BiogpsDataset(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     slug = AutoSlugField(max_length=50, populate_from='name')
     species = models.CharField(max_length=200)
+    sample_count = models.IntegerField(default=0,
+                                       verbose_name='no. of samples')
 
 #     @property
 #     def factors_text(self):
