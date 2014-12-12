@@ -23,7 +23,7 @@ class BiogpsDatasetAdmin(admin.ModelAdmin):
     def _factors(self, obj):
         if len(obj.factors) == 0:
             return None
-        return '|'.join(obj.factors[0].keys())
+        return ' | '.join(obj.factors[0].keys())
     _factors.short_description = 'factors'
 admin.site.register(BiogpsDataset, BiogpsDatasetAdmin)
 
