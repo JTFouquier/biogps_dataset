@@ -28,31 +28,48 @@ def adopt_dataset(ds_id):
         return None
 
 
-def get_ds_factors_keys(ds, factor_by=None, group_up=False):
+def get_sample_name_list(ds):
+    p = 0
+    s_0 = ds.metadata['factors'][0]
+    content = s_0[s_0.keys()[0]]
+    if 'comment' in content:
+        c = content['comment']
+        if 'Sample_title' in c:
+            p = 1
+
+    names = []
+    for f in ds.metadata['factors']:
+        if p == 0:
+            name = f.keys()[0]
+        elif p == 1:
+            name = f[f.keys()[0]]['comment']['Sample_title']
+        else:
+            pass
+        names.append(name)
+    return names
+
+
+def get_ds_factors_keys(ds, group=None, collapse=False, naming=None):
     """
-        return an array of samples' info(factor value, 
+        return an array of samples' info(factor value,
          name, display order, color order)
     """
     factors = []
-    i = 1
-    if factor_by is not None:
+    names = []
+    if group is not None:
         fvs = []
-        if not group_up:
+        if not collapse:
             t = {}
             interval = len(ds.metadata['factors'])
-    for f in ds.metadata['factors']:
-        name = order_idx = color_idx = None
-
-        # get order and color(grouping) by some certain facet
-        content = f[f.keys()[0]]
-        # by specified factor value 'factor_by'
-        if factor_by is not None:
-            v = content['factorvalue'][factor_by]
-            name = v
+        for f in ds.factors:
+            order_idx = color_idx = None
+            if group not in f:
+                return None
+            v = f[group]
             if v not in fvs:
                 fvs.append(v)
             color_idx = fvs.index(v)
-            if group_up:
+            if collapse:
                 order_idx = fvs.index(v)
             else:
                 if color_idx in t:
@@ -61,40 +78,38 @@ def get_ds_factors_keys(ds, factor_by=None, group_up=False):
                     existed = len(t.keys())
                     order_idx = interval*existed+1
                 t[color_idx] = order_idx
-        # by 'order_idx' and 'color_idx' (default dataset)
-        elif 'order_idx' in content and 'color_idx' in content:
+                if naming is not None:
+                    names.append(v)
+            factors.append({'order_idx': order_idx, 'color_idx': color_idx})
+    else:
+        i = 1
+        for f in ds.metadata['factors']:
+            content = f[f.keys()[0]]
+            if 'order_idx' in content and 'color_idx' in content:
                 order_idx = content['order_idx']
                 color_idx = content['color_idx']
-        # finally by index number
-        else:
-            color_idx = order_idx = i
-            i = i + 1
-
-        # get sample name
-        if name is None:
-            if 'comment' in f[f.keys()[0]]:
-                comment = f[f.keys()[0]]['comment']
-                name = comment.get('Sample_title', None)
-                if name is None:
-                    name = comment.get('Sample_title', None)
-                    if name is None:
-                        name = f.keys()[0]
+            # finally by index number
             else:
-                name = f.keys()[0]
-        factors.append({'name': name, 'order_idx': order_idx,
-                        'color_idx': color_idx})
-    # compact order
-#     if factor_by is not None and not group_up:
-#          for e in factors:
+                color_idx = order_idx = i
+                i = i + 1
+            factors.append({'order_idx': order_idx, 'color_idx': color_idx})
+
+    if len(names) == 0:
+        names = get_sample_name_list(ds)
+
+    for j, e in enumerate(factors):
+        e['name'] = names[j]
+
     return factors
 
 
 def _contruct_meta(ds):
     preset = {'default': True, 'permission_style': 'public',
               'role_permission': ['biogpsusers'], 'rating_data':
-              {'total': 5, 'avg_stars': 10, 'avg': 5}, 'display_params':
-              {'color': ['color_idx'], 'sort': ['order_idx'],
-               'aggregate': ['title']}}
+              {'total': 5, 'avg_stars': 10, 'avg': 5}}
+    # 'display_params':
+    #          {'color': ['color_idx'], 'sort': ['order_idx'],
+    #           'aggregate': ['title']}
     if type(ds.metadata['geo_gpl_id']) is dict:
         geo_gpl_id = ds.metadata['geo_gpl_id']['accession']
     else:
@@ -118,19 +133,17 @@ def dataset_info(request, ds_id):
     """
     ds = adopt_dataset(ds_id)
     if ds is None:
-        return HttpResponse('{"code":4004, \
-                            "detail":"dataset with this id not found"}',
-                            content_type="application/json")
+        return general_json_response(code=GENERAL_ERRORS.ERROR_NOT_FOUND,
+                                     detail="dataset with this id not found")
     ret = _contruct_meta(ds)
-    factors = []
-    fb = request.GET.get('facet', None)
-    group = request.GET.get('group', False)
-    fa = get_ds_factors_keys(ds, fb, group)
-    for f in fa:
-        factors.append({f['name']: {"color_idx": f.get('color_idx', 0),
-                        "order_idx": f.get('order_idx', 0), "title": f['name']}
-                        })
-    ret.update({'factors': factors})
+    # factors = []
+    fa = get_ds_factors_keys(ds)
+#     for f in fa:
+#         factors.append({f['name']: {"color_idx": f.get('color_idx', 0),
+#                         "order_idx": f.get('order_idx', 0), "title": f['name']}
+#                         })
+#     ret.update({'factors': factors})
+    ret.update({'factors': fa})
     return general_json_response(detail=ret)
 
 
@@ -155,6 +168,8 @@ def get_dataset_data(ds, gene_id=None, reporter_id=None):
     reporters = []
     if gene_id is not None:
         reporters = _get_reporter_from_gene(gene_id)
+        if reporters is None:
+            return None
     elif reporter_id is not None:
         reporters.append(reporter_id)
     else:
@@ -177,7 +192,8 @@ def _avg_with_deviation(li):
 
 def prepare_chart_data(val_list, factors):
     """
-        combine value and sample info together, order, group by order_index
+        combine value and sample info together, grouping, collapse
+        by order_index
     """
     import copy
     factors = copy.deepcopy(factors)
@@ -235,16 +251,16 @@ def dataset_chart(request, ds_id, reporter_id):
     """
     ds = adopt_dataset(ds_id)
     if ds is None:
-        return HttpResponse('{"code":4004, "detail":"dataset with this id not \
-            found"}', content_type="application/json")
+        return general_json_response(GENERAL_ERRORS.ERROR_NOT_FOUND,
+                                     "dataset with this id not found.")
     data_list = get_dataset_data(
         ds, reporter_id=reporter_id)['data'][0][reporter_id]['values']
     val_list = [float(item) for item in data_list]
 
-    facet = request.GET.get('facet', None)
-    group = request.GET.get('group', 'off')
-    group = True if group == 'on' else False
-    factors = get_ds_factors_keys(ds, facet, group)
+    group = request.GET.get('group', None)
+    collapse = request.GET.get('collapse', 'off')
+    collapse = True if collapse == 'on' else False
+    factors = get_ds_factors_keys(ds, group, collapse)
     back = prepare_chart_data(val_list, factors)
 
     # start render part
@@ -367,7 +383,6 @@ def dataset_search(request):
     ids = []
     for item in search_res["hits"]["hits"]:
         ids.append(item["_source"]["geo_gse_id"])
-    print ids
     ds_query = models.BiogpsDataset.objects.filter(geo_gse_id__in=ids)
     for ds in ds_query:
         # temp_dic = {"id": ds.id, "name": ds.name, 'geo_gse_id':
@@ -375,7 +390,7 @@ def dataset_search(request):
         # factors = get_ds_factors_keys(ds)
         # temp_dic["factors"] = [obj['name'] for obj in factors]
         temp_dic = {"id": ds.id, "name": ds.name, 'geo_gse_id':
-                    ds.geo_gse_id, "sample_count": len(ds.metadata['factors'])}
+                    ds.geo_gse_id, "sample_count": ds.sample_count}
         res.append(temp_dic)
 
     res = {"current_page": page, "total_page": total_page, "count": count,
@@ -403,7 +418,7 @@ def dataset_search_default(request):
     res = []
     for ds in qs:
         temp_dic = {"id": ds.id, "name": ds.name, 'geo_gse_id':
-                    ds.geo_gse_id, "sample_count": len(ds.metadata['factors'])}
+                    ds.geo_gse_id, "sample_count": ds.sample_count}
 #         factors = get_ds_factors_keys(ds)
 #         temp_dic["factors"] = [obj['name'] for obj in factors]
         res.append(temp_dic)
@@ -432,7 +447,7 @@ def dataset_search_all(request):
     res_default = []
     for ds in qs:
         temp_dic = {"id": ds.id, "name": ds.name, 'geo_gse_id':
-                    ds.geo_gse_id, "sample_count": len(ds.metadata['factors'])}
+                    ds.geo_gse_id, "sample_count": ds.sample_count}
         # factors = get_ds_factors_keys(ds)
         # temp_dic["factors"] = [obj['name'] for obj in factors]
         res_default.append(temp_dic)
@@ -451,7 +466,7 @@ def dataset_search_all(request):
     ds_query = models.BiogpsDataset.objects.filter(geo_gse_id__in=ids)
     for ds in ds_query:
         temp_dic = {"id": ds.id, "name": ds.name, 'geo_gse_id':
-                    ds.geo_gse_id, "sample_count": len(ds.metadata['factors'])}
+                    ds.geo_gse_id, "sample_count": ds.sample_count}
         res.append(temp_dic)
 
     res = {"current_page": 1, "total_page": total_page, "count": count,
@@ -466,10 +481,10 @@ def dataset_csv(request, ds_id, gene_id):
     """
     ds = adopt_dataset(ds_id)
     if ds is None:
-        return HttpResponse('{"code":4004, "detail":"dataset with this id not \
-            found"}', content_type="application/json")
+        return general_json_response(GENERAL_ERRORS.ERROR_NOT_FOUND,
+                                     "dataset with this id not found")
     data_list = get_dataset_data(ds, gene_id=gene_id)['data']
-    row_list = ['Tissue']
+    row_list = ['Samples']
     val_list = []
     for item in data_list:
         key_list = item.keys()
@@ -477,7 +492,7 @@ def dataset_csv(request, ds_id, gene_id):
             row_list.append(key_item)
             val_list.append(item[key_item]['values'])
     length = len(val_list[0])
-    name_list = get_ds_factors_keys(ds)
+    name_list = get_sample_name_list(ds)
     response = HttpResponse(mimetype='text/csv')
     response['Content-Disposition'] = 'attachment; filename=%s.csv' \
         % ds.geo_gse_id
@@ -501,13 +516,10 @@ def dataset_data(request, ds_id, gene_id):
     """
     ds = adopt_dataset(ds_id)
     if ds is None:
-        return HttpResponse('{"code":4004, "detail":"dataset with this id not \
-            found"}', content_type="application/json")
+        return general_json_response(detail='dataset with this id not found')
     ret = get_dataset_data(ds, gene_id=gene_id)
     ret['probeset_list'] = ret['data']
-    del ret['data']
-    return HttpResponse('{"code":0, "detail":%s}' % json.dumps(ret),
-                        content_type="application/json")
+    return general_json_response(detail=ret)
 
 
 @require_http_methods(["GET"])
@@ -518,10 +530,10 @@ def dataset_full_data(request, ds_id, gene_id):
             GENERAL_ERRORS.ERROR_BAD_ARGS,
             "Dataset with this id does not exist.")
     data_lists = get_dataset_data(ds, gene_id=gene_id)['data']
-    facet = request.GET.get('facet', None)
-    group = request.GET.get('group', 'off')
-    group = True if group == 'on' else False
-    factors = get_ds_factors_keys(ds, facet, group)
+    group = request.GET.get('group', None)
+    collapse = request.GET.get('collapse', 'off')
+    collapse = True if collapse == 'on' else False
+    factors = get_ds_factors_keys(ds, group, collapse)
     res = {}
     for e in data_lists:
         r = e.keys()[0]
@@ -533,6 +545,7 @@ def dataset_full_data(request, ds_id, gene_id):
     return general_json_response(detail=ret)
 
 
+@require_http_methods(["GET"])
 def dataset_default(request):
     gene_id = request.GET.get('gene', None)
     if gene_id is None:
@@ -611,10 +624,7 @@ def dataset_correlation(request, ds_id, reporter_id, min_corr):
                            round(rep_cor[i['query']], 4)})
         ret_type = request.GET.get('type', None)
         if ret_type is None:
-            # print reporters
-            from .util import ComplexEncoder
-            return HttpResponse(json.dumps(result, cls=ComplexEncoder),
-                                content_type="application/json")
+            return general_json_response(detail=result)
         else:
             response = HttpResponse(mimetype='text/csv')
             response['Content-Disposition'] = 'attachment; filename=%s.csv' \
@@ -635,18 +645,14 @@ def dataset_correlation(request, ds_id, reporter_id, min_corr):
 def dataset_factors(request, ds_id):
     ds = adopt_dataset(ds_id)
     if ds is None:
-        return HttpResponse(
-            '{"code":4004, \
-            "detail":"dataset with this id not found"}',
-            content_type="application/json")
-    smps = ds.metadata['factors']
+        return general_json_response(GENERAL_ERRORS.ERROR_NOT_FOUND,
+                                     "dataset with this id not found")
     # no factor value
-    if 'factorvalue' not in smps[0].values()[0]:
+    if ds.factor_count:
         return general_json_response(code=GENERAL_ERRORS.ERROR_NOT_FOUND)
 
     factor_keys = {}
-    for smp in smps:
-        fv = smp.values()[0]['factorvalue']
+    for fv in ds.factors:
         for f in fv:
             if f in factor_keys.keys():
                 factor_keys[f].add(fv[f])
