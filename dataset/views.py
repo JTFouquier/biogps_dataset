@@ -103,7 +103,7 @@ def get_ds_factors_keys(ds, group=None, collapse=False, naming=None):
             factors.append({'order_idx': order_idx, 'color_idx': color_idx})
 
     if len(names) == 0:
-        names = get_sample_name_list(ds)
+        names = get_sample_name_list(ds, naming)
 
     for j, e in enumerate(factors):
         e['name'] = names[j]
