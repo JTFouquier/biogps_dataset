@@ -1029,6 +1029,10 @@
                     else{
                         this.facet = null;
                         this.group = false;
+                        if($('#label_names').find('option').length>0)
+                        {
+                            $('#label_toggle').show();
+                        }
                     }
                     this.probeData = null;
                     $('.ui-icon-closethick').click();
