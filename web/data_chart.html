@@ -53,7 +53,7 @@
                 tabContentContainerIDs : ["DC_026887848_dataset_canvas", "DC_026887848_probe_set_image", "DC_026887848_correlationContainer", "DC_026887848_downloadContainer"],
                 facet : null,
                 group : false,
-
+                chart_label : null,
                 init : function() {
                     this.loadTabs();
                     this.showCanvasControls();
@@ -586,7 +586,14 @@
                     var url = "/dataset/full-data/"+ds+"/gene/"+gene+"/";
                     if(this.facet != null){
                         url += ("?group="+this.facet);
-                        if(this.group) url += '&collapse=on';
+                        if(this.group)
+                        {
+                            url += '&collapse=on';
+                        }
+                        else
+                        {
+                            url += '&name='+this.chart_label;
+                        }
                     }
                     $.getJSON(url, function(dataJson, code) {
                         if (code != "success") {
@@ -988,6 +995,14 @@
                         }
                     }
                 },
+                changeLabel : function(obj){
+                    var label = $(obj).val();
+                    this.chart_label = label;
+                    this.probeData = null;
+                    $('.ui-icon-closethick').click();
+                    this.setCanvasMouseMap(null);
+                    this.getProbeData();
+                },
                 changeFacet : function(obj){
                     var facet = $('#facter-list input:checked').attr('facet');
                     var group = $('#facter-list input:checked').parents('tr').
@@ -995,6 +1010,17 @@
                     if(facet){
                         this.facet = facet;
                         this.group = group;
+                        if(group==True)
+                        {
+                            $('#label_toggle').hide();
+                        }
+                        else
+                        {
+                            if($('#label_names').find('option').length>0)
+                            {
+                                $('#label_toggle').show();
+                            }
+                        }
                     }
                     else{
                         this.facet = null;
@@ -1076,6 +1102,9 @@
                                     if(dataJson.details.hasOwnProperty(f)==false)
                                         continue;
                                     $('#label_names').append('<option id="'+f+'">'+f+'</option>');
+                                }
+                                if($('#label_names').find('option').length>0)
+                                {
                                     $('#label_toggle').show();
                                 }
 
@@ -1436,7 +1465,7 @@
                             <div id='label_toggle' style="position:relative; float:left; left: 100%; margin-left: -74%; width:25%; display:none">
                                 <p id="DC_026887848_canvas_label_choice" style="text-align: left;">
                                     Label:
-                                <select id='label_names'><option id='name'>Sample Name</option></select>
+                                <select id='label_names' onchange='changeLabel(this)'><option id='name'>Sample Name</option></select>
                                 </p>
                             </div>
                             <div style="position:relative; float:left; left: 100%; margin-left: -50%; width:10%; margin-top:3px">
