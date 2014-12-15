@@ -28,23 +28,30 @@ def adopt_dataset(ds_id):
         return None
 
 
-def get_sample_name_list(ds):
-    p = 0
-    s_0 = ds.metadata['factors'][0]
-    content = s_0[s_0.keys()[0]]
-    if 'comment' in content:
-        c = content['comment']
-        if 'Sample_title' in c:
-            p = 1
+def get_sample_name_list(ds, from_factor=None):
+    if from_factor is None:
+        p = 0
+        s_0 = ds.metadata['factors'][0]
+        content = s_0[s_0.keys()[0]]
+        if 'comment' in content:
+            c = content['comment']
+            if 'Sample_title' in c:
+                p = 1
 
     names = []
     for f in ds.metadata['factors']:
-        if p == 0:
-            name = f.keys()[0]
-        elif p == 1:
-            name = f[f.keys()[0]]['comment']['Sample_title']
+        if from_factor is not None:
+            if from_factor in f[f.keys()[0]]['factorvalue']:
+                name = f[f.keys()[0]]['factorvalue'][from_factor]
+            else:
+                return []
         else:
-            pass
+            if p == 0:
+                name = f.keys()[0]
+            elif p == 1:
+                name = f[f.keys()[0]]['comment']['Sample_title']
+            else:
+                pass
         names.append(name)
     return names
 
@@ -79,8 +86,8 @@ def get_ds_factors_keys(ds, group=None, collapse=False, naming=None):
                     existed = len(t.keys())
                     order_idx = interval*existed+1
                 t[color_idx] = order_idx
-                if naming is not None and naming in f:
-                    names.append(f[naming])
+#                 if naming is not None and naming in f:
+#                     names.append(f[naming])
             factors.append({'order_idx': order_idx, 'color_idx': color_idx})
     else:
         i = 1
