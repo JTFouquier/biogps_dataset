@@ -648,7 +648,7 @@ def dataset_factors(request, ds_id):
         return general_json_response(GENERAL_ERRORS.ERROR_NOT_FOUND,
                                      "dataset with this id not found")
     # no factor value
-    if ds.factor_count:
+    if ds.factor_count == 0:
         return general_json_response(code=GENERAL_ERRORS.ERROR_NOT_FOUND)
 
     factor_keys = {}
