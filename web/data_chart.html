@@ -581,8 +581,8 @@
                     $("#datasetName a").attr('href', "/dataset/meta/"+ds+"/");
                     var url = "/dataset/full-data/"+ds+"/gene/"+gene+"/";
                     if(this.facet != null){
-                        url += ("?facet="+this.facet);
-                        if(this.group) url += '&group=on';
+                        url += ("?group="+this.facet);
+                        if(this.group) url += '&collapse=on';
                     }
                     $.getJSON(url, function(dataJson, code) {
                         if (code != "success") {
