@@ -630,7 +630,9 @@ def dataset_correlation(request, ds_id, reporter_id, min_corr):
                            round(rep_cor[i['query']], 4)})
         ret_type = request.GET.get('type', None)
         if ret_type is None:
-            return general_json_response(detail=result)
+            from .util import ComplexEncoder
+            return HttpResponse(json.dumps(result, cls=ComplexEncoder),
+                                content_type="application/json")
         else:
             response = HttpResponse(mimetype='text/csv')
             response['Content-Disposition'] = 'attachment; filename=%s.csv' \
