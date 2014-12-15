@@ -592,8 +592,12 @@
                         }
                     }
 
-                    if(this.chart_label!=null)
-                        url += '&name='+this.chart_label;
+                    if(this.chart_label!=null){
+                        if(this.facet != null)
+                            url += '&name='+this.chart_label;
+                        else
+                            url += '?name='+this.chart_label;
+                    }
                     $.getJSON(url, function(dataJson, code) {
                         if (code != "success") {
                             // Error getting json from server
