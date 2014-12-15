@@ -546,7 +546,8 @@ def dataset_full_data(request, ds_id, gene_id):
     group = request.GET.get('group', None)
     collapse = request.GET.get('collapse', 'off')
     collapse = True if collapse == 'on' else False
-    factors = get_ds_factors_keys(ds, group, collapse)
+    naming = request.GET.get('name', None)
+    factors = get_ds_factors_keys(ds, group, collapse, naming)
     res = {}
     for e in data_lists:
         r = e.keys()[0]
