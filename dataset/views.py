@@ -71,6 +71,7 @@ def get_ds_factors_keys(ds, group=None, collapse=False, naming=None):
             color_idx = fvs.index(v)
             if collapse:
                 order_idx = fvs.index(v)
+                names.append(v)
             else:
                 if color_idx in t:
                     order_idx = t[color_idx]+1
@@ -78,8 +79,8 @@ def get_ds_factors_keys(ds, group=None, collapse=False, naming=None):
                     existed = len(t.keys())
                     order_idx = interval*existed+1
                 t[color_idx] = order_idx
-                if naming is not None:
-                    names.append(v)
+                if naming is not None and naming in f:
+                    names.append(f[naming])
             factors.append({'order_idx': order_idx, 'color_idx': color_idx})
     else:
         i = 1
