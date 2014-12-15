@@ -259,8 +259,13 @@ def dataset_chart(request, ds_id, reporter_id):
 
     group = request.GET.get('group', None)
     collapse = request.GET.get('collapse', 'off')
-    collapse = True if collapse == 'on' else False
-    factors = get_ds_factors_keys(ds, group, collapse)
+    if collapse == 'on':
+        collapse = True
+    else:
+        collapse = False
+    name = request.GET.get('name', None)
+
+    factors = get_ds_factors_keys(ds, group, collapse, name)
     back = prepare_chart_data(val_list, factors)
 
     # start render part

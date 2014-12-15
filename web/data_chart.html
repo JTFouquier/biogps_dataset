@@ -124,10 +124,14 @@
                     var url = '/dataset/chart/'+datasetid+'/reporter/' + datarowname+'/';
                     if(this.facet!= null)
                     {
-                        url += ('?facet='+this.facet);
+                        url += ('?group='+this.facet);
                         if(this.group)
                         {
-                            url += '&group=on';
+                            url += '&collapse=on';
+                        }
+                        else
+                        {
+                            url += '&name='+this.facet;
                         }
                     }
                     document.images["DC_026887848_probe_set_image"].src = url;
