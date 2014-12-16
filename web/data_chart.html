@@ -1000,7 +1000,7 @@
                     }
                 },
                 changeLabel : function(obj){
-                    var label = $(obj).val();
+                    var label = $(obj).find('option:selected').attr('id');
                     if(label=='Sample Name') this.chart_label = null;
                     else this.chart_label = label;
                     this.probeData = null;
