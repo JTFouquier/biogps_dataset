@@ -17,7 +17,7 @@ from django.core.exceptions import ObjectDoesNotExist
 def adopt_dataset(ds_id):
     if ds_id in settings.DEFAULT_DS_ACCESSION:
         try:
-            return models.BiogpsDataset.objects.using('default_ds')\
+            return models.BiogpsDataset.objects.using('default_dataset')\
                 .get(geo_gse_id=ds_id)
         except ObjectDoesNotExist:
             return None
@@ -426,7 +426,7 @@ def dataset_search_default(request):
     search_res = _es_search(' '.join(reporters), query, 1, 0, 9999)
     ids = [item["_source"]["geo_gse_id"]
            for item in search_res["hits"]["hits"]]
-    qs = models.BiogpsDataset.objects.using('default_ds')\
+    qs = models.BiogpsDataset.objects.using('default_dataset')\
         .filter(geo_gse_id__in=ids)
     res = []
     for ds in qs:
@@ -455,7 +455,7 @@ def dataset_search_all(request):
     search_res = _es_search(rep, query, 1, 0, 9999)
     ids = [item["_source"]["geo_gse_id"]
            for item in search_res["hits"]["hits"]]
-    qs = models.BiogpsDataset.objects.using('default_ds')\
+    qs = models.BiogpsDataset.objects.using('default_dataset')\
         .filter(geo_gse_id__in=ids)
     res_default = []
     for ds in qs:
