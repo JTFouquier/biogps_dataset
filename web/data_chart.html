@@ -625,6 +625,7 @@
                     this.probeData = null;
                     this.setCanvasMouseMap(null);
                     this.clearFacet();
+                    this.clearLabel();
                 },
 
                 /* setProbeData -- Call this after downloading json data for new group of probesets. It will
@@ -1038,6 +1039,12 @@
                     $('.ui-icon-closethick').click();
                     this.setCanvasMouseMap(null);
                     this.getProbeData();
+                },
+                clearLabel : function(){
+                    $('#label_toggle').hide();
+                    this.chart_label = null;
+                    $('#label_names').find('option').remove();
+                    $('#label_names').append('<option id="Sample Name">Sample Name</option>');
                 },
                 clearFacet : function(){
                     this._factor_dialog = '';
