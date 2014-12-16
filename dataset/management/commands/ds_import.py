@@ -22,8 +22,14 @@ class Command(BaseCommand):
             else:
                 platforms.append(plt.id)
                 plt.save(using="default_dataset")
+            data_ids = ds.dataset_data.all().values_list('id', flat=True)
+            print '%d datas in the dataset' % len(data_ids)
             ds.save(using="default_dataset")
-            ds_datas = ds.dataset_data.all()
-            for data_item in ds_datas:
-                data_item.save(using="default_dataset")
+            # ds_datas = ds.dataset_data.all()
+            ds = models.BiogpsDataset.objects.\
+                using("default_dataset").get(id=ds.id)
+            for i in data_ids:
+                dd = models.BiogpsDatasetData.\
+                    objects.using("default_ds").get(id=i)
+                dd.save(using="default_dataset")
         print "done"
