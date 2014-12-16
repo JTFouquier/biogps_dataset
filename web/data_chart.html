@@ -1116,7 +1116,10 @@
                                 {
                                     if(dataJson.details.hasOwnProperty(f)==false)
                                         continue;
-                                    $('#label_names').append('<option id="'+f+'">'+f+'</option>');
+                                    var shorten = f;
+                                    if (f.length>12)
+                                        shorten = f.substring(0,12)+'...';
+                                    $('#label_names').append('<option id="'+f+'">'+shorten+'</option>');
                                 }
                                 if($('#label_names').find('option').length>0)
                                 {
