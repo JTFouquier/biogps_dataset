@@ -1130,7 +1130,7 @@
                     $('#link-content').val(_url);
                 },
                 loadTabs : function() {
-                    var start_tab = 1
+                    var start_tab = 1;
                     if (this.checkForCanvas()) {
                         start_tab = 0;
                         DC_026887848.dsCanvas = true;
@@ -1160,6 +1160,13 @@
                             title : "Downloads"
                         }]
                     });
+
+                   tabs.on('tabchange', function(tabPanel, newCard, oldCard){
+                       if(newCard.title=='Interactive Image')
+                       {
+                           DC_026887848.updateCanvasGraph();
+                       }
+                   });
                 },
 
                 _getUrlParam : function (name)
