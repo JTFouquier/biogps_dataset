@@ -1363,7 +1363,9 @@
                     }
                     this.fresh_timer = setTimeout(
                         "DC_026887848.updateCanvasGraph();\
-                        $('#DC_026887848_probe_set_image').width($('#DC_026887848_dataset_image').width());\
+                        var w = $('#DC_026887848_dataset_image').width(); \
+                        if(w>1200) w=1200; \
+                        $('#DC_026887848_probe_set_image').width(w);\
                          DC_026887848.fresh_timer=null;",
                          500);
                 }
