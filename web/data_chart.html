@@ -1076,7 +1076,7 @@
                             {
                                 var table = '<table style="width:100%"><thead><tr><th style="width: 20%;">\
                                        Factor name</th><th style="width: 70%;">Factor values</th><th style="width: 10%;">\
-                                       Collapse</th></tr></thead><tbody>';
+                                       Collapse</th></tr></thead><tbody><div style="height:350px">';
                                 var max_option = 5;
                                 var bg;
                                 var k=0;
@@ -1089,7 +1089,7 @@
                                     var options = dataJson.details[f].length;
                                     if(k%2 == 0) bg = '#eee'; else bg = '#ddd';
                                     k++;
-                                    table += '<div style="height:350px"><tr style="height:20px; background:'+bg+'"><td style="padding:2px">';
+                                    table += '<tr style="height:20px; background:'+bg+'"><td style="padding:2px">';
                                     if (options>1)
                                          table += '<input type="radio" name="factor" facet="'+f+'" onclick="DC_026887848._clear_factor_select(this)">';
                                     table += '<label><b>'+f+'&nbsp('+dataJson.details[f].length+'&nbsp values)'
