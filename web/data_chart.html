@@ -327,6 +327,14 @@
                         resizable : true,
                         title : "All Factors",
                         width : $("#DC_026887848_tabs1").width() * 0.5,
+                        buttons:{
+                            ok:function(){
+                                $(this).dialog("close");
+                            },
+                            cancel:function(){
+                                $(this).dialog("close");
+                            }
+                         }
                         //open : this.updateFactorDialog()
                     });
                 },
