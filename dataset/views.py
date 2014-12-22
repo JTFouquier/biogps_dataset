@@ -673,7 +673,8 @@ def dataset_factors(request, ds_id):
                 factor_keys[f].add(fv[f])
             else:
                 factor_keys[f] = set([fv[f]])
-    for e in factor_keys:
+    keys = factor_keys.keys()
+    for e in keys:
         # remove factors with only 1 options
         if len(factor_keys[e]) == 1:
             del factor_keys[e]
