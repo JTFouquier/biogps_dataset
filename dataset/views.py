@@ -219,10 +219,9 @@ def prepare_chart_data(val_list, factors):
                 res[-1]['value'] = ad[0]
             else:
                 res[-1]['dev'] = 0
-            # remove '.xxx' surfix in element name
-            # mark off by now, when faceting some keys are like 6.44, 4.32
-            # data_chart.html?dataset=E-GEOD-41613&gene=1017
-            # e['name'] = e["name"].split('.')[0]
+            # remove ' 1' surfix in element name
+            if e["name"].endswith(' 1'):
+                e['name'] = e["name"][:-2]
             res.append(e)
         # same ordered element, put value to last element together
         else:
