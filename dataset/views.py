@@ -677,6 +677,7 @@ def dataset_factors(request, ds_id):
         # remove factors with only 1 options
         if len(factor_keys[e]) == 1:
             del factor_keys[e]
+            continue
         factor_keys[e] = list(factor_keys[e])
     if len(factor_keys) == 0:
         return general_json_response(code=GENERAL_ERRORS.ERROR_NOT_FOUND)
