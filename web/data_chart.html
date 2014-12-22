@@ -135,6 +135,9 @@
                             url += '&name='+this.facet;
                         }
                     }
+                    var w = document.body.clientWidth - 80;
+                    if (w>1200) w=1200;
+                    $('#DC_026887848_probe_set_image').width(w);
                     document.images["DC_026887848_probe_set_image"].src = url;
                 },
 
