@@ -327,11 +327,14 @@
                         resizable : true,
                         title : "All Factors",
                         width : $("#DC_026887848_tabs1").width() * 0.5,
+                        buttonAlign: 'center',
                         buttons:{
-                            ok:function(){
+                            Reset:function(){
+                                DC_026887848.changeFacet(this, true);
                                 $(this).dialog("close");
                             },
-                            cancel:function(){
+                            Apply:function(){
+                                DC_026887848.changeFacet(this);
                                 $(this).dialog("close");
                             }
                          }
@@ -1048,7 +1051,7 @@
                         }
                     }
                     this.probeData = null;
-                    $('.ui-icon-closethick').click();
+                    // $('.ui-icon-closethick').click();
                     this.setCanvasMouseMap(null);
                     this.getProbeData();
                 },
@@ -1119,11 +1122,10 @@
                                     <b>Default</b></label></td>\
                                     <td style="padding:2px"><i>remove all grouping by factor</i></td><td></td></tr>';
                                 table += '</tbody></table></div>';
-                                var buttons = '<div><input type="button" value="Reset" onclick="DC_026887848.changeFacet(this, true);\
-                                        margin-left: 45%; width: 40px; margin-top: 20px;"><input type="button" value="Apply" onclick="DC_026887848.changeFacet(this);\
-                                        margin-left: 45%; width: 40px; margin-top: 20px;"></div>';
-                                _factor_dialog = $('<div id="facter-list" style="font-size: 12px">'+
-                                    table+buttons);
+                                // var buttons = '<div><input type="button" value="Reset" onclick="DC_026887848.changeFacet(this, true);\
+                                        // margin-left: 45%; width: 40px; margin-top: 20px;"><input type="button" value="Apply" onclick="DC_026887848.changeFacet(this);\
+                                        // margin-left: 45%; width: 40px; margin-top: 20px;"></div>';
+                                _factor_dialog = $('<div id="facter-list" style="font-size: 12px">'+table);
                                 //show 'Show Factors' dialog
                                 $('#datasetFactors').show();
 
