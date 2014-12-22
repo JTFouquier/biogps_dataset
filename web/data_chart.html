@@ -1074,9 +1074,9 @@
                             }
                             else
                             {
-                                var table = '<table style="width:100%"><thead><tr><th style="width: 20%;">\
+                                var table = '<div style="height:350px"><table style="width:100%"><thead><tr><th style="width: 20%;">\
                                        Factor name</th><th style="width: 70%;">Factor values</th><th style="width: 10%;">\
-                                       Collapse</th></tr></thead><tbody><div style="height:350px">';
+                                       Collapse</th></tr></thead><tbody>';
                                 var max_option = 5;
                                 var bg;
                                 var k=0;
@@ -1110,13 +1110,12 @@
                                     '"><td style="padding:2px"><label><input type="radio" name="factor" onclick="DC_026887848._clear_factor_select(this)">\
                                     <b>Default</b></label></td>\
                                     <td style="padding:2px"><i>remove all grouping by factor</i></td><td></td></tr>';
-                                table += '</tbody></table><div>';
+                                table += '</tbody></table></div>';
                                 var buttons = '<div><input type="button" value="Reset" onclick="DC_026887848.changeFacet(this, true);\
                                         margin-left: 45%; width: 40px; margin-top: 20px;"><input type="button" value="Apply" onclick="DC_026887848.changeFacet(this);\
                                         margin-left: 45%; width: 40px; margin-top: 20px;"></div>';
                                 _factor_dialog = $('<div id="facter-list" style="font-size: 12px">'+
-                                    table+'<input type="button" value="OK" onclick="DC_026887848.changeFacet(this);"\
-                                        style="margin-left: 45%; width: 40px; margin-top: 20px;"></div>');
+                                    table+buttons);
                                 //show 'Show Factors' dialog
                                 $('#datasetFactors').show();
 
