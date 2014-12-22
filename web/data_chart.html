@@ -1100,9 +1100,13 @@
                                     var options = dataJson.details[f].length;
                                     if(k%2 == 0) bg = '#eee'; else bg = '#ddd';
                                     k++;
-                                    table += '<tr style="height:20px; background:'+bg+'"><td style="padding:2px">';
-                                    if (options>1)
-                                         table += '<input type="radio" name="factor" facet="'+f+'" onclick="DC_026887848._clear_factor_select(this)">';
+                                    var color = 'black';
+                                    if (options<=1) color='lightgrey';
+                                    table += '<tr style="height:20px; background:'+bg+'; color:'+color+';"><td style="padding:2px">';
+                                    table += '<input type="radio" name="factor" facet="'+f+'" onclick="DC_026887848._clear_factor_select(this)"';
+                                    if (options<=1)
+                                        table += ' disabled="disabled"';
+                                    table += '>';
                                     table += '<label><b>'+f+'&nbsp('+dataJson.details[f].length+'&nbsp values)'
                                        +'</b></label></td><td style="padding:2px">';
                                     var show_options = Math.min(max_option, options);
@@ -1112,8 +1116,7 @@
                                     }
                                     if(show_options < options) table += '...';
                                     table += '</td><td style="padding:2px">';
-                                    if (options>1)
-                                        table += '<label>Group</label>&nbsp;<input id="group_check" type="checkbox" disabled="disabled">';
+                                    table += '<input id="group_check" type="checkbox" disabled="disabled">';
                                     table += '</td></tr>';
                                 }
                                 if(bg == '#eee') bg='#ddd'; else bg='#eee';
