@@ -1362,7 +1362,10 @@
                         clearTimeout(this.fresh_timer);
                     }
                     this.fresh_timer = setTimeout(
-                        "DC_026887848.updateCanvasGraph(); DC_026887848.fresh_timer=null;", 500);
+                        "DC_026887848.updateCanvasGraph();\
+                        $('#DC_026887848_probe_set_image').width($('#DC_026887848_dataset_image').width());\
+                         DC_026887848.fresh_timer=null;",
+                         500);
                 }
             };
         </script>
