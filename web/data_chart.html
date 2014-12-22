@@ -54,6 +54,7 @@
                 facet : null,
                 group : false,
                 chart_label : null,
+                fresh_timer : null,
                 init : function() {
                     this.loadTabs();
                     this.showCanvasControls();
@@ -1355,6 +1356,12 @@
                     }
                     Ext.Ajax.timeout = 30000;
                     //reset timeout to default 30s
+                },
+                trailFresh : function(){
+                    if (fresh_timer!=null){
+                        clearTimeout(fresh_timer);
+                        fresh_timer = setTimeout("this.updateCanvasGraph()", 500);
+                    }
                 }
             };
         </script>
@@ -1422,7 +1429,7 @@
         </script>
 
     </head>
-    <body onresize="DC_026887848.resizeCanvas()" class="   ext-webkit ext-chrome ext-linux">
+    <body onresize="DC_026887848.resizeCanvas(); DC_026887848.trailFresh();" class="   ext-webkit ext-chrome ext-linux">
         <div id="DC_026887848_outside" style="margin:5px">
             <div id="DC_026887848_top_input" style="margin:5px">
                 <form method="get" action="./Data Chart Plugin_files/Data Chart Plugin.html" enctype="multipart/form-data" name="form1">
