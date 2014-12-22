@@ -1012,11 +1012,11 @@
                     this.setCanvasMouseMap(null);
                     this.getProbeData();
                 },
-                changeFacet : function(obj){
+                changeFacet : function(obj, rest){
                     var facet = $('#facter-list input:checked').attr('facet');
                     var group = $('#facter-list input:checked').parents('tr').
                         find('input:checkbox').attr('checked');
-                    if(facet){
+                    if(rest==null && facet){
                         this.facet = facet;
                         this.group = group;
                         if(group==true)
@@ -1074,7 +1074,9 @@
                             }
                             else
                             {
-                                var table = '<table style="width:100%"><tbody>';
+                                var table = '<table style="width:100%"><thead><tr><th style="width: 20%;">\
+                                       Factor name</th><th style="width: 70%;">Factor values</th><th style="width: 10%;">\
+                                       Collapse</th></tr></thead><tbody>';
                                 var max_option = 5;
                                 var bg;
                                 var k=0;
@@ -1087,7 +1089,7 @@
                                     var options = dataJson.details[f].length;
                                     if(k%2 == 0) bg = '#eee'; else bg = '#ddd';
                                     k++;
-                                    table += '<tr style="height:20px; background:'+bg+'"><td style="padding:2px">';
+                                    table += '<div style="height:350px"><tr style="height:20px; background:'+bg+'"><td style="padding:2px">';
                                     if (options>1)
                                          table += '<input type="radio" name="factor" facet="'+f+'" onclick="DC_026887848._clear_factor_select(this)">';
                                     table += '<label><b>'+f+'&nbsp('+dataJson.details[f].length+'&nbsp values)'
@@ -1108,7 +1110,10 @@
                                     '"><td style="padding:2px"><label><input type="radio" name="factor" onclick="DC_026887848._clear_factor_select(this)">\
                                     <b>Default</b></label></td>\
                                     <td style="padding:2px"><i>remove all grouping by factor</i></td><td></td></tr>';
-                                table += '</tbody></table>';
+                                table += '</tbody></table><div>';
+                                var buttons = '<div><input type="button" value="Reset" onclick="DC_026887848.changeFacet(this, true);\
+                                        margin-left: 45%; width: 40px; margin-top: 20px;"><input type="button" value="Apply" onclick="DC_026887848.changeFacet(this);\
+                                        margin-left: 45%; width: 40px; margin-top: 20px;"></div>';
                                 _factor_dialog = $('<div id="facter-list" style="font-size: 12px">'+
                                     table+'<input type="button" value="OK" onclick="DC_026887848.changeFacet(this);"\
                                         style="margin-left: 45%; width: 40px; margin-top: 20px;"></div>');
