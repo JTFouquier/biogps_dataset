@@ -1358,10 +1358,11 @@
                     //reset timeout to default 30s
                 },
                 trailFresh : function(){
-                    if (fresh_timer!=null){
-                        clearTimeout(fresh_timer);
-                        fresh_timer = setTimeout("this.updateCanvasGraph()", 500);
+                    if (this.fresh_timer!=null){
+                        clearTimeout(this.fresh_timer);
                     }
+                    this.fresh_timer = setTimeout(
+                        "this.updateCanvasGraph(); this.fresh_timer=null;", 500);
                 }
             };
         </script>
