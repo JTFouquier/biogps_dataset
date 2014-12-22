@@ -292,7 +292,7 @@ def dataset_chart(request, ds_id, reporter_id):
     y_pos = np.arange(len(back))
     import matplotlib.pyplot as plt
     fig, ax = plt.subplots()
-    fig.set_size_inches(18, len(back) * 0.14)
+    fig.set_size_inches(15, len(back) * 0.14)
     # draw bars
     # bar width
     width = 0.8
