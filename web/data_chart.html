@@ -1088,7 +1088,7 @@
                                 var table = '<div style="height:350px"><table style="width:100%"><thead><tr><th style="width: 20%;">\
                                        Factor name</th><th style="width: 70%;">Factor values</th><th style="width: 10%;">\
                                        Collapse</th></tr></thead><tbody>';
-                                var max_option = 5;
+                                // var max_option = 5;
                                 var bg;
                                 var k=0;
 
@@ -1100,34 +1100,22 @@
                                     var options = dataJson.details[f].length;
                                     if(k%2 == 0) bg = '#eee'; else bg = '#ddd';
                                     k++;
-                                    var color = 'black';
-                                    if (options<=1) color='lightgrey';
-                                    table += '<tr style="height:20px; background:'+bg+'; color:'+color+';"><td style="padding:2px">';
-                                    table += '<input type="radio" name="factor" facet="'+f+'" onclick="DC_026887848._clear_factor_select(this)"';
-                                    if (options<=1)
-                                        table += ' disabled="disabled"';
-                                    table += '>';
-                                    table += '<label><b>'+f+'&nbsp('+dataJson.details[f].length+'&nbsp values)'
-                                       +'</b></label></td><td style="padding:2px">';
-                                    var show_options = Math.min(max_option, options);
-                                    for(var i=0; i<show_options; i++)
+                                    table += '<tr style="height:20px; background:'+bg+'"><td style="padding:2px">';
+                                    table += '<input type="radio" name="factor" facet="'+f+'" onclick="DC_026887848._clear_factor_select(this)">';
+                                    table += '<label><b>'+f+'</b></label></td><td style="padding:2px">';
+                                    // var show_options = Math.min(max_option, options);
+                                    var opt_span = '<span style="border-radius: 2px; background-color: rgb(201, 209, 221);padding: 3px; margin: 1px">';
+                                    for(var i=0; i<options; i++)
                                     {
-                                        table += ((i+1)+')'+dataJson.details[f][i]+'&nbsp&nbsp');
+                                        table += (opt_span+dataJson.details[f][i]+'</span>');
                                     }
-                                    if(show_options < options) table += '...';
+                                    // if(show_options < options) table += '...';
                                     table += '</td><td style="padding:2px">';
                                     table += '<input id="group_check" type="checkbox" disabled="disabled">';
                                     table += '</td></tr>';
                                 }
-                                if(bg == '#eee') bg='#ddd'; else bg='#eee';
-                                table += '<tr style="height:20px; background:'+bg+
-                                    '"><td style="padding:2px"><label><input type="radio" name="factor" onclick="DC_026887848._clear_factor_select(this)">\
-                                    <b>Default</b></label></td>\
-                                    <td style="padding:2px"><i>remove all grouping by factor</i></td><td></td></tr>';
+
                                 table += '</tbody></table></div>';
-                                // var buttons = '<div><input type="button" value="Reset" onclick="DC_026887848.changeFacet(this, true);\
-                                        // margin-left: 45%; width: 40px; margin-top: 20px;"><input type="button" value="Apply" onclick="DC_026887848.changeFacet(this);\
-                                        // margin-left: 45%; width: 40px; margin-top: 20px;"></div>';
                                 _factor_dialog = $('<div id="facter-list" style="font-size: 12px">'+table);
                                 //show 'Show Factors' dialog
                                 $('#datasetFactors').show();
@@ -1146,7 +1134,6 @@
                                 {
                                     $('#label_toggle').show();
                                 }
-
                             }
                         }
                     });
