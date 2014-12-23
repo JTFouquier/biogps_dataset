@@ -1050,6 +1050,23 @@
                             $('#label_toggle').show();
                         }
                     }
+
+                    this.chart_label = this.facet;
+                    if($('#label_toggle').is(":visible"))
+                    {
+                        $('#label_names option').css('background-color', '');
+                        if(this.facet == null)
+                        {
+                            $('#label_names option').eq(0).css('background-color', 'lightgray');
+                            $('#label_names option').eq(0).attr('selected', true);
+                        }
+                        else
+                        {
+                            var s = "#label_names "+this.facet;
+                            $(s).css('background-color', 'lightgray');
+                            $(s).attr('selected', true);
+                        }
+                    }
                     this.probeData = null;
                     // $('.ui-icon-closethick').click();
                     this.setCanvasMouseMap(null);
@@ -1131,6 +1148,7 @@
                                 $('#datasetFactors').show();
 
                                 //label toggle
+                                var i = 0;
                                 for(var f in dataJson.details)
                                 {
                                     if(dataJson.details.hasOwnProperty(f)==false)
@@ -1138,7 +1156,11 @@
                                     var shorten = f;
                                     if (f.length>12)
                                         shorten = f.substring(0,12)+'...';
-                                    $('#label_names').append('<option id="'+f+'">'+shorten+'</option>');
+                                    if(i=0){
+                                        $('#label_names').append('<option id="'+f+'" style="background-color:lightgray">'+shorten+'</option>');
+                                    }else{
+                                        $('#label_names').append('<option id="'+f+'">'+shorten+'</option>');
+                                    }
                                 }
                                 if($('#label_names').find('option').length>0)
                                 {
