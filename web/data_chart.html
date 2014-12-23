@@ -1016,6 +1016,8 @@
                 },
                 changeLabel : function(obj){
                     var label = $(obj).find('option:selected').attr('id');
+                    $(obj).find('option').css('background-color','');
+                    $(obj).find('option:selected').css('background-color','lightgray');
                     if(label=='Sample Name') this.chart_label = null;
                     else this.chart_label = label;
                     this.probeData = null;
