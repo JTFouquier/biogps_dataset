@@ -110,7 +110,7 @@ def get_ds_factors_keys(ds, group=None, collapse=False, naming=None):
             val = e['order_idx']
             idx = fvs.index(val)
             od = interval*idx
-            if collapse:
+            if not collapse:
                 if val in t:
                     t[val] += 1
                     inc = t[val]
