@@ -1101,10 +1101,10 @@
                                     if(k%2 == 0) bg = '#eee'; else bg = '#ddd';
                                     k++;
                                     table += '<tr style="background:'+bg+'"><td style="padding:2px">';
-                                    table += '<input type="radio" name="factor" style="vertical-align: bottom" facet="'+f+'" onclick="DC_026887848._clear_factor_select(this)">';
-                                    table += f+'</td><td style="padding:2px">';
+                                    table += '<input type="radio" name="factor" style="vertical-align: text-bottom" facet="'+f+'" onclick="DC_026887848._clear_factor_select(this)">';
+                                    table += f+'</td><td style="padding:2px; line-height: 22px">';
                                     // var show_options = Math.min(max_option, options);
-                                    var opt_span = '<span style="border-radius: 2px; background-color: rgb(90, 160, 220);padding: 2px; margin: 1px">';
+                                    var opt_span = '<span style="border-radius: 3px; background-color: rgb(90, 160, 220);padding: 2px; margin: 2px">';
                                     for(var i=0; i<options; i++)
                                     {
                                         table += (opt_span+dataJson.details[f][i]+'</span>');
