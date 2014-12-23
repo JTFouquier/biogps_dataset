@@ -680,6 +680,15 @@ def dataset_factors(request, ds_id):
             del factor_keys[e]
             continue
         factor_keys[e] = list(factor_keys[e])
+
+        # sort, 'not specified' always put last
+        def c(x, y):
+            if x == 'not specified':
+                return 1
+            if y == 'not specified':
+                return -1
+            return cmp(x, y)
+        factor_keys[e].sort(c)
     if len(factor_keys) == 0:
         return general_json_response(code=GENERAL_ERRORS.ERROR_NOT_FOUND)
     return general_json_response(detail=factor_keys)
