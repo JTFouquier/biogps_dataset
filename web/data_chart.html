@@ -1055,20 +1055,20 @@
                     if($('#label_toggle').is(":visible"))
                     {
                         $('#label_names option').css('background-color', '');
-                        if(this.facet == null)
+                        if(this.facet)
                         {
-                            $('#label_names option').eq(0).css('background-color', 'lightgray');
-                            $('#label_names option').eq(0).attr('selected', true);
-                        }
-                        else
-                        {
-                            $('#label_names option').each(function(e, i){
+                            $('#label_names option').each(function(i, e){
                                 if($(e).attr('id')==this.facet)
                                 {
                                     $(e).css('background-color', 'lightgray');
                                     $(e).attr('selected', true);
                                 }
                             });
+                        }
+                        else
+                        {
+                            $('#label_names option').eq(0).css('background-color', 'lightgray');
+                            $('#label_names option').eq(0).attr('selected', true);
                         }
                     }
                     this.probeData = null;
