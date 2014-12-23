@@ -73,16 +73,13 @@ def get_ds_factors_keys(ds, group=None, collapse=False, naming=None):
                 return None
             v = f[group]
             if v not in fvs:
-                # record order border(where order changes)
-                tag.append(j)
                 fvs.append(v)
             color_idx = fvs.index(v)
             if collapse:
                 # label(name) switch does not support when collapse is true
                 names.append(v)
-                order_idx = fvs.index(v)
-            else:
-                order_idx = v
+            # set order just factor value, do real order at the end
+            order_idx = v
             factors.append({'order_idx': order_idx, 'color_idx': color_idx})
     else:
         # no group, order by sequence or preset 'order_idx'
@@ -104,20 +101,23 @@ def get_ds_factors_keys(ds, group=None, collapse=False, naming=None):
     for j, e in enumerate(factors):
         e['name'] = names[j]
 
-    #
-    if group and not collapse:
+    # sort samples by grouped name
+    if group:
         fvs.sort()
         t = {}
         interval = len(ds.metadata['factors'])
         for e in factors:
             val = e['order_idx']
             idx = fvs.index(val)
-            if val in t:
-                t[val] += 1
-                inc = t[val]
-            else:
-                inc = t[val] = 0
-            e['order_idx'] = interval*idx + inc
+            od = interval*idx
+            if collapse:
+                if val in t:
+                    t[val] += 1
+                    inc = t[val]
+                else:
+                    inc = t[val] = 0
+                od += inc
+            e['order_idx'] = od
 
     return factors
 
