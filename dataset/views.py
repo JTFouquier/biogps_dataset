@@ -63,33 +63,29 @@ def get_ds_factors_keys(ds, group=None, collapse=False, naming=None):
     """
     factors = []
     names = []
+    tag = []
+    fvs = []
     if group is not None:
-        fvs = []
-        if not collapse:
-            t = {}
-            interval = len(ds.metadata['factors'])
-        for f in ds.factors:
+        for j, f in enumerate(ds.factors):
             order_idx = color_idx = None
+            # exception!
             if group not in f:
                 return None
             v = f[group]
             if v not in fvs:
+                # record order border(where order changes)
+                tag.append(j)
                 fvs.append(v)
             color_idx = fvs.index(v)
             if collapse:
-                order_idx = fvs.index(v)
+                # label(name) switch does not support when collapse is true
                 names.append(v)
+                order_idx = fvs.index(v)
             else:
-                if color_idx in t:
-                    order_idx = t[color_idx]+1
-                else:
-                    existed = len(t.keys())
-                    order_idx = interval*existed+1
-                t[color_idx] = order_idx
-#                 if naming is not None and naming in f:
-#                     names.append(f[naming])
+                order_idx = v
             factors.append({'order_idx': order_idx, 'color_idx': color_idx})
     else:
+        # no group, order by sequence or preset 'order_idx'
         i = 1
         for f in ds.metadata['factors']:
             content = f[f.keys()[0]]
@@ -107,6 +103,21 @@ def get_ds_factors_keys(ds, group=None, collapse=False, naming=None):
 
     for j, e in enumerate(factors):
         e['name'] = names[j]
+
+    #
+    if group and not collapse:
+        fvs.sort()
+        t = {}
+        interval = len(ds.metadata['factors'])
+        for e in factors:
+            val = e['order_idx']
+            idx = fvs.index(val)
+            if val in t:
+                t[val] += 1
+                inc = t[val]
+            else:
+                inc = t[val] = 0
+            e['order_idx'] = interval*idx + inc
 
     return factors
 
@@ -205,6 +216,7 @@ def prepare_chart_data(val_list, factors):
     """
     import copy
     factors = copy.deepcopy(factors)
+    # combine values and samples, just by position in the array
     for idx, e in enumerate(factors):
         e['value'] = val_list[idx]
     factors.sort(key=lambda e: e['order_idx'], reverse=True)
