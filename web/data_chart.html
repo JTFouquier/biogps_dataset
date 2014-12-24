@@ -1118,13 +1118,13 @@
                                 var l= getJsonObjLength(dataJson.details);
                                 var table='<div style="margin-bottom:5px">';
                                 var sample_link = 'http://www.ebi.ac.uk/arrayexpress/experiments/'+DC_026887848.dsID+'/samples/';
-                                var samples = '<a href="'+sample_link+'">(more details)</a>';
+                                var samples = '<a style="text-decoration: none; color: blue" href="'+sample_link+'">(more details)</a>';
                                 if(l<=1) table += 'Pick the factor '+samples+' below, ';
                                 else table += 'Pick one of '+l+' factors '+samples+' below, ';
                                 table += 'and click "Apply":</div>';
                                 table += '<div style="max-height:350px"><table style="width:100%"><thead><tr style="background: url(css/images/ui-bg_highlight-hard_75_9497b8_1x100.png) 50% 50% repeat-x;\
                                        font-size: 15px;line-height: 25px;font-size: 15px;"><th style="width: 20%; padding-left: 4px">Factor name</th><th style="width: 70%; padding-left: 4px">Factor values</th><th style="width: 10%; padding-left: 4px">\
-                                       Collapse</th></tr></thead><tbody>';
+                                       Collapse?</th></tr></thead><tbody>';
                                 // var max_option = 5;
                                 var bg;
                                 var k=0;
