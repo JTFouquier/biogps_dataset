@@ -10,9 +10,9 @@
         <link rel="stylesheet" type="text/css" href="./css/flexigrid.css"/>
         <!-- <script src="./js/ext_mainApp.js" type="text/JavaScript"></script> -->
         <script src="./js/jquery_custom.js" type="text/JavaScript"></script>
-        <script src="./js/jquery.ui.core.js" type="text/JavaScript"></script>
-        <script src="./js/jquery.ui.widget.js" type="text/JavaScript"></script>
-        <script src="./js/jquery.ui.accordion.js" type="text/JavaScript"></script>
+        <!--<script src="./js/jquery.ui.core.js" type="text/JavaScript"></script>-->
+        <!--<script src="./js/jquery.ui.widget.js" type="text/JavaScript"></script>-->
+        <!--<script src="./js/jquery.ui.accordion.js" type="text/JavaScript"></script>-->
         <script src="./js/jquery-ui.js" type="text/JavaScript"></script>
         <script type="text/javascript" src="./js/flexigrid.js"></script>
 
@@ -63,6 +63,7 @@
                     this.initSlider();
                     this.initCanvas();
                     this.loadDataset("");
+                    this.checkDatasetImageSize();
                 },
 
                 showCanvasControls : function() {
@@ -1192,20 +1193,19 @@
                     $('#link-content').val(_url);
                 },
                 loadTabs : function() {
-                    var start_tab = 1;
                     if (this.checkForCanvas()) {
-                        start_tab = 0;
                         DC_026887848.dsCanvas = true;
                     }
-                    $('#dataChartTabPanel').tabs();
-//                    $('#dataChartTabPanel').bind('tabsselect', function(event, ui) {
-//                        if(ui.index == 0){
-//                            DC_026887848.updateCanvasGraph();
-//                            return true;
-//                        }
-//                    });
+                    $('#dataChartTabPanel').tabs({show: function (event, ui) {
+                        if(ui.index == 0){
+                            if (DC_026887848.dsCanvas == true) {
+                                DC_026887848.updateCanvasGraph();
+//                                setTimeout("DC_026887848.updateCanvasGraph();", 500);
+                            }
+                        }
+                    }});
 
-//                           DC_026887848.updateCanvasGraph();
+                    DC_026887848.updateCanvasGraph();
                 },
 
                 _getUrlParam : function (name)
@@ -1342,19 +1342,13 @@
                             bclass : 'add',
                             onpress : this.DLCorr
                         } ],
-                        width : 400,
+                        width : 388,
                         height : 520,
                         usepager : true,
                         rp: 20,
                         useRp: false,
                         procmsg: 'Loading',
-                        pagestat: '{from}-{to} of {total}',
-                        onError: function (data) {
-                            alert("Error occured");
-                        },
-                        onSuccess: function (statusdata) {
-                            console.log(statusdata);
-                        }
+                        pagestat: '{from}-{to} of {total}'
                     });
 /*
                     Ext.Ajax.timeout = 300000;
@@ -1437,6 +1431,7 @@
                     Ext.Ajax.timeout = 30000; */
                     //reset timeout to default 30s
                 },
+                isDatasetIamgeSamll : false,
                 trailFresh : function(){
                     if (this.fresh_timer!=null){
                         clearTimeout(this.fresh_timer);
@@ -1444,10 +1439,39 @@
                     this.fresh_timer = setTimeout(
                         "DC_026887848.updateCanvasGraph();\
                         var w = $('#DC_026887848_dataset_image').width(); \
-                        if(w>1200) w=1200; \
+                        if(w>1200){ w=1200; DC_026887848.isDatasetIamgeSamll = false}\
+                        else {DC_026887848.isDatasetIamgeSamll = true;}\
                         $('#DC_026887848_probe_set_image').width(w);\
-                         DC_026887848.fresh_timer=null;",
-                         500);
+                        DC_026887848.zoomImage();\
+                        DC_026887848.fresh_timer=null;",
+                        500);
+                },
+                checkDatasetImageSize: function () {
+                    var w = $('#DC_026887848_dataset_image').width();
+                    if(w < 1200){
+                        DC_026887848.isDatasetIamgeSamll = true;
+                        DC_026887848.zoomImage();
+                    }
+                },
+                zoomImage : function () {
+                    if(DC_026887848.isDatasetIamgeSamll){
+                        $('#DC_026887848_probe_set_image').css('cursor', '-webkit-zoom-in');
+                        $('#DC_026887848_probe_set_image').unbind('click');
+                        $('#DC_026887848_probe_set_image').click(function () {
+                            if($(this).css('width') == 'auto'){
+                                $(this).css('width', '100%');
+                                $(this).css('cursor', '-webkit-zoom-in');
+                                $('#DC_026887848_dataset_image').css('overflow', 'scroll');
+                            } else {
+                                $(this).css('width', 'auto');
+                                $(this).css('cursor', '-webkit-zoom-out');
+                                $('#DC_026887848_dataset_image').css('overflow', 'scroll');
+                            }
+                            return false;
+                        });
+                    }else{
+                        $('#DC_026887848_probe_set_image').css('cursor', 'auto');
+                    }
                 }
             };
         </script>
@@ -1641,7 +1665,7 @@
                                 Correlation Cutoff:
                                 <input type="text" id="DC_026887848_cor_val" size="5" value="0.9">
                                 <input type="button" id="DC_026887848_cor_button&quot;" value="Go!" onclick="DC_026887848.loadCorr()">
-                            </p> <div id="DC_026887848_corr-grid" style="margin:5px"></div>
+                            </p> <div id="DC_026887848_corr-grid" style="margin:5px; margin-left: 0px;"></div>
                         </span>
                     </div>
                     <div id="DC_026887848_Download" class="">

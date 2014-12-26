@@ -1,3 +1,4 @@
+html,body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,p,blockquote,th,td{margin:0;padding:0;}img,body,html{border:0;}address,caption,cite,code,dfn,em,strong,th,var{font-style:normal;font-weight:normal;}ol,ul {list-style:none;}caption,th {text-align:left;}h1,h2,h3,h4,h5,h6{font-size:100%;}q:before,q:after{content:'';}
 
 .icon-load {
     background-image: url(./images/arrow_join.png) !important;
@@ -71,4 +72,14 @@ a.ui-dialog-titlebar-close {
 
 .span-reset-search a{
     text-decoration:none;
+}
+#DC_026887848_corr-grid {
+    margin-left: 0px;
+}
+/*new css about tab panel*/
+.x-tab-panel {
+    overflow:hidden;
+}
+.ui-tabs .ui-tabs-nav li a, .ui-tabs.ui-tabs-collapsible .ui-tabs-nav li.ui-tabs-selected a {
+    font-size: 1.3em;
 }
