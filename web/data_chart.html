@@ -7,12 +7,14 @@
         <link rel="icon" type="image/vnd.microsoft.icon" href="http://compdisc.gnf.org/hts/hts.ico">
         <link rel="stylesheet" type="text/css" href="./css/data_chart.css">
         <link rel="stylesheet" type="text/css" href="./css/ext-all.css">
+        <link rel="stylesheet" type="text/css" href="./css/flexigrid.css"/>
         <script src="./js/ext_mainApp.js" type="text/JavaScript"></script>
         <script src="./js/jquery_custom.js" type="text/JavaScript"></script>
         <script src="./js/jquery.ui.core.js" type="text/JavaScript"></script>
         <script src="./js/jquery.ui.widget.js" type="text/JavaScript"></script>
         <script src="./js/jquery.ui.accordion.js" type="text/JavaScript"></script>
         <script src="./js/jquery-ui.js" type="text/JavaScript"></script>
+        <script type="text/javascript" src="./js/flexigrid.js"></script>
 
         <style id="clearly_highlighting_css" type="text/css">
 /* selection */ html.clearly_highlighting_enabled ::-moz-selection { background: rgba(246, 238, 150, 0.99); } html.clearly_highlighting_enabled ::selection { background: rgba(246, 238, 150, 0.99); } /* cursor */ html.clearly_highlighting_enabled {    /* cursor and hot-spot position -- requires a default cursor, after the URL one */    cursor: url("chrome-extension://pioclpoplcdbaefihamjohnefbikjilc/clearly/images/highlight--cursor.png") 14 16, text; } /* highlight tag */ em.clearly_highlight_element {    font-style: inherit !important; font-weight: inherit !important;    background-image: url("chrome-extension://pioclpoplcdbaefihamjohnefbikjilc/clearly/images/highlight--yellow.png");    background-repeat: repeat-x; background-position: top left; background-size: 100% 100%; } /* the delete-buttons are positioned relative to this */ em.clearly_highlight_element.clearly_highlight_first { position: relative; } /* delete buttons */ em.clearly_highlight_element a.clearly_highlight_delete_element {    display: none; cursor: pointer;    padding: 0; margin: 0; line-height: 0;    position: absolute; width: 34px; height: 34px; left: -17px; top: -17px;    background-image: url("chrome-extension://pioclpoplcdbaefihamjohnefbikjilc/clearly/images/highlight--delete-sprite.png"); background-repeat: no-repeat; background-position: 0px 0px; } em.clearly_highlight_element a.clearly_highlight_delete_element:hover { background-position: -34px 0px; } /* retina */ @media (min--moz-device-pixel-ratio: 2), (-webkit-min-device-pixel-ratio: 2), (min-device-pixel-ratio: 2) {    em.clearly_highlight_element { background-image: url("chrome-extension://pioclpoplcdbaefihamjohnefbikjilc/clearly/images/highlight--yellow@2x.png"); }    em.clearly_highlight_element a.clearly_highlight_delete_element { background-image: url("chrome-extension://pioclpoplcdbaefihamjohnefbikjilc/clearly/images/highlight--delete-sprite@2x.png"); background-size: 68px 34px; } }
@@ -374,7 +376,8 @@
                     // Ext JS will ignore TabPanel margin setting unless we also use
                     // BorderLayout or a BoxLayout subclass... Simply subtracting
                     // margin value here instead
-                    Ext.getCmp("dataChartTabPanel").setWidth(chart_container_width - 10);
+//                    Ext.getCmp("dataChartTabPanel").setWidth(chart_container_width - 10);
+                    $('#dataChartTabPanel').width(chart_container_width - 10);
                     if (DC_026887848.dsCanvas == true) {
                         DCCG.clearCanvas(this.getCanvas());
                         this.updateCanvasGraph();
@@ -385,7 +388,8 @@
                     // Chart container width on initialization is +15px for some odd
                     // reason... Ext JS?
                     var chart_container_width = $("#DC_026887848_outside").width() - 15;
-                    Ext.getCmp("dataChartTabPanel").setWidth(chart_container_width - 10);
+                    $('#dataChartTabPanel').width(chart_container_width - 10);
+//                    Ext.getCmp("dataChartTabPanel").setWidth(chart_container_width - 10);
                     if (DC_026887848.dsCanvas == true) {
                         DCCG.clearCanvas(this.getCanvas());
                         DCCG.buildCanvasLoading(this.getCanvas());
@@ -1193,38 +1197,15 @@
                         start_tab = 0;
                         DC_026887848.dsCanvas = true;
                     }
+                    $('#dataChartTabPanel').tabs();
+//                    $('#dataChartTabPanel').bind('tabsselect', function(event, ui) {
+//                        if(ui.index == 0){
+//                            DC_026887848.updateCanvasGraph();
+//                            return true;
+//                        }
+//                    });
 
-                    // basic tabs 1, built from existing content
-                    var tabs = new Ext.TabPanel({
-                        id : "dataChartTabPanel",
-                        renderTo : "DC_026887848_tabs1",
-                        activeTab : start_tab,
-                        frame : true,
-                        defaults : {
-                            autoHeight : true
-                        },
-                        resizable : true,
-                        items : [{
-                            contentEl : "DC_026887848_dataset_canvas",
-                            title : "Interactive Image"
-                        }, {
-                            contentEl : "DC_026887848_dataset_image",
-                            title : "Static Image"
-                        }, {
-                            contentEl : "DC_026887848_correlation",
-                            title : "Correlation"
-                        }, {
-                            contentEl : "DC_026887848_Download",
-                            title : "Downloads"
-                        }]
-                    });
-
-                   tabs.on('tabchange', function(tabPanel, newCard, oldCard){
-                       if(newCard.title=='Interactive Image')
-                       {
-                           DC_026887848.updateCanvasGraph();
-                       }
-                   });
+//                           DC_026887848.updateCanvasGraph();
                 },
 
                 _getUrlParam : function (name)
@@ -1324,6 +1305,58 @@
                 loadCorr : function() {
                     // create the Data Store for the correlation data
                     var corrUrl = this.buildCorrURL();
+//                    start : 0,
+//                    limit : 20
+                    $('#DC_026887848_corr-grid').flexigrid({
+                        url : corrUrl + "?start=0&limit=20",
+                        method: 'GET',
+                        errormsg: 'something wrong',
+                        dataType : 'json',
+                        colModel : [ {
+                            display : 'Correlation',
+                            name : 'value',
+                            width : 80,
+                            sortable : true,
+                            align : 'center'
+                        }, {
+                            display : 'ID',
+                            name : 'id',
+                            width : 60,
+                            sortable : true,
+                            align : 'center'
+                        }, {
+                            display : 'Gene_Symbol',
+                            name : 'symbol',
+                            width : 100,
+                            sortable : true,
+                            align : 'center'
+                        }, {
+                            display : 'Probe',
+                            name : 'reporter',
+                            width : 100,
+                            sortable : true,
+                            align : 'center'
+                        } ],
+                        buttons : [ {
+                            name : 'Download Correlation',
+                            bclass : 'add',
+                            onpress : this.DLCorr
+                        } ],
+                        width : 400,
+                        height : 520,
+                        usepager : true,
+                        rp: 20,
+                        useRp: false,
+                        procmsg: 'Loading',
+                        pagestat: '{from}-{to} of {total}',
+                        onError: function (data) {
+                            alert("Error occured");
+                        },
+                        onSuccess: function (statusdata) {
+                            console.log(statusdata);
+                        }
+                    });
+/*
                     Ext.Ajax.timeout = 300000;
                     //increase default timeout to 5min
                     if (this.Corr_Store === null) {
@@ -1401,7 +1434,7 @@
                         this.Corr_Store.reload(opt);
                         this.Corr_Grid.render();
                     }
-                    Ext.Ajax.timeout = 30000;
+                    Ext.Ajax.timeout = 30000; */
                     //reset timeout to default 30s
                 },
                 trailFresh : function(){
@@ -1530,85 +1563,94 @@
                 </div>
             </div>
             <div id="DC_026887848_tabs1" style="clear: both; margin: 5px;">
-                <div id="dataChartTabPanel" class=" x-tab-panel" style="width: 1168px;"></div>
-                <div id="DC_026887848_dataset_canvas" class="">
-                    <div style="font: normal normal normal 11px/normal tahoma, arial, helvetica, sans-serif;">
-                        <div style="float:left; width:100%; display: block; position: relative; margin-top:5px">
-                            <div style="position:relative; float:left; left: 100%; margin-left: -99%; width:98%">
-                                <p id="DC_026887848_canvas_error_message" class="\&quot;ds-error\&quot;" style="display:none; text-align:left">
-                                    Your browser does not support HTML5 features required for the interactive gene expression chart. Please use the Static Image or update to the latest version of your browser.
-                                </p>
+                <div id="dataChartTabPanel" class=" x-tab-panel" style="width: 1168px;">
+                    <ul>
+                        <li><a href="#DC_026887848_dataset_canvas">Interactive Image</a></li>
+                        <li><a href="#DC_026887848_dataset_image">Static Image</a></li>
+                        <li><a href="#DC_026887848_correlation">Correlation</a></li>
+                        <li><a href="#DC_026887848_Download">Downloads</a></li>
+                    </ul>
+                    <div id="DC_026887848_dataset_canvas" class="">
+                        <div style="font: normal normal normal 11px/normal tahoma, arial, helvetica, sans-serif;">
+                            <div style="float:left; width:100%; display: block; position: relative; margin-top:5px">
+                                <div style="position:relative; float:left; left: 100%; margin-left: -99%; width:98%">
+                                    <p id="DC_026887848_canvas_error_message" class="\&quot;ds-error\&quot;" style="display:none; text-align:left">
+                                        Your browser does not support HTML5 features required for the interactive gene expression chart. Please use the Static Image or update to the latest version of your browser.
+                                    </p>
+                                </div>
                             </div>
-                        </div>
-                        <div style="float:left; width:100%; display: block; position: relative; margin-top:5px">
-                            <div style="position:relative; float:left; left: 100%; margin-left: -99%; width:25%">
-                                <p id="DC_026887848_canvas_search_controls" style="text-align: left;">
-                                    Search:
-                                    <input style="font-size: 10px; width:50%;" type="text" id="DC_026887848_canvas_search" size="8" onkeyup="DC_026887848.searchGraph()">
-                                </p>
+                            <div style="float:left; width:100%; display: block; position: relative; margin-top:5px">
+                                <div style="position:relative; float:left; left: 100%; margin-left: -99%; width:25%">
+                                    <p id="DC_026887848_canvas_search_controls" style="text-align: left;">
+                                        Search:
+                                        <input style="font-size: 10px; width:50%;" type="text" id="DC_026887848_canvas_search" size="8" onkeyup="DC_026887848.searchGraph()">
+                                    </p>
+                                </div>
+                                <div id='label_toggle' style="position:relative; float:left; left: 100%; margin-left: -74%; width:25%; display:none">
+                                    <p id="DC_026887848_canvas_label_choice" style="text-align: left;">
+                                        Label:
+                                        <select id='label_names' onchange='DC_026887848.changeLabel(this)'><option id='Sample Name'>Sample Name</option></select>
+                                    </p>
+                                </div>
+                                <div style="position:relative; float:left; left: 100%; margin-left: -50%; width:10%; margin-top:3px">
+                                    <p id="DC_026887848_canvas_zoom_label" style="text-align: right; margin-right: 8px;">
+                                        Zoom:
+                                    </p>
+                                </div>
+                                <div style="position:relative; float:left; left: 100%; margin-left: -40%; width:38%; margin-top:5px">
+                                    <div id="DC_026887848_canvas_chart_slider" class="ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all">
+                                        <div class="ui-slider-range ui-widget-header" style="left: 0%; width: 100%;"></div><a href="http://plugins.biogps.org/data_chart/data_chart.cgi?id=362817#" class="ui-slider-handle ui-state-default ui-corner-all" style="left: 0%;"></a><a href="http://plugins.biogps.org/data_chart/data_chart.cgi?id=362817#" class="ui-slider-handle ui-state-default ui-corner-all" style="left: 100%;"></a>
+                                    </div>
+                                </div>
                             </div>
-                            <div id='label_toggle' style="position:relative; float:left; left: 100%; margin-left: -74%; width:25%; display:none">
-                                <p id="DC_026887848_canvas_label_choice" style="text-align: left;">
-                                    Label:
-                                <select id='label_names' onchange='DC_026887848.changeLabel(this)'><option id='Sample Name'>Sample Name</option></select>
-                                </p>
+                            <div style="float:left; width:100%; display: block; position: relative;">
+                                <div style="position:relative; float:left; left: 100%; margin-left: -99%; width:99%">
+                                    <canvas id="DC_026887848_canvas_chart" height="511" width="1168">
+                                        <iframe frameborder="0" style="border: 1px solid #AAAAAA;" width="370" height="370" src="./browsers.html">
+                                            &lt;p&gt;Your browser does not support iframes or the canvas object.  You might consider upgrading to a modern browser.&lt;/p&gt;
+                                        </iframe>
+                                    </canvas>
+                                </div>
                             </div>
-                            <div style="position:relative; float:left; left: 100%; margin-left: -50%; width:10%; margin-top:3px">
-                                <p id="DC_026887848_canvas_zoom_label" style="text-align: right; margin-right: 8px;">
-                                    Zoom:
-                                </p>
-                            </div>
-                            <div style="position:relative; float:left; left: 100%; margin-left: -40%; width:38%; margin-top:5px">
-                                <div id="DC_026887848_canvas_chart_slider" class="ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all">
-                                    <div class="ui-slider-range ui-widget-header" style="left: 0%; width: 100%;"></div><a href="http://plugins.biogps.org/data_chart/data_chart.cgi?id=362817#" class="ui-slider-handle ui-state-default ui-corner-all" style="left: 0%;"></a><a href="http://plugins.biogps.org/data_chart/data_chart.cgi?id=362817#" class="ui-slider-handle ui-state-default ui-corner-all" style="left: 100%;"></a>
+                            <div style="float:left; width:100%; display: block; position: relative;">
+                                <div style="position:relative; float:left; left: 100%; margin-left: -99%; width:20%">
+                                    <input style="" type="button" id="DC_026887848_canvas_save_button" value="Save Image" onclick="DC_026887848.saveCanvas()">
+                                </div>
+                                <!-- <div style="position:relative; float:left; left: 100%; margin-left: -75%; width:30%">
+                                    <p style="" id="DC_026887848_canvas_graph_type_wrapper">
+                                        Chart Type:
+                                        <select style="font-size: 10px;" id="DC_026887848_canvas_graph_type" onchange="DC_026887848.changeCanvasGraphType()">
+                                            <option value="bar">Bar</option>
+                                            <option value="plot">Plot</option>
+                                        </select>
+                                    </p>
+                                </div> -->
+                                <div style="position:relative; float:left; left: 100%; margin-left: -25%; width:25%; text-align:right;">
+                                    <input style="" type="button" id="DC_026887848_canvas_clear_button" value="Clear Labels" onclick="DC_026887848.clearCanvasLabels()">
                                 </div>
                             </div>
                         </div>
-                        <div style="float:left; width:100%; display: block; position: relative;">
-                            <div style="position:relative; float:left; left: 100%; margin-left: -99%; width:99%">
-                                <canvas id="DC_026887848_canvas_chart" height="511" width="1168">
-                                    <iframe frameborder="0" style="border: 1px solid #AAAAAA;" width="370" height="370" src="./browsers.html">
-                                        &lt;p&gt;Your browser does not support iframes or the canvas object.  You might consider upgrading to a modern browser.&lt;/p&gt;
-                                    </iframe>
-                                </canvas>
-                            </div>
-                        </div>
-                        <div style="float:left; width:100%; display: block; position: relative;">
-                            <div style="position:relative; float:left; left: 100%; margin-left: -99%; width:20%">
-                                <input style="" type="button" id="DC_026887848_canvas_save_button" value="Save Image" onclick="DC_026887848.saveCanvas()">
-                            </div>
-                            <!-- <div style="position:relative; float:left; left: 100%; margin-left: -75%; width:30%">
-                                <p style="" id="DC_026887848_canvas_graph_type_wrapper">
-                                    Chart Type:
-                                    <select style="font-size: 10px;" id="DC_026887848_canvas_graph_type" onchange="DC_026887848.changeCanvasGraphType()">
-                                        <option value="bar">Bar</option>
-                                        <option value="plot">Plot</option>
-                                    </select>
-                                </p>
-                            </div> -->
-                            <div style="position:relative; float:left; left: 100%; margin-left: -25%; width:25%; text-align:right;">
-                                <input style="" type="button" id="DC_026887848_canvas_clear_button" value="Clear Labels" onclick="DC_026887848.clearCanvasLabels()">
-                            </div>
-                        </div>
                     </div>
-                </div>
-                <div id="DC_026887848_dataset_image" class="x-hide-display">
-                    <img id="DC_026887848_probe_set_image" title="Data Chart Image" alt="Data Chart Image" src="">
-                </div>
-                <div id="DC_026887848_correlation" class="x-hide-display">
-                    <span id="DC_026887848_correlationContainer">
-                        <p style="margin:5px">
-                            Correlation Cutoff:
-                            <input type="text" id="DC_026887848_cor_val" size="5" value="0.9">
-                            <input type="button" id="DC_026887848_cor_button&quot;" value="Go!" onclick="DC_026887848.loadCorr()">
-                        </p> <div id="DC_026887848_corr-grid" style="margin:5px"></div> </span>
-                </div>
-                <div id="DC_026887848_Download" class="x-hide-display">
+                    <div id="DC_026887848_dataset_image" class="">
+                        <img id="DC_026887848_probe_set_image" title="Data Chart Image" alt="Data Chart Image" src="">
+                    </div>
+                    <div id="DC_026887848_correlation" class="">
+                        <span id="DC_026887848_correlationContainer">
+                            <p style="margin:5px">
+                                Correlation Cutoff:
+                                <input type="text" id="DC_026887848_cor_val" size="5" value="0.9">
+                                <input type="button" id="DC_026887848_cor_button&quot;" value="Go!" onclick="DC_026887848.loadCorr()">
+                            </p> <div id="DC_026887848_corr-grid" style="margin:5px"></div>
+                        </span>
+                    </div>
+                    <div id="DC_026887848_Download" class="">
                     <span id="DC_026887848_downloadContainer">
                         <p style="margin:5px">
                             <a id="DC_026887848_Download_link" href="javascript:void(0)"></a>
                         </p> </span>
+                    </div>
                 </div>
+
 
                 </div>
             </div>
