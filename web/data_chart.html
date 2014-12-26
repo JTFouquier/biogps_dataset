@@ -1499,18 +1499,19 @@
             });
 
             $(document).ready(function() {
-                var link = $("<link>");
-                link.attr({
-                    type: "text/css",
-                    rel: "stylesheet",
-                    href: "./css/jquery-ui-1.8.5.custom.css"
-                });
-                $("head").append( link );
-                //$.getScript("/data_chart/assets/data_chart_canvas.js?ver=3", function() {
-                $.getScript("js/jquery-ui.js",function() {
-                    DC_026887848.init();
-                });
-                //});
+                DC_026887848.init();
+                // var link = $("<link>");
+                // link.attr({
+                    // type: "text/css",
+                    // rel: "stylesheet",
+                    // href: "./css/jquery-ui-1.8.5.custom.css"
+                // });
+                // $("head").append( link );
+                // //$.getScript("/data_chart/assets/data_chart_canvas.js?ver=3", function() {
+                // $.getScript("js/jquery-ui.js",function() {
+                    // DC_026887848.init();
+                // });
+                // //});
             });
         </script>
 
