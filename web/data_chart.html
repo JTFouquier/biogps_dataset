@@ -5,7 +5,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
         <title>Data Chart Plugin</title>
         <link rel="icon" type="image/vnd.microsoft.icon" href="http://compdisc.gnf.org/hts/hts.ico">
-        <link rel="stylesheet" type="text/css" href="./css/data_chart.css">
+
         <!-- <link rel="stylesheet" type="text/css" href="./css/ext-all.css"> -->
         <link rel="stylesheet" type="text/css" href="./css/flexigrid.css"/>
         <!-- <script src="./js/ext_mainApp.js" type="text/JavaScript"></script> -->
@@ -20,6 +20,7 @@
 /* selection */ html.clearly_highlighting_enabled ::-moz-selection { background: rgba(246, 238, 150, 0.99); } html.clearly_highlighting_enabled ::selection { background: rgba(246, 238, 150, 0.99); } /* cursor */ html.clearly_highlighting_enabled {    /* cursor and hot-spot position -- requires a default cursor, after the URL one */    cursor: url("chrome-extension://pioclpoplcdbaefihamjohnefbikjilc/clearly/images/highlight--cursor.png") 14 16, text; } /* highlight tag */ em.clearly_highlight_element {    font-style: inherit !important; font-weight: inherit !important;    background-image: url("chrome-extension://pioclpoplcdbaefihamjohnefbikjilc/clearly/images/highlight--yellow.png");    background-repeat: repeat-x; background-position: top left; background-size: 100% 100%; } /* the delete-buttons are positioned relative to this */ em.clearly_highlight_element.clearly_highlight_first { position: relative; } /* delete buttons */ em.clearly_highlight_element a.clearly_highlight_delete_element {    display: none; cursor: pointer;    padding: 0; margin: 0; line-height: 0;    position: absolute; width: 34px; height: 34px; left: -17px; top: -17px;    background-image: url("chrome-extension://pioclpoplcdbaefihamjohnefbikjilc/clearly/images/highlight--delete-sprite.png"); background-repeat: no-repeat; background-position: 0px 0px; } em.clearly_highlight_element a.clearly_highlight_delete_element:hover { background-position: -34px 0px; } /* retina */ @media (min--moz-device-pixel-ratio: 2), (-webkit-min-device-pixel-ratio: 2), (min-device-pixel-ratio: 2) {    em.clearly_highlight_element { background-image: url("chrome-extension://pioclpoplcdbaefihamjohnefbikjilc/clearly/images/highlight--yellow@2x.png"); }    em.clearly_highlight_element a.clearly_highlight_delete_element { background-image: url("chrome-extension://pioclpoplcdbaefihamjohnefbikjilc/clearly/images/highlight--delete-sprite@2x.png"); background-size: 68px 34px; } }
         </style>
         <link type="text/css" rel="stylesheet" href="./css/jquery-ui-1.8.5.custom.css">
+        <link rel="stylesheet" type="text/css" href="./css/data_chart.css">
         <style>
             [touch-action="none"] {
                 -ms-touch-action: none;
@@ -333,6 +334,7 @@
                         buttons:{
                             Reset:function(){
                                 DC_026887848.changeFacet(this, true);
+                                DC_026887848._clear_factor_radio();
                                 $(this).dialog("close");
                             },
                             Apply:function(){
@@ -1021,8 +1023,8 @@
                 },
                 changeLabel : function(obj){
                     var label = $(obj).find('option:selected').attr('id');
-                    $(obj).find('option').css('background-color','');
-                    $(obj).find('option:selected').css('background-color','lightgray');
+//                    $(obj).find('option').css('background-color','');
+//                    $(obj).find('option:selected').css('background-color','lightgray');
                     if(label=='Sample Name') this.chart_label = null;
                     else this.chart_label = label;
                     this.probeData = null;
@@ -1068,6 +1070,7 @@
                                 if($(e).attr('id')==DC_026887848.facet)
                                 {
                                     $(e).css('background-color', 'lightgray');
+                                    $(e).css('font-weight', 'bold');
                                     $(e).attr('selected', true);
                                 }
                             });
@@ -1101,6 +1104,9 @@
                     $(obj).parents('tr').siblings().find('input:checkbox').attr('disabled', 'disabled');
                     $(obj).parents('tr').find('input:checkbox').attr('disabled', false);
                 },
+                _clear_factor_radio : function () {
+                    $('.factor-item').find('input:radio').attr('checked', false);
+                },
                 loadFactors : function(){
                     function getJsonObjLength(jsonObj) {
                         var Length = 0;
@@ -1128,7 +1134,7 @@
                                 else table += 'Pick one of '+l+' factors '+samples+' below, ';
                                 table += 'and click "Apply":</div>';
                                 table += '<div style="max-height:350px"><table style="width:100%"><thead><tr style="background: url(css/images/ui-bg_highlight-hard_75_9497b8_1x100.png) 50% 50% repeat-x;\
-                                       font-size: 15px;line-height: 25px;font-size: 15px;"><th style="width: 20%; padding-left: 4px">Factor name</th><th style="width: 70%; padding-left: 4px">Factor values</th><th style="width: 10%; padding-left: 4px">\
+                                       font-size: 15px;line-height: 25px;font-size: 15px;"><th style="width: 20%; padding-left: 4px">Factor name</th><th style="width: 70%; padding-left: 4px">Factor values</th><th style="width: 10%; padding-left: 4px;padding-right: 4px;">\
                                        Collapse?</th></tr></thead><tbody>';
                                 // var max_option = 5;
                                 var bg;
@@ -1142,7 +1148,7 @@
                                     var options = dataJson.details[f].length;
                                     if(k%2 == 0) bg = '#eee'; else bg = '#ddd';
                                     k++;
-                                    table += '<tr style="background:'+bg+'"><td style="padding:2px">';
+                                    table += '<tr class="factor-item" style="background:'+bg+'"><td style="padding:2px">';
                                     table += '<input type="radio" name="factor" style="vertical-align: text-bottom" facet="'+f+'" onclick="DC_026887848._clear_factor_select(this)">';
                                     table += '<span style="margin-left:3px">'+f+'</span></td><td style="padding:2px; line-height: 22px; word-break: break-all;">';
                                     var opt_span = '<span style="border-radius: 3px; background-color: darkgray;padding: 2px 5px; margin: 2px">';
@@ -1312,6 +1318,7 @@
                         method: 'GET',
                         errormsg: 'something wrong',
                         dataType : 'json',
+                        striped: true,
                         colModel : [ {
                             display : 'Correlation',
                             name : 'value',
@@ -1339,7 +1346,7 @@
                         } ],
                         buttons : [ {
                             name : 'Download Correlation',
-                            bclass : 'add',
+                            bclass : 'download',
                             onpress : this.DLCorr
                         } ],
                         width : 388,
@@ -1589,7 +1596,7 @@
             </div>
             <div id="DC_026887848_tabs1" style="clear: both; margin: 5px;">
                 <div id="dataChartTabPanel" class=" x-tab-panel" style="width: 1168px;">
-                    <ul>
+                    <ul style="border-bottom: 1px solid #8db2e3;padding-bottom: 1px;">
                         <li><a href="#DC_026887848_dataset_canvas">Interactive Image</a></li>
                         <li><a href="#DC_026887848_dataset_image">Static Image</a></li>
                         <li><a href="#DC_026887848_correlation">Correlation</a></li>
@@ -1661,7 +1668,7 @@
                     </div>
                     <div id="DC_026887848_correlation" class="">
                         <span id="DC_026887848_correlationContainer">
-                            <p style="margin:5px">
+                            <p style="margin:5px;font-size: 2em;">
                                 Correlation Cutoff:
                                 <input type="text" id="DC_026887848_cor_val" size="5" value="0.9">
                                 <input type="button" id="DC_026887848_cor_button&quot;" value="Go!" onclick="DC_026887848.loadCorr()">
@@ -1671,7 +1678,7 @@
                     <div id="DC_026887848_Download" class="">
                     <span id="DC_026887848_downloadContainer">
                         <p style="margin:5px">
-                            <a id="DC_026887848_Download_link" href="javascript:void(0)"></a>
+                            <a id="DC_026887848_Download_link" href="javascript:void(0)" style="font-size: 2em;color: -webkit-link;"></a>
                         </p> </span>
                     </div>
                 </div>
