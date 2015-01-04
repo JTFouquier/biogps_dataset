@@ -231,9 +231,6 @@ def prepare_chart_data(val_list, factors):
                 res[-1]['value'] = ad[0]
             else:
                 res[-1]['dev'] = 0
-            # remove ' 1' surfix in element name
-            if e['name'].endswith(' 1'):
-                e['name'] = e["name"][:-2]
             res.append(e)
         # same ordered element, put value to last element together
         else:
@@ -250,9 +247,10 @@ def prepare_chart_data(val_list, factors):
         res[-1]['value'] = ad[0]
     else:
         res[-1]['dev'] = 0
-    # remove ' 1' surfix in element name
-    if res[-1]['name'].endswith(' 1'):
-        res[-1]['name'] = res[-1]['name'][:-2]
+    for e in res:
+        # remove ' 1' surfix in element name
+        if e['name'].endswith(' 1'):
+            e['name'] = e['name'][:-2]
     return res
 
 
