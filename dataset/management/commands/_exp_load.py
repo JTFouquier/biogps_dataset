@@ -25,7 +25,7 @@ class Platform(ResourceRequest):
         self.name = name
         self.reports = None
         self.exps = None
-        #save as biogps plstform
+        # save as biogps plstform
         self.platform = None
 
     def load(self):
@@ -47,7 +47,7 @@ class Platform(ResourceRequest):
 
     def load_exps(self):
         url = "http://www.ebi.ac.uk/arrayexpress/json/v2/files?array="\
-             + self.name
+              + self.name
         data_json = requests.get(url).json()
         if data_json["files"]["total-experiments"] > 0:
             self.exps = []
@@ -78,14 +78,14 @@ class ExperimentRaw(ResourceRequest):
                 for human reading.
         '''
         self.name = name
-        #exp desc, json
+        # exp desc, json
         self.info = None
-        #sdrf, processed file urls and others
+        # sdrf, processed file urls and others
         self.files_info = None
-        #sdrf file content as StringIO
+        # sdrf file content as StringIO
         self.sdrf = None
-        #processed data file name and
-        #file content mapping
+        # processed data file name and
+        # file content mapping
         self.data = None
 
     def get_json_by_url(self, url):
@@ -98,7 +98,7 @@ class ExperimentRaw(ResourceRequest):
         raw.write(response.content)
         return raw
 
-    #unzip stringio to stringio
+    # unzip stringio to stringio
     def unzip_file(self, zfile):
         zobj = zipfile.ZipFile(zfile)
         ret = {}
@@ -145,7 +145,7 @@ class ExperimentRaw(ResourceRequest):
         self.load_sdrf()
         self.load_processed_data()
 
-    #dump data to a folder named after exp name
+    # dump data to a folder named after exp name
     def dump(self):
         try:
             os.stat(self.name)

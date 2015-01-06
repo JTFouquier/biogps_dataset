@@ -29,15 +29,6 @@ def adopt_dataset(ds_id):
 
 
 def get_sample_name_list(ds, from_factor=None):
-    if from_factor is None:
-        p = 0
-        s_0 = ds.metadata['factors'][0]
-        content = s_0[s_0.keys()[0]]
-        if 'comment' in content:
-            c = content['comment']
-            if 'Sample_title' in c:
-                p = 1
-
     names = []
     for f in ds.metadata['factors']:
         if from_factor is not None:
@@ -46,12 +37,7 @@ def get_sample_name_list(ds, from_factor=None):
             else:
                 return []
         else:
-            if p == 0:
-                name = f.keys()[0]
-            elif p == 1:
-                name = f[f.keys()[0]]['comment']['Sample_title']
-            else:
-                pass
+            name = f.keys()[0]
         names.append(name)
     return names
 
