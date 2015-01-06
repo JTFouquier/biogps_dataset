@@ -8,7 +8,7 @@
 
         <!-- <link rel="stylesheet" type="text/css" href="./css/ext-all.css"> -->
         <link rel="stylesheet" type="text/css" href="./css/flexigrid.css"/>
-        <!-- <script src="./js/ext_mainApp.js" type="text/JavaScript"></script> -->
+         <!--<script src="./js/ext_mainApp.js" type="text/JavaScript"></script>-->
         <script src="./js/jquery_custom.js" type="text/JavaScript"></script>
         <!--<script src="./js/jquery.ui.core.js" type="text/JavaScript"></script>-->
         <!--<script src="./js/jquery.ui.widget.js" type="text/JavaScript"></script>-->
@@ -1064,13 +1064,14 @@
                     if($('#label_toggle').is(":visible"))
                     {
                         $('#label_names option').css('background-color', '');
+                        $('#label_names option').css('color', 'black');
                         if(this.facet)
                         {
                             $('#label_names option').each(function(i, e){
                                 if($(e).attr('id')==DC_026887848.facet)
                                 {
                                     $(e).css('background-color', 'lightgray');
-                                    $(e).css('font-weight', 'bold');
+                                    $(e).css('color', 'rgb(44, 124, 230)');
                                     $(e).attr('selected', true);
                                 }
                             });
@@ -1103,9 +1104,12 @@
                     $(obj).parents('tr').siblings().find('input:checkbox').attr('checked', false);
                     $(obj).parents('tr').siblings().find('input:checkbox').attr('disabled', 'disabled');
                     $(obj).parents('tr').find('input:checkbox').attr('disabled', false);
+//                    $(obj).parents('tr').find('input:checkbox').attr('checked', false);
                 },
                 _clear_factor_radio : function () {
                     $('.factor-item').find('input:radio').attr('checked', false);
+                    $('.factor-item').find('input:checkbox').attr('checked', false);
+                    $('.factor-item').find('input:checkbox').attr('disabled', 'disabled');
                 },
                 loadFactors : function(){
                     function getJsonObjLength(jsonObj) {
@@ -1129,7 +1133,7 @@
                                 var l= getJsonObjLength(dataJson.details);
                                 var table='<div style="margin-bottom:5px">';
                                 var sample_link = 'http://www.ebi.ac.uk/arrayexpress/experiments/'+DC_026887848.dsID+'/samples/';
-                                var samples = '<a style="text-decoration: none; color: blue" href="'+sample_link+'">(more details)</a>';
+                                var samples = '<a style="text-decoration: none; color: blue" href="'+sample_link+'" target="_blank">(more details)</a>';
                                 if(l<=1) table += 'Pick the factor '+samples+' below, ';
                                 else table += 'Pick one of '+l+' factors '+samples+' below, ';
                                 table += 'and click "Apply":</div>';

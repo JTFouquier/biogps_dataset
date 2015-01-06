@@ -181,3 +181,12 @@ a.ui-dialog-titlebar-close {
 .flexigrid div.pDiv {
     background-image: url(../images/default/toolbar/bg.gif);
 }
+h3.ui-accordion-header.ui-helper-reset.ui-state-default.ui-corner-all {
+    padding: 0px;
+}
+h3.ui-accordion-header.ui-helper-reset.ui-state-active.ui-corner-top {
+    padding: 3px;
+}
+div.ui-accordion-content.ui-helper-reset.ui-widget-content.ui-corner-bottom.ui-accordion-content-active {
+    padding-top: 5px;
+}
