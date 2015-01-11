@@ -41,6 +41,18 @@ class ExperimentSave:
             for e in dataset['arraytype']:
                 if e['accession'] == self.platform:
                     dataset['arraytype'] = e
+        # get sample count and factor count and factor contents
+        factors = dataset['factors']
+        sample_count = len(factors)
+        factor_count = 0
+        fvs = []
+        for e in factors:
+            if 'factorvalue' not in e:
+                break
+            fvs.append(e['factorvalue'])
+        if len(fvs) > 0:
+            factor_count = len(fvs[0].keys())
+
         meta = {
             'geo_gds_id': '', 'name': dataset['name'],
             'default': False, 'display_params': {},
@@ -59,7 +71,10 @@ class ExperimentSave:
             geo_gse_id=self.name,
             geo_id_plat=self.name + '_' + self.platform,
             metadata=meta,
-            species=self.SPECIES_MAP[dataset['species']])
+            species=self.SPECIES_MAP[dataset['species']],
+            sample_count=sample_count,
+            factor_count=factor_count,
+            )
         # dataset data
         datasetdata = []
         for idx in self.data.index:
