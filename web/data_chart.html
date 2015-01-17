@@ -1111,6 +1111,31 @@
                     $('.factor-item').find('input:checkbox').attr('checked', false);
                     $('.factor-item').find('input:checkbox').attr('disabled', 'disabled');
                 },
+                updateFactorSpan: function (type, data, obj) {
+                    var opt_span = '<span style="border-radius: 3px; background-color: darkgray;padding: 2px 5px; margin: 2px">';
+                    var html = '';
+                    var dataArray = data.split(',');
+                    console.log(type + "  " + data + "  " + dataArray);
+                    if(type == "more"){
+                        for(var i = 0;i < dataArray.length; i++){
+                            console.log(dataArray[i]);
+                            html += (opt_span+dataArray[i]+'</span>');
+                        }
+                        html += ("<a href=\"javascript:void(0)\" onclick=\"DC_026887848.updateFactorSpan(\'less\', '"+data +"',this);\" style=\"color: blue;\">less</a>");
+                    }else{
+                        for(var i = 0;i < dataArray.length; i++){
+                            html += (opt_span+dataArray[i]+'</span>');
+                            if(i == 4){
+                                html += ("<a href=\"javascript:void(0)\" onclick=\"DC_026887848.updateFactorSpan(\'more\', '"+data +"',this);\" style=\"color: blue;\">more</a>");
+                                break;
+                            }
+                        }
+                    }
+//                    $(this).parent().removeAll();
+                    console.log(html);
+                    $(obj).parent().html(html);
+
+                },
                 loadFactors : function(){
                     function getJsonObjLength(jsonObj) {
                         var Length = 0;
@@ -1159,6 +1184,10 @@
                                     for(var i=0; i<options; i++)
                                     {
                                         table += (opt_span+dataJson.details[f][i]+'</span>');
+                                        if(i == 4 && options > 5){
+                                            table += ("<a href=\"javascript:void(0)\" onclick=\"DC_026887848.updateFactorSpan(\'more\', '"+dataJson.details[f] +"',this);\" style=\"color: blue;\" >more</a>");
+                                            break;
+                                        }
                                     }
                                     table += '</td><td style="padding:2px; text-align:center">';
                                     table += '<input id="group_check" type="checkbox" disabled="disabled">';
@@ -1212,6 +1241,8 @@
                                 DC_026887848.updateCanvasGraph();
 //                                setTimeout("DC_026887848.updateCanvasGraph();", 500);
                             }
+                        }else if(ui.index == 1){
+                            DC_026887848.checkDatasetImageSize();
                         }
                     }});
 
@@ -1459,6 +1490,7 @@
                 },
                 checkDatasetImageSize: function () {
                     var w = $('#DC_026887848_dataset_image').width();
+                    $('#DC_026887848_probe_set_image').width(w);
                     if(w < 1200){
                         DC_026887848.isDatasetIamgeSamll = true;
                         DC_026887848.zoomImage();
@@ -1575,10 +1607,7 @@
                             <option>D28753_i_at</option><option>D28754_s_at</option>
                         </select>
                     </div>
-                    <div id="datasetFactors" style="float:left; padding-left:10px; display:none">
-                        <input type="button" id="show-factors" value="Show Factors" style="padding-left:10px; padding-right:10px; float: left;"
-                             onclick="DC_026887848.showFactors()">
-                    </div>
+
                 </div>
                 <div id="datasetSummaryContainer" style="width: 99%; float:left">
                     <b>Summary: </b><span id="datasetSummary"></span>&nbsp;<a id="datasetSummaryMoreLink" class="requires-js" href="javascript:void(0)" onclick="DC_026887848.updateSummary(&quot;more&quot;);" style="display: none;">more</a>
@@ -1596,6 +1625,11 @@
                 </div>
                 <div id="datasetSourceContainer" style="display: none; width: 99%;">
                     <b>Source: </b><span id="datasetSource"></span>
+                </div>
+                <div id="datasetFactors" style="float:left;  display:none;margin-bottom: 5px;">
+                    <b>View:</b>
+                    <input type="button" id="show-factors" value="Change by factors" style="margin-left: 5px "
+                           onclick="DC_026887848.showFactors()">
                 </div>
             </div>
             <div id="DC_026887848_tabs1" style="clear: both; margin: 5px;">
