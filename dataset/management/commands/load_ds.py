@@ -76,14 +76,7 @@ class Command(BaseCommand):
             # load experiments listed in the specified file
             elif options['list_file'] is not None:
                 exps = self.get_list_from_file(options['list_file'])
-                p = Platform(options['platform'])
-                p.load()
-                for e in exps:
-                    if e not in p.exps:
-                        logging.info('experiment %s and\
-                         platform not match' % e)
-                        continue
-                    self.save_dataset(e, options['platform'], True)
+                self.load_exps_list(exps, options['platform'])
             # load whole experiments of this platform
             else:
                 start = options['start']
@@ -130,7 +123,24 @@ class Command(BaseCommand):
             return True
         except ObjectDoesNotExist:
             return False
-        
+
+    def load_exps_list(self, lst, p):
+        po = Platform(p)
+        po.load()
+        po.save()
+        for e in lst:
+            if self.is_already_loaded(e):
+                logging.info('existed %s' % e)
+                continue
+            try:
+                self.save_dataset(e, p)
+            except Exception, e:
+                logging.error('Exception: %s' % e)
+                res = models.BiogpsDatasetFailed.objects.get_or_create(\
+                    platform=p, dataset=e)
+                res[0].reason = e
+                res[0].save()
+
     def load_exps_of_platform(self, p, start=0, skips=[]):
         po = Platform(p)
         po.load()
@@ -155,5 +165,5 @@ class Command(BaseCommand):
                 logging.error('Exception: %s' % e)
                 res = models.BiogpsDatasetFailed.objects.get_or_create(\
                     platform=p, dataset=exp)
-                res[0].reason=e
+                res[0].reason = e
                 res[0].save()
