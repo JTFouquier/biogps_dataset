@@ -39,6 +39,9 @@ class Command(BaseCommand):
     option_list = option_list + (make_option("-e", "--exp", action="store",
       type="string", dest="exp", help='Load the specified experiment.\
       must specify platform name using -p option',),)
+    option_list = option_list + (make_option("-l", "--list", action="store",
+      type="string", dest="list_file", help='Load the specified file contained.\
+      experiments must specify platform name using -p option',),)
     option_list = option_list + (make_option("-i", "--start", action="store",
       type="string", dest="start", help='Load the first Nth experiments.\
       must specify platform name using -p option',),)
@@ -68,6 +71,17 @@ class Command(BaseCommand):
                 p.save()
                 self.save_dataset(options['exp'], options['platform'], True)
                 return
+            # load experiments listed in the specified file
+            elif options['list'] is not None:
+                exps = self.get_list_from_file(options['list_file'])
+                p = Platform(options['platform'])
+                p.load()
+                for e in exps:
+                    if e not in p.exps:
+                        logging.info('experiment %s and\
+                         platform not match' % e)
+                        continue
+                    self.save_dataset(e, options['platform'], True)
             # load whole experiments of this platform
             else:
                 start = options['start']
