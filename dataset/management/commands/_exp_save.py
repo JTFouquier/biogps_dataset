@@ -74,7 +74,7 @@ class ExperimentSave:
             species=self.SPECIES_MAP[dataset['species']],
             sample_count=sample_count,
             factor_count=factor_count,
-            )
+            factors=fvs)
         # dataset data
         datasetdata = []
         for idx in self.data.index:
