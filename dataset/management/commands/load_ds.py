@@ -72,7 +72,7 @@ class Command(BaseCommand):
                 self.save_dataset(options['exp'], options['platform'], True)
                 return
             # load experiments listed in the specified file
-            elif options['list'] is not None:
+            elif options['list_file'] is not None:
                 exps = self.get_list_from_file(options['list_file'])
                 p = Platform(options['platform'])
                 p.load()
