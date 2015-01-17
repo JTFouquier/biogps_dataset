@@ -128,16 +128,16 @@ class Command(BaseCommand):
         po = Platform(p)
         po.load()
         po.save()
-        for e in lst:
-            if self.is_already_loaded(e):
-                logging.info('existed %s' % e)
+        for exp in lst:
+            if self.is_already_loaded(exp):
+                logging.info('existed %s' % exp)
                 continue
             try:
-                self.save_dataset(e, p)
+                self.save_dataset(exp, p)
             except Exception, e:
                 logging.error('Exception: %s' % e)
                 res = models.BiogpsDatasetFailed.objects.get_or_create(\
-                    platform=p, dataset=e)
+                    platform=p, dataset=exp)
                 res[0].reason = e
                 res[0].save()
 
