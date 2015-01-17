@@ -47,6 +47,8 @@ class Command(BaseCommand):
       must specify platform name using -p option',),)
 
     def handle(self, *args, **options):
+        # turn off debug to limit memory usage
+        settings.DEBUG = False
         if options['test'] is not None:
             er = ExperimentRaw(options['test'])
             er.load()
