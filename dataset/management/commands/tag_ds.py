@@ -2,7 +2,7 @@
 
 from django.core.management.base import NoArgsCommand
 from django.conf import settings
-from biogps.apps.dataset.models import BiogpsDataset
+from dataset.models import BiogpsDataset
 import urllib
 import urllib2
 
