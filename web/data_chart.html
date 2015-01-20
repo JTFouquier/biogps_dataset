@@ -1115,10 +1115,8 @@
                     var opt_span = '<span style="border-radius: 3px; background-color: darkgray;padding: 2px 5px; margin: 2px">';
                     var html = '';
                     var dataArray = data.split(',');
-                    console.log(type + "  " + data + "  " + dataArray);
                     if(type == "more"){
                         for(var i = 0;i < dataArray.length; i++){
-                            console.log(dataArray[i]);
                             html += (opt_span+dataArray[i]+'</span>');
                         }
                         html += ("<a href=\"javascript:void(0)\" onclick=\"DC_026887848.updateFactorSpan(\'less\', '"+data +"',this);\" style=\"color: blue;\">less</a>");
@@ -1131,8 +1129,6 @@
                             }
                         }
                     }
-//                    $(this).parent().removeAll();
-                    console.log(html);
                     $(obj).parent().html(html);
 
                 },
@@ -1594,9 +1590,14 @@
                         <b>Dataset: </b><span id="datasetName"><a class="ds-name" href="http://biogps.org/dataset/5" target="_blank"></a></span>
                         <span id="go-ae" style='display: none'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="go-ae btn-use-object requires-js" href="http://www.ebi.ac.uk/">[source]</a></span>
                     </div>
-                    <div style="float: right; display: inline; width: 20%">
-                        <input type="button" id="change-dataset" value="Change Dataset" style="padding-left:10px; padding-right:10px; float: right; width:120px; height:40px; font-size: 14px;"
+                    <div style="float: right; display: inline; width: 20%;text-align: right;">
+                        <input type="button" id="change-dataset" value="Change Dataset" style="padding-left:10px; padding-right:10px; width:120px; height:40px; font-size: 14px;"
                              onclick="DC_026887848.changeDataset()">
+                        <div id="datasetFactors" style="  display:none;margin-top: 3px;">
+                            <!--<b>View:</b>-->
+                            <input type="button" id="show-factors" value="Change by factors" style="width: 120px;font-size: 14px;height: 40px; "
+                                   onclick="DC_026887848.showFactors()">
+                        </div>
                     </div>
                 </div>
                 <div style='width: 99%; display:block'>
@@ -1607,7 +1608,6 @@
                             <option>D28753_i_at</option><option>D28754_s_at</option>
                         </select>
                     </div>
-
                 </div>
                 <div id="datasetSummaryContainer" style="width: 99%; float:left">
                     <b>Summary: </b><span id="datasetSummary"></span>&nbsp;<a id="datasetSummaryMoreLink" class="requires-js" href="javascript:void(0)" onclick="DC_026887848.updateSummary(&quot;more&quot;);" style="display: none;">more</a>
@@ -1625,11 +1625,6 @@
                 </div>
                 <div id="datasetSourceContainer" style="display: none; width: 99%;">
                     <b>Source: </b><span id="datasetSource"></span>
-                </div>
-                <div id="datasetFactors" style="float:left;  display:none;margin-bottom: 5px;">
-                    <b>View:</b>
-                    <input type="button" id="show-factors" value="Change by factors" style="margin-left: 5px "
-                           onclick="DC_026887848.showFactors()">
                 </div>
             </div>
             <div id="DC_026887848_tabs1" style="clear: both; margin: 5px;">
