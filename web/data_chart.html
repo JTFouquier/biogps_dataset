@@ -1590,17 +1590,17 @@
                         <b>Dataset: </b><span id="datasetName"><a class="ds-name" href="http://biogps.org/dataset/5" target="_blank"></a></span>
                         <span id="go-ae" style='display: none'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="go-ae btn-use-object requires-js" href="http://www.ebi.ac.uk/">[source]</a></span>
                     </div>
-                    <div style="float: right; display: inline; width: 20%;text-align: right;">
+                    <div style="float: right; display: inline; width: 18%;text-align: right;">
                         <input type="button" id="change-dataset" value="Change Dataset" style="padding-left:10px; padding-right:10px; width:120px; height:40px; font-size: 14px;"
                              onclick="DC_026887848.changeDataset()">
                         <div id="datasetFactors" style="  display:none;margin-top: 3px;">
                             <!--<b>View:</b>-->
-                            <input type="button" id="show-factors" value="Change by factors" style="width: 120px;font-size: 14px;height: 40px; "
+                            <input type="button" id="show-factors" value="Customize Chart" style="width: 120px;font-size: 12px;height: 30px; "
                                    onclick="DC_026887848.showFactors()">
                         </div>
                     </div>
                 </div>
-                <div style='width: 99%; display:block'>
+                <div style='width: 80%; display:block'>
                     <div id="datasetProbes" style="float:left;">
                         <b>Probeset:</b>
                         <select id="DC_026887848_probe" onchange="DC_026887848.setProbe(); DC_026887848.clearCorrData()">
@@ -1609,10 +1609,10 @@
                         </select>
                     </div>
                 </div>
-                <div id="datasetSummaryContainer" style="width: 99%; float:left">
+                <div id="datasetSummaryContainer" style="width: 80%; float:left">
                     <b>Summary: </b><span id="datasetSummary"></span>&nbsp;<a id="datasetSummaryMoreLink" class="requires-js" href="javascript:void(0)" onclick="DC_026887848.updateSummary(&quot;more&quot;);" style="display: none;">more</a>
                 </div>
-                <div id="datasetLinkContainer" style="width: 99%; float:left; margin-bottom: 3px;">
+                <div id="datasetLinkContainer" style="width: 80%; float:left; margin-bottom: 3px;">
                     <b>Link: </b>&nbsp;
                     <a href="javascript:void(0)" title="permanent link of the current chart">
                         <input id="link-content" type="text" readonly="readonly" style="width: 100px; color: gray; border: 1px inset;"
@@ -1623,7 +1623,7 @@
                     </a>
                     <span style='display:none; font-size: small; font-style: italic; color: gray;' id='copy-hint'>press ctrl+c to copy</span>
                 </div>
-                <div id="datasetSourceContainer" style="display: none; width: 99%;">
+                <div id="datasetSourceContainer" style="display: none; width: 80%;">
                     <b>Source: </b><span id="datasetSource"></span>
                 </div>
             </div>
