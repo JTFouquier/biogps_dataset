@@ -52,7 +52,7 @@ class Command(NoArgsCommand):
 
         # NCBO annotator web service
         API_KEY = settings.NCBO_ANNO_KEY
-        annotator_url = 'http://rest.bioontology.org/obs/annotator'
+        annotator_url = 'http://data.bioontology.org/annotator'
         all_ds_annos = {}
         #all_ds_freqs = {}
         #doid_freqs = {}
