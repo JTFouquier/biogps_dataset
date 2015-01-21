@@ -711,12 +711,7 @@ def dataset_factors(request, ds_id):
             else:
                 return cmp(kx, ky)
     ret.sort(c2)
-    # back to dict
-    res = {}
-    for e in ret:
-        k = e.keys()[0]
-        res[k] = e[k]
-    return general_json_response(detail=res)
+    return general_json_response(detail=ret)
 
 
 def dataset_503_test(request):
