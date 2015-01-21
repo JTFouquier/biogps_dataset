@@ -1166,22 +1166,22 @@
                                 var k=0;
 
                                 //construct factor dialog
-                                for(var f in dataJson.details)
+                                for(j=0; j<l; j++)
                                 {
-                                    if(dataJson.details.hasOwnProperty(f)==false)
-                                        continue;
-                                    var options = dataJson.details[f].length;
+                                    var key = Object.keys(dataJson.details[j])[0];
+                                    var options = dataJson.details[j][key].length;
+                                    var option_array = dataJson.details[j][key];
                                     if(k%2 == 0) bg = '#eee'; else bg = '#ddd';
                                     k++;
                                     table += '<tr class="factor-item" style="background:'+bg+'"><td style="padding:2px">';
-                                    table += '<input type="radio" name="factor" style="vertical-align: text-bottom" facet="'+f+'" onclick="DC_026887848._clear_factor_select(this)">';
+                                    table += '<input type="radio" name="factor" style="vertical-align: text-bottom" facet="'+key+'" onclick="DC_026887848._clear_factor_select(this)">';
                                     table += '<span style="margin-left:3px">'+f+'</span></td><td style="padding:2px; line-height: 22px; word-break: break-all;">';
                                     var opt_span = '<span style="border-radius: 3px; background-color: darkgray;padding: 2px 5px; margin: 2px">';
                                     for(var i=0; i<options; i++)
                                     {
-                                        table += (opt_span+dataJson.details[f][i]+'</span>');
+                                        table += (opt_span+option_array[i]+'</span>');
                                         if(i == 4 && options > 5){
-                                            table += ("<a href=\"javascript:void(0)\" onclick=\"DC_026887848.updateFactorSpan(\'more\', '"+dataJson.details[f] +"',this);\" style=\"color: blue;\" >more</a>");
+                                            table += ("<a href=\"javascript:void(0)\" onclick=\"DC_026887848.updateFactorSpan(\'more\', '"+option_array +"',this);\" style=\"color: blue;\" >more</a>");
                                             break;
                                         }
                                     }
@@ -1197,17 +1197,16 @@
 
                                 //label toggle
                                 var i = 0;
-                                for(var f in dataJson.details)
+                                for(j=0; j<l; j++)
                                 {
-                                    if(dataJson.details.hasOwnProperty(f)==false)
-                                        continue;
-                                    var shorten = f;
-                                    if (f.length>12)
-                                        shorten = f.substring(0,12)+'...';
+                                    var key = Object.keys(dataJson.details[j])[0];
+                                    var shorten = key;
+                                    if (key.length>12)
+                                        shorten = key.substring(0,12)+'...';
                                     if(i=0){
-                                        $('#label_names').append('<option id="'+f+'" style="background-color:lightgray">'+shorten+'</option>');
+                                        $('#label_names').append('<option id="'+key+'" style="background-color:lightgray">'+shorten+'</option>');
                                     }else{
-                                        $('#label_names').append('<option id="'+f+'">'+shorten+'</option>');
+                                        $('#label_names').append('<option id="'+key+'">'+shorten+'</option>');
                                     }
                                 }
                                 if($('#label_names').find('option').length>0)
