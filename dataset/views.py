@@ -692,7 +692,31 @@ def dataset_factors(request, ds_id):
         factor_keys[e].sort(c)
     if len(factor_keys) == 0:
         return general_json_response(code=GENERAL_ERRORS.ERROR_NOT_FOUND)
-    return general_json_response(detail=factor_keys)
+    # dict to array to dicts, then sorting
+    ret = []
+    for e in factor_keys:
+        ret.append({e: factor_keys[e]})
+
+    def c2(x, y):
+        kx = x.keys()[0]
+        ky = y.keys()[0]
+        if kx in settings.POPULAR_FACTORS:
+            if ky in settings.POPULAR_FACTORS:
+                return cmp(kx, ky)
+            else:
+                return -1
+        else:
+            if ky in settings.POPULAR_FACTORS:
+                return 1
+            else:
+                return cmp(kx, ky)
+    ret.sort(c2)
+    # back to dict
+    res = {}
+    for e in ret:
+        k = e.keys()[0]
+        res[k] = e[k]
+    return general_json_response(detail=res)
 
 
 def dataset_503_test(request):
