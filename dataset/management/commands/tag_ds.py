@@ -5,6 +5,7 @@ from django.conf import settings
 from dataset.models import BiogpsDataset
 import urllib
 import urllib2
+from boto.s3.tagging import Tags
 
 
 class Command(NoArgsCommand):
@@ -80,28 +81,30 @@ class Command(NoArgsCommand):
                 print '\n{}'.format(d.id)
                 all_ds_annos[d.id] = []
                 params = {
-                  'longestOnly': 'false',
-                  'wholeWordOnly': 'true',
-                  'withContext': 'true',
-                  'filterNumber': 'true',
-                  'stopWords': '',
-                  'withDefaultStopWords': 'false',
-                  'isStopWordsCaseSenstive': 'false',
-                  'minTermSize': '3',
-                  'scored': 'true',
-                  'withSynonyms': 'true',
-                  'ontologiesToExpand': '1053,1009',
-                  'ontologiesToKeepInResult': '1053,1009',
-                  'isVirtualOntologyId': 'true',
-                  'semanticTypes': '',
-                  'levelMax': '0',
-                  'mappingTypes': 'null',
-                  'textToAnnotate': summary,
-                  'format': 'tabDelimited',
-                  'apikey': API_KEY,
+                      # 'longestOnly': 'false',
+                      # 'wholeWordOnly': 'true',
+                      # 'withContext': 'true',
+                      # 'filterNumber': 'true',
+                      # 'stopWords': '',
+                      # 'withDefaultStopWords': 'false',
+                      # 'isStopWordsCaseSenstive': 'false',
+                      # 'minTermSize': '3',
+                      # 'scored': 'true',
+                      # 'withSynonyms': 'true',
+                      # 'ontologiesToExpand': '1053,1009',
+                      # 'ontologiesToKeepInResult': '1053,1009',
+                      # 'isVirtualOntologyId': 'true',
+                      # 'semanticTypes': '',
+                      # 'levelMax': '0',
+                      # 'mappingTypes': 'null',
+                      # 'textToAnnotate': summary,
+                      # 'format': 'tabDelimited',
+                      'text': summary,
+                      'apikey': API_KEY,
+                      # 'ontologies': 'FMA,DOID',
                 }
-                post_data = urllib.urlencode(params)
-                conn = urllib2.urlopen(annotator_url, post_data)
+                data = urllib.urlencode(params)
+                conn = urllib2.urlopen(annotator_url+'?'+data)
                 anno_results = conn.read()
                 conn.close()
 
@@ -116,6 +119,12 @@ class Command(NoArgsCommand):
 
                 params = ['conceptId', 'fullId', 'localConceptId',
                           'localOntologyId', 'preferredName']
+                import json
+                jsn = json.loads(anno_results)
+                for j in jsn:
+                    ds_tags.add(j['annotations'][0]['text'])
+                print ds_tags
+                return
 
                 for i in anno_results.split('\r\n'):
                     if len(i) > 0:
@@ -191,16 +200,3 @@ class Command(NoArgsCommand):
         with open('anno_results.txt', 'w') as f:
             f.write('\n\n'.join('{}: {}'.format(i, all_ds_annos[i])
                     for i in all_ds_annos))
-
-        #print sorted(all_ds_freqs.items(), key=lambda i: i[1], reverse=True)
-        #print '\n{}'.format('DOID:')
-        #doid = sorted(doid_freqs.items(), key=lambda i: i[1], reverse=True)
-        #print doid
-        #for i in doid:
-        #    print '{},{}'.format(i[0], i[1])
-        #print '\n{}'.format('fma:')
-        #fma = sorted(fma_freqs.items(), key=lambda i: i[1], reverse=True)
-        #print fma
-        #for i in fma:
-        #    print '{},{}'.format(i[0], i[1])
-
