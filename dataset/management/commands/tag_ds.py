@@ -100,7 +100,7 @@ class Command(NoArgsCommand):
                       # 'format': 'tabDelimited',
                       'text': summary,
                       'apikey': API_KEY,
-                      # 'ontologies': 'FMA,DOID',
+                      'ontologies': 'FMA,DOID',
                 }
                 data = urllib.urlencode(params)
                 conn = urllib2.urlopen(annotator_url+'?'+data)
