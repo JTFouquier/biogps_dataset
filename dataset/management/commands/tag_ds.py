@@ -5,7 +5,6 @@ from django.conf import settings
 from dataset.models import BiogpsDataset
 import urllib
 import urllib2
-from boto.s3.tagging import Tags
 
 
 class Command(NoArgsCommand):
