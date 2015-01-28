@@ -722,7 +722,7 @@ def dataset_tags(request):
     qs = Tag.objects.all()
     total = qs.count()
     total_page = int(math.ceil(float(total) / float(page_by)))
-    li = qs[(page-1)*page_by, page.page_by]
+    li = qs[(page-1)*page_by, page*page_by]
     res = {"current_page": page, "total_page": total_page, "count": total,
            "results": li}
     return general_json_response(detail=res)
