@@ -74,7 +74,7 @@ class Command(NoArgsCommand):
         # Annotate datasets
         ds = BiogpsDataset.objects.all()
         for d in ds:
-            summary = d.metadata['summary'].encode('utf-8')
+            summary = d.summary.encode('utf-8')
 
             if summary:
                 # Get annotation(s) for current summary
