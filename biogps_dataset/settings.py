@@ -40,6 +40,7 @@ INSTALLED_APPS = (
     'grappelli',
     'django.contrib.admin',
     'django_extensions',
+    'tagging',
 )
 
 MIDDLEWARE_CLASSES = (
