@@ -5,30 +5,13 @@ from django.conf import settings
 from dataset.models import BiogpsDataset
 import urllib
 import urllib2
+from tagging.models import Tag
 
 
 class Command(NoArgsCommand):
     help = 'A utility that tags datasets based on NCBO annotations.'
     # Turn off Django's DEBUG mode to limit memory usage
     settings.DEBUG = False
-
-    def handle_noargs(self, **options):
-        def get_param_vals(params, res_str):
-            """Return value for param, parsed from NCBO res_str"""
-            _annos = {}
-            for p in params:
-                try:
-                    p_pos = res_str.index(p)
-                    p_val = res_str[p_pos:].split(': ', 1)[1].split(',', 1)[0]
-                    if p == 'localConceptId':
-                        p_val = p_val.split(':')[0]
-                    if p == 'preferredName':
-                        p_val = p_val.lower()
-                    _annos[p] = p_val
-                except ValueError:
-                    # Param not found in string
-                    continue
-            return _annos
 
         def read_fma_file():
             """Load fma subset from file"""
@@ -44,19 +27,13 @@ class Command(NoArgsCommand):
                         continue
             return _fma_annos
 
-        def update_ds_annos(annos):
-            """Compare annotations to previously parsed annotations,
-               update if necessary"""
-            if annos['preferredName'] not in prev_annos['preferredName']:
-                ds_annos.append(annos)
-
         # NCBO annotator web service
         API_KEY = settings.NCBO_ANNO_KEY
         annotator_url = 'http://data.bioontology.org/annotator'
         all_ds_annos = {}
-        #all_ds_freqs = {}
-        #doid_freqs = {}
-        #fma_freqs = {}
+        # all_ds_freqs = {}
+        # doid_freqs = {}
+        # fma_freqs = {}
         self.stdout.write('\nLoading datasets...\n')
 
         # Read in fma susbset from file: {"full_id": "preferred_name"}
@@ -122,80 +99,6 @@ class Command(NoArgsCommand):
                 jsn = json.loads(anno_results)
                 for j in jsn:
                     ds_tags.add(j['annotations'][0]['text'])
-                print ds_tags
-                return
-
-                for i in anno_results.split('\r\n'):
-                    if len(i) > 0:
-                        annotations = get_param_vals(params, i)
-
-                        if not annotations:
-                            # No results
-                            continue
-
-                        # Update anno freq
-                        #freq_dict = doid_freqs
-
-                        # Check against skip terms
-                        pref_name = annotations['preferredName']
-                        if pref_name in skip_terms:
-                            print '    **Skip term: "{}"\n'.format(pref_name)
-                            continue
-
-                        if annotations['localConceptId'].find('fma') != -1:
-                        #    freq_dict = fma_freqs
-
-                            # Check for fullID param match against fma subset
-                            full_id = annotations['fullId']
-                            if full_id not in fma_full_ids:
-                                print '  **full Id "{}" not in file'.format(
-                                    full_id)
-                                continue
-
-                        #        #print '  Matched {}'.format(annotations['fullId'])
-                        #        pref_name = annotations['preferredName']
-                        #        if pref_name in freq_dict:
-                        #            freq_dict[pref_name] += 1
-                        #        else:
-                        #            freq_dict[pref_name] = 1
-
-                        #else:
-                        #    # DOID
-                        #    pref_name = annotations['preferredName']
-
-                        #    if pref_name in freq_dict:
-                        #        freq_dict[pref_name] += 1
-                        #    else:
-                        #        freq_dict[pref_name] = 1
-
-                        #for k, v in annotations.iteritems():
-                        #    if k == 'preferredName':
-                        #        if v in all_ds_freqs:
-                        #            all_ds_freqs[v] += 1
-                        #        else:
-                        #            all_ds_freqs[v] = 1
-
-                        # Format preferredName for tagging
-                        pref_name = pref_name.replace(' ', '-').replace("'", "")
-                        annotations['preferredName'] = pref_name
-
-                        # Add dataset tag
-                        ds_tags.add(pref_name)
-
-                        # Check current annotations against previous results
-                        if not prev_annos:
-                            prev_annos['preferredName'] = pref_name
-                            ds_annos.append(annotations)
-                        else:
-                            update_ds_annos(annotations)
-
-                # Add dataset annotations to results
-                all_ds_annos[d.id] = ds_annos
-
-                # Update dataset tags
-                d.tags = ','.join(ds_tags)
-
-        print 'Writing annotations to file...'
-        with open('anno_results.txt', 'w') as f:
-            f.write('\n\n'.join('{}: {}'.format(i, all_ds_annos[i])
-                    for i in all_ds_annos))
+                # tagging using django-tagging
+                for e in ds_tags:
+                    Tag.objects.add_tag(d, e)
