@@ -126,4 +126,6 @@ class Command(NoArgsCommand):
                 # tagging using django-tagging
                 for e in ds_tags:
                     for t in e.split(' '):
-                        Tag.objects.add_tag(d, t.lower())
+                        t = t.strip()
+                        if len(t) > 0:
+                            Tag.objects.add_tag(d, t.lower())
