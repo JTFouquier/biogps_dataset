@@ -44,8 +44,6 @@ class DP_E_GEOD_4006(Pattern):
         f = data.values()[0]
         f.seek(0)
         header = f.readline().strip().split('\t')
-        print header
-        print self.data_keys
         if self.match_any(self.data_keys, header) is None:
             return None
         f.seek(0)
