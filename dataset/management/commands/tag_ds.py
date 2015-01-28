@@ -104,7 +104,7 @@ class Command(NoArgsCommand):
                       'ontologies': 'FMA,DOID',
                 }
                 data = urllib.urlencode(params)
-                conn = urllib2.urlopen(annotator_url+'?'+data)
+                conn = urllib2.urlopen(annotator_url, data)
                 anno_results = conn.read()
                 conn.close()
 
