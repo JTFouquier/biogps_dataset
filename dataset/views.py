@@ -731,7 +731,7 @@ def dataset_tags(request):
 
 def dataset_filter_by_tag(request):
     # no factor value
-    tag = request.GET.get("page", None)
+    tag = request.GET.get("tag", None)
     if tag is None:
         return general_json_response(
             GENERAL_ERRORS.ERROR_BAD_ARGS,
