@@ -714,6 +714,20 @@ def dataset_factors(request, ds_id):
     return general_json_response(detail=ret)
 
 
+def dataset_tags(request):
+    # no factor value
+    page = request.GET.get("page", 1)
+    page_by = request.GET.get("page_by", 8)
+    from tagging.models import Tag
+    qs = Tag.objects.all()
+    total = qs.count()
+    total_page = int(math.ceil(float(total) / float(page_by)))
+    li = qs[(page-1)*page_by, page.page_by]
+    res = {"current_page": page, "total_page": total_page, "count": total,
+           "results": li}
+    return general_json_response(detail=res)
+
+
 def dataset_503_test(request):
     """
         just for test 503 error page redirect
