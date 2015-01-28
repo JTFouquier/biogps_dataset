@@ -8,6 +8,7 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 import requests
 import math
+from tagging.models import Tag, TaggedItem
 from dataset.util import general_json_response, GENERAL_ERRORS
 import StringIO
 import mygene
@@ -725,6 +726,29 @@ def dataset_tags(request):
     li = qs[(page-1)*page_by: page*page_by]
     res = {"current_page": page, "total_page": total_page, "count": total,
            "results": li}
+    return general_json_response(detail=res)
+
+
+def dataset_filter_by_tag(request):
+    # no factor value
+    tag = request.GET.get("page", None)
+    if tag is None:
+        return general_json_response(
+            GENERAL_ERRORS.ERROR_BAD_ARGS,
+            "must input a tag name")
+    page = int(request.GET.get("page", 1))
+    page_by = int(request.GET.get("page_by", 8))
+
+    qs = TaggedItem.objects.get_by_model(models.BiogpsDataset, tag)
+    total = qs.count()
+    total_page = int(math.ceil(float(total) / float(page_by)))
+    li = qs[(page-1)*page_by: page*page_by]
+    data = []
+    for ds in li:
+        data.append({"id": ds.id, "name": ds.name, 'geo_gse_id':
+                    ds.geo_gse_id, "summary": ds.summary})
+    res = {"current_page": page, "total_page": total_page, "count": total,
+           "results": data}
     return general_json_response(detail=res)
 
 
