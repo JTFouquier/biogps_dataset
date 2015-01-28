@@ -13,6 +13,24 @@ class Command(NoArgsCommand):
     # Turn off Django's DEBUG mode to limit memory usage
     settings.DEBUG = False
 
+    def handle_noargs(self, **options):
+        def get_param_vals(params, res_str):
+            """Return value for param, parsed from NCBO res_str"""
+            _annos = {}
+            for p in params:
+                try:
+                    p_pos = res_str.index(p)
+                    p_val = res_str[p_pos:].split(': ', 1)[1].split(',', 1)[0]
+                    if p == 'localConceptId':
+                        p_val = p_val.split(':')[0]
+                    if p == 'preferredName':
+                        p_val = p_val.lower()
+                    _annos[p] = p_val
+                except ValueError:
+                    # Param not found in string
+                    continue
+            return _annos
+
         def read_fma_file():
             """Load fma subset from file"""
             _fma_annos = {}
@@ -26,6 +44,12 @@ class Command(NoArgsCommand):
                         # Metadata or blank line
                         continue
             return _fma_annos
+
+        def update_ds_annos(annos):
+            """Compare annotations to previously parsed annotations,
+               update if necessary"""
+            if annos['preferredName'] not in prev_annos['preferredName']:
+                ds_annos.append(annos)
 
         # NCBO annotator web service
         API_KEY = settings.NCBO_ANNO_KEY
