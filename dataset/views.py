@@ -716,8 +716,8 @@ def dataset_factors(request, ds_id):
 
 def dataset_tags(request):
     # no factor value
-    page = request.GET.get("page", 1)
-    page_by = request.GET.get("page_by", 8)
+    page = int(request.GET.get("page", 1))
+    page_by = int(request.GET.get("page_by", 8))
     from tagging.models import Tag
     qs = Tag.objects.all()
     total = qs.count()
