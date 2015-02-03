@@ -731,17 +731,16 @@ def dataset_tags(request):
     return general_json_response(detail=res)
 
 
-def dataset_filter_by_tag(request):
+def dataset_filter_by_tag(request, tag_name):
     # no factor value
-    tag = request.GET.get("tag", None)
-    if tag is None:
+    if tag_name is None:
         return general_json_response(
             GENERAL_ERRORS.ERROR_BAD_ARGS,
             "must input a tag name")
     page = int(request.GET.get("page", 1))
     page_by = int(request.GET.get("page_by", 8))
 
-    qs = TaggedItem.objects.get_by_model(models.BiogpsDataset, tag)
+    qs = TaggedItem.objects.get_by_model(models.BiogpsDataset, tag_name)
     total = qs.count()
     total_page = int(math.ceil(float(total) / float(page_by)))
     li = qs[(page-1)*page_by: page*page_by]
