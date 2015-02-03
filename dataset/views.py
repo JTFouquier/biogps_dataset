@@ -479,7 +479,8 @@ def dataset_search_all(request):
     ds_query = models.BiogpsDataset.objects.filter(geo_gse_id__in=ids)
     for ds in ds_query:
         temp_dic = {"id": ds.id, "name": ds.name, 'geo_gse_id':
-                    ds.geo_gse_id, "sample_count": ds.sample_count}
+                    ds.geo_gse_id, "sample_count": ds.sample_count,
+                    'factor_count': ds.factor_count}
         res.append(temp_dic)
 
     res = {"current_page": 1, "total_page": total_page, "count": count,
