@@ -28,7 +28,7 @@ urlpatterns = patterns(
         name='dataset factors'),
     # Tag related
     url(r'^tag/$', views.dataset_tags, name='dataset tag list'),
-    url(r'^tag/tag_by/$', views.dataset_filter_by_tag,
+    url(r'^tag/(?P<tag_name>.+)/$', views.dataset_filter_by_tag,
         name='dataset filtered by tag'),
     # url(r'^503_test/$', views.dataset_503_test, name='dataset 503 test'),
 )
