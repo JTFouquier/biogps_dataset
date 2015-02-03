@@ -459,7 +459,8 @@ def dataset_search_all(request):
     res_default = []
     for ds in qs:
         temp_dic = {"id": ds.id, "name": ds.name, 'geo_gse_id':
-                    ds.geo_gse_id, "sample_count": ds.sample_count}
+                    ds.geo_gse_id, "sample_count": ds.sample_count,
+                    'factor_count': ds.factor_count}
         # factors = get_ds_factors_keys(ds)
         # temp_dic["factors"] = [obj['name'] for obj in factors]
         res_default.append(temp_dic)
