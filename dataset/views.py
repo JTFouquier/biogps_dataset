@@ -135,13 +135,16 @@ def _contruct_meta(ds):
 @require_http_methods(["GET"])
 def dataset_list(request):
     order = request.GET.get('order', None)
+    page = request.GET.get('page', 1)
+    page_by = request.GET.get('page_by', 15)
     if order == 'pop':
         qs = models.BiogpsDataset.objects.all()
     elif order == 'new':
         qs = models.BiogpsDataset.objects.all().order_by('-created')
     else:
         qs = models.BiogpsDataset.objects.all().order_by('created')
-    ds = qs[:15]
+    ds = qs.values_list('id', 'name', 'slug',
+                        'summary')[(page-1)*page_by: page*page_by]
     return general_json_response(detail=ds)
 
 
