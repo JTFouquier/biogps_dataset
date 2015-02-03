@@ -247,7 +247,7 @@
                     $.each(allDatasets.results, function(idx, ds) {
                         var _dsClass = (idx % 2 == 0 ? "odd-li" : "even-li");
                         var _dsTitle = (ds.name.length > _titleWidth ? ds.name.substring(0, _titleWidth - 3) + "..." : ds.name);
-                        _dsTitle += "  (" + ds.sample_count + " samples)";
+                        _dsTitle += "  (" + ds.sample_count + " samples, "+ds.factor_count+" factors)";
                         $("#dsList").append('<a class="ds-dialog" href="javascript:void(0)" onclick="DC_026887848.loadDataset(\'' + ds.geo_gse_id + '\')"><li class="ds-dialog ' + _dsClass + '" id="ds' + ds.id + '">' + _dsTitle + '</li></a>');
                     });
                     // Update default datasets
