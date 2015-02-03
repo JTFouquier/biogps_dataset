@@ -125,7 +125,5 @@ class Command(NoArgsCommand):
                     ds_tags.add(j['annotations'][0]['text'])
                 # tagging using django-tagging
                 for e in ds_tags:
-                    for t in e.split(' '):
-                        t = t.strip()
-                        if len(t) > 0:
-                            Tag.objects.add_tag(d, t.lower())
+                    print '"%s"' % e.lower()
+                    Tag.objects.add_tag(d, '"%s"' % e.lower())
