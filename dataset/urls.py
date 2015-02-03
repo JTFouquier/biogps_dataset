@@ -3,6 +3,7 @@ from dataset import views
 
 urlpatterns = patterns(
     '',
+    url(r'^/$', views.dataset_list, name='dataset list'),
     url(r'^meta/(?P<ds_id>.+)/$', views.dataset_info,
         name='dataset meta'),
     url(r'^data/(?P<ds_id>.+)/gene/(?P<gene_id>.+)/$',
