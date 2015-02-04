@@ -531,7 +531,7 @@ def dataset_search_4_biogps(request):
         p = ds.platform
         dict['species'] = 'human'
         t = Tag.objects.get_for_object(ds)
-        dict['tags'] = t.values_list('name', flat=True)
+        dict['tags'] = list(t.values_list('name', flat=True))
         res.append(dict)
     return general_json_response(detail=res)
 
