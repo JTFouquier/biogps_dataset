@@ -21,6 +21,8 @@ urlpatterns = patterns(
     # return first page non-default and all default ds
     url(r'^search/all/$', views.dataset_search_all,
         name='dataset search all'),
+    url(r'^search/4-biogps/$', views.dataset_search_4_biogps,
+        name='dataset search for biogps'),
     url(r'^default/$', views.dataset_default, name='dataset default'),
     url(r'^correlation/(?P<ds_id>.+)/reporter/(?P<reporter_id>.+)/min/(?P<min_corr>.+)/$',
         views.dataset_correlation,
