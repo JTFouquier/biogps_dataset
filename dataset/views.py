@@ -756,7 +756,7 @@ def dataset_filter_by_tag(request, tag_name):
             GENERAL_ERRORS.ERROR_BAD_ARGS,
             "must input a tag name")
     page = int(request.GET.get("page", 1))
-    page_by = int(request.GET.get("page_by", 8))
+    page_by = int(request.GET.get("page_by", 5))
 
     qs = TaggedItem.objects.get_by_model(models.BiogpsDataset, tag_name)
     total = qs.count()
@@ -765,7 +765,7 @@ def dataset_filter_by_tag(request, tag_name):
     data = []
     for ds in li:
         data.append({"id": ds.id, "name": ds.name, 'geo_gse_id':
-                    ds.geo_gse_id, "summary": ds.summary})
+                    ds.geo_gse_id, "slug": ds.slug})
     res = {"current_page": page, "total_page": total_page, "count": total,
            "results": data}
     return general_json_response(detail=res)
