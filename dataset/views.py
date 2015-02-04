@@ -507,6 +507,34 @@ def dataset_search_all(request):
                                          'non-default': res})
 
 
+def dataset_search_4_biogps(request):
+    query = request.GET.get("query", None)
+    if query is None:
+        return general_json_response(
+            code=GENERAL_ERRORS.ERROR_BAD_ARGS, detail='must\
+            input a keyword for search.')
+    body = {"from": 0, "size": 15}
+    body["query"] = {
+        "multi_match": {"query": query, "fields": ["summary", "name"]}}
+    data = json.dumps(body)
+    r = requests.post(settings.ES_URLS['SCH'], data=data)
+    r = r.json()
+    ids = []
+    for item in r["hits"]["hits"]:
+        ids.append(item["_source"]["geo_gse_id"])
+    ds_query = models.BiogpsDataset.objects.filter(geo_gse_id__in=ids)
+    res = []
+    for ds in ds_query:
+        dict = {"id": ds.id, "name": ds.name, 'geo_gse_id':
+                ds.geo_gse_id, "sample_count": ds.sample_count,
+                'factor_count': ds.factor_count, 'slug': ds.slug}
+        p = ds.platform
+        dict['species'] = 'human'
+        t = Tag.objects.get_for_object(ds)
+        dict['tags'] = t.values_list('name', flat=True)
+        res.append(dict)
+    return general_json_response(detail=res)
+
 def dataset_csv(request, ds_id, gene_id):
     """
          csv format file download
