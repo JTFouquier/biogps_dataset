@@ -143,7 +143,8 @@ def dataset_list(request):
         qs = models.BiogpsDataset.objects.all().order_by('-created')
     else:
         qs = models.BiogpsDataset.objects.all().order_by('created')
-    ret = [{'id': ds.id, 'name': ds.name, 'slug': ds.slug} for ds in qs]
+    ret = [{'id': ds.id, 'name': ds.name, 'slug': ds.slug}
+           for ds in qs[(page-1)*page_by: page*page_by]]
 #     ds = qs.values_list('id', 'name', 'slug',
 #                         'summary')[(page-1)*page_by: page*page_by]
     return general_json_response(detail=ret)
