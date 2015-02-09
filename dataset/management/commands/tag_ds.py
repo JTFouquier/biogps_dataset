@@ -72,13 +72,20 @@ class Command(NoArgsCommand):
                       'cytoplasm', 'disease', 'genome', 'organ', 'syndrome']
 
         # Annotate datasets
-        ds = BiogpsDataset.objects.all()
+        ds = BiogpsDataset.objects.all().order_by('-created')
+        watch = ['immune system', 'nervous system']
+        i = 0
         for d in ds:
+            print 'No.%d' % i
+            print 'id:%s, geo_gse_id:%s' % (d.id, d.geo_gse_id)
+            # skip already tagged ones
+            ts = Tag.objects.get_for_object(ds)
+            if ts.count() > 0:
+                print 'already tagged'
+                continue
             summary = d.summary.encode('utf-8')
-
             if summary:
                 # Get annotation(s) for current summary
-                print '\n{}'.format(d.id)
                 all_ds_annos[d.id] = []
                 params = {
                       # 'longestOnly': 'false',
@@ -125,5 +132,9 @@ class Command(NoArgsCommand):
                     ds_tags.add(j['annotations'][0]['text'])
                 # tagging using django-tagging
                 for e in ds_tags:
-                    print '"%s"' % e.lower()
+                    # print '"%s"' % e.lower()
+                    if e in watch:
+                        print e
                     Tag.objects.add_tag(d, '"%s"' % e.lower())
+            else:
+                print 'summary wrong'

@@ -536,6 +536,7 @@ def dataset_search_4_biogps(request):
         res.append(dict)
     return general_json_response(detail=res)
 
+
 def dataset_csv(request, ds_id, gene_id):
     """
          csv format file download
@@ -787,7 +788,8 @@ def dataset_filter_by_tag(request, tag_name):
     page = int(request.GET.get("page", 1))
     page_by = int(request.GET.get("page_by", 5))
 
-    qs = TaggedItem.objects.get_by_model(models.BiogpsDataset, tag_name)
+    qs = TaggedItem.objects.get_by_model(models.BiogpsDataset,
+                                         '"%s"' % tag_name)
     total = qs.count()
     total_page = int(math.ceil(float(total) / float(page_by)))
     li = qs[(page-1)*page_by: page*page_by]
