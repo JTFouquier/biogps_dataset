@@ -47,6 +47,7 @@ class ExperimentSave:
         factor_count = 0
         fvs = []
         for e in factors:
+            e = e[e.keys()[0]]
             if 'factorvalue' not in e:
                 break
             fvs.append(e['factorvalue'])
