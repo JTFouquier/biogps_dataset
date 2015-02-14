@@ -5,7 +5,7 @@ from dataset.models import (BiogpsDataset,
 
 class BiogpsDatasetAdmin(admin.ModelAdmin):
     list_display = ('id', 'geo_gse_id', 'platform',  'sample_count',
-                    'factor_count', '_factors')
+                    'factor_count', '_factors', 'is_default')
     list_filter = ('platform',)
     list_display_links = ('geo_gse_id',)
     search_fields = ['geo_gse_id']
