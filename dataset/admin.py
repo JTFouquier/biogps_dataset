@@ -40,7 +40,7 @@ admin.site.register(BiogpsDataset, BiogpsDatasetAdmin)
 
 
 class BiogpsDatasetPlatformAdmin(admin.ModelAdmin):
-    list_display = ('platform', 'dataset', 'name', 'spcecies')
+    list_display = ('platform', 'dataset', 'name', 'species')
     exclude = ('reporters',)
 
     def dataset(self, obj):
