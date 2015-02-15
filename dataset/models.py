@@ -99,7 +99,8 @@ class BiogpsDataset(models.Model):
                 "summary": self.summary, "geo_gse_id": self.geo_gse_id,
                 "sample_count": self.sample_count, "factor_count":
                 self.factor_count, "species": self.platform.species, "tags":
-                Tag.objects.get_for_object(self)}
+                list(Tag.objects.get_for_object(self).values_list
+                     ("name", flat=True)), 'is_default': self.is_default}
 
     @property
     def name_wrapped(self):
