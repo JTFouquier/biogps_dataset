@@ -91,10 +91,15 @@ class BiogpsDataset(models.Model):
 #                     for v in format_factor(val):
 #                         _fac_txt.add(v)
 #         return ' '.join(_fac_txt)
+
     # serialize object data for es index setup
     def es_index_serialize(self):
-        return {"name": self.name,
-                "summary": self.summary, "geo_gse_id": str(self.geo_gse_id)}
+        from tagging.models import Tag
+        return {"name": self.name, "id": self.id, "slug": self.slug,
+                "summary": self.summary, "geo_gse_id": self.geo_gse_id,
+                "sample_count": self.sample_count, "factor_count":
+                self.factor_count, "species": self.platform.species, "tags":
+                Tag.objects.get_for_object(self)}
 
     @property
     def name_wrapped(self):
@@ -231,6 +236,7 @@ class BiogpsDatasetPlatform(models.Model):
     platform = models.CharField(max_length=100)
     reporters = JSONField(blank=False, editable=True)
     name = models.CharField(max_length=256)
+    species = models.CharField(max_length=64)
 
     class Meta:
         verbose_name_plural = "Dataset Platform"
