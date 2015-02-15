@@ -33,7 +33,7 @@ urlpatterns = patterns(
         name='dataset filtered by tag'),
     url(r'^search/4-biogps/$', views.dataset_search_4_biogps,
         name='dataset search for biogps'),
-    url(r'^(?P<_id>d+)/4-biogps/$', views.dataset_info_4_biogps,
+    url(r'^(?P<_id>\d+)/4-biogps/$', views.dataset_info_4_biogps,
         name='dataset info for biogps'),
     # url(r'^503_test/$', views.dataset_503_test, name='dataset 503 test'),
 )
