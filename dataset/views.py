@@ -363,7 +363,7 @@ def dataset_chart(request, ds_id, reporter_id):
     return response
 
 
-def _es_search(rpt, q=None, dft=0, start=0, size=8):
+def _es_search(rpt, q=None, dft=False, start=0, size=8):
     """
         filter by "default" field and "platform" and query by keywords
         if specified
@@ -371,7 +371,7 @@ def _es_search(rpt, q=None, dft=0, start=0, size=8):
     body = {"from": start, "size": size}
     # setup filter, filter is faster that query
     body['query'] = {"filtered": {"filter": {"bool": {
-        "must": [{"term": {"default": dft}},
+        "must": [{"term": {"is_default": dft}},
                  {"has_parent": {"parent_type": "platform", "query":
                                  {"match": {"reporters": rpt}}}}]}}
     }}
@@ -405,7 +405,7 @@ def dataset_search(request):
     page = int(page)
     page_by = int(page_by)
     rep = ' '.join(reporters)
-    search_res = _es_search(rep, query, 0, (page-1)*page_by, page_by)
+    search_res = _es_search(rep, query, False, (page-1)*page_by, page_by)
     count = search_res["hits"]["total"]
 
     total_page = int(math.ceil(float(count) / float(page_by)))
@@ -441,7 +441,7 @@ def dataset_search_default(request):
             code=GENERAL_ERRORS.ERROR_NOT_FOUND, detail='no\
             matched data for gene %s.' % gene)
     # retrive all results
-    search_res = _es_search(' '.join(reporters), query, 1, 0, 9999)
+    search_res = _es_search(' '.join(reporters), query, True, 0, 9999)
     ids = [item["_source"]["geo_gse_id"]
            for item in search_res["hits"]["hits"]]
     qs = models.BiogpsDataset.objects.using('default_dataset')\
@@ -470,7 +470,7 @@ def dataset_search_all(request):
             matched data for gene %s.' % gene)
     # retrive all default results(9999)
     rep = ' '.join(reporters)
-    search_res = _es_search(rep, query, 1, 0, 9999)
+    search_res = _es_search(rep, query, True, 0, 9999)
     ids = [item["_source"]["geo_gse_id"]
            for item in search_res["hits"]["hits"]]
     qs = models.BiogpsDataset.objects.using('default_dataset')\
@@ -488,7 +488,7 @@ def dataset_search_all(request):
     # retrive fist page non-default ds
     page_by = request.GET.get("page_by", 8)
     page_by = int(page_by)
-    search_res = _es_search(rep, query, 0, 0, page_by)
+    search_res = _es_search(rep, query, False, 0, page_by)
     count = search_res["hits"]["total"]
     total_page = int(math.ceil(float(count) / float(page_by)))
     res = []
@@ -520,20 +520,24 @@ def dataset_search_4_biogps(request):
     data = json.dumps(body)
     r = requests.post(settings.ES_URLS['SCH'], data=data)
     r = r.json()
-    ids = []
-    for item in r["hits"]["hits"]:
-        ids.append(item["_source"]["geo_gse_id"])
-    ds_query = models.BiogpsDataset.objects.filter(geo_gse_id__in=ids)
     res = []
-    for ds in ds_query:
-        dict = {"id": ds.id, "name": ds.name, 'geo_gse_id':
-                ds.geo_gse_id, "sample_count": ds.sample_count,
-                'factor_count': ds.factor_count, 'slug': ds.slug}
-        p = ds.platform
-        dict['species'] = 'human'
-        t = Tag.objects.get_for_object(ds)
-        dict['tags'] = list(t.values_list('name', flat=True))
-        res.append(dict)
+    print r["hits"]["hits"][0]
+#     for e in r["hits"]["hits"]:
+#         item["_source"]["geo_gse_id"]
+#     ids = []
+#     for item in r["hits"]["hits"]:
+#         ids.append(item["_source"]["geo_gse_id"])
+#     ds_query = models.BiogpsDataset.objects.filter(geo_gse_id__in=ids)
+#     res = []
+#     for ds in ds_query:
+#         dict = {"id": ds.id, "name": ds.name, 'geo_gse_id':
+#                 ds.geo_gse_id, "sample_count": ds.sample_count,
+#                 'factor_count': ds.factor_count, 'slug': ds.slug}
+#         p = ds.platform
+#         dict['species'] = 'human'
+#         t = Tag.objects.get_for_object(ds)
+#         dict['tags'] = list(t.values_list('name', flat=True))
+#         res.append(dict)
     return general_json_response(detail=res)
 
 
