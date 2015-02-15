@@ -521,9 +521,10 @@ def dataset_search_4_biogps(request):
     r = requests.post(settings.ES_URLS['SCH'], data=data)
     r = r.json()
     res = []
-    print r["hits"]["hits"][0]
-#     for e in r["hits"]["hits"]:
-#         item["_source"]["geo_gse_id"]
+    for e in r["hits"]["hits"]:
+        _e = e["_source"]
+        del _e['summary']
+        res.append(_e)
 #     ids = []
 #     for item in r["hits"]["hits"]:
 #         ids.append(item["_source"]["geo_gse_id"])
