@@ -498,6 +498,18 @@ def dataset_search_4_biogps(request):
     return general_json_response(detail=res)
 
 
+@require_http_methods(["GET"])
+def dataset_info_4_biogps(request, _id):
+    """
+        get information about a dataset
+    """
+    ds = models.BiogpsDataset.objects.get(id=id)
+    ret = _contruct_meta(ds)
+    fa = get_ds_factors_keys(ds)
+    ret.update({'factors': fa})
+    return general_json_response(detail=ret)
+
+
 def dataset_csv(request, ds_id, gene_id):
     """
          csv format file download
