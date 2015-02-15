@@ -503,7 +503,7 @@ def dataset_info_4_biogps(request, _id):
     """
         get information about a dataset
     """
-    ds = models.BiogpsDataset.objects.get(id=id)
+    ds = models.BiogpsDataset.objects.get(id=_id)
     ret = _contruct_meta(ds)
     fa = get_ds_factors_keys(ds)
     ret.update({'factors': fa})
