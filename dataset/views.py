@@ -411,22 +411,8 @@ def dataset_search(request):
     res = []
     for e in search_res["hits"]["hits"]:
         _e = e["_source"]
-        del _e['summary']
+        del _e['summary'], _e['tags']
         res.append(_e)
-#     ids = []
-#     for item in search_res["hits"]["hits"]:
-#         ids.append(item["_source"]["geo_gse_id"])
-#     ds_query = models.BiogpsDataset.objects.filter(geo_gse_id__in=ids)
-#     for ds in ds_query:
-#         # temp_dic = {"id": ds.id, "name": ds.name, 'geo_gse_id':
-#         #             ds.geo_gse_id}
-#         # factors = get_ds_factors_keys(ds)
-#         # temp_dic["factors"] = [obj['name'] for obj in factors]
-#         temp_dic = {"id": ds.id, "name": ds.name, 'geo_gse_id':
-#                     ds.geo_gse_id, "sample_count": ds.sample_count,
-#                     'factor_count': ds.factor_count}
-#         res.append(temp_dic)
-
     res = {"current_page": page, "total_page": total_page, "count": count,
            "results": res}
     return general_json_response(detail=res)
@@ -448,19 +434,8 @@ def dataset_search_default(request):
     res = []
     for e in search_res["hits"]["hits"]:
         _e = e["_source"]
-        del _e['summary']
+        del _e['summary'], _e['tags']
         res.append(_e)
-#     ids = [item["_source"]["geo_gse_id"]
-#            for item in search_res["hits"]["hits"]]
-#     qs = models.BiogpsDataset.objects.using('default_dataset')\
-#         .filter(geo_gse_id__in=ids)
-#     res = []
-#     for ds in qs:
-#         temp_dic = {"id": ds.id, "name": ds.name, 'geo_gse_id':
-#                     ds.geo_gse_id, "sample_count": ds.sample_count}
-# #         factors = get_ds_factors_keys(ds)
-# #         temp_dic["factors"] = [obj['name'] for obj in factors]
-#         res.append(temp_dic)
     res = {"count": len(res),   "results": res}
     return general_json_response(detail=res)
 
@@ -479,22 +454,10 @@ def dataset_search_all(request):
     # retrive all default results(9999)
     rep = ' '.join(reporters)
     search_res = _es_search(rep, query, True, 0, 9999)
-#     ids = [item["_source"]["geo_gse_id"]
-#            for item in search_res["hits"]["hits"]]
-#     qs = models.BiogpsDataset.objects.using('default_dataset')\
-#         .filter(geo_gse_id__in=ids)
-#     res_default = []
-#     for ds in qs:
-#         temp_dic = {"id": ds.id, "name": ds.name, 'geo_gse_id':
-#                     ds.geo_gse_id, "sample_count": ds.sample_count,
-#                     'factor_count': 0}
-#         # factors = get_ds_factors_keys(ds)
-#         # temp_dic["factors"] = [obj['name'] for obj in factors]
-#         res_default.append(temp_dic)
     res_dft = []
     for e in search_res["hits"]["hits"]:
         _e = e["_source"]
-        del _e['summary']
+        del _e['summary'], _e['tags']
         res_dft.append(_e)
     res_default = {"count": len(res_dft),   "results": res_dft}
 
@@ -507,19 +470,8 @@ def dataset_search_all(request):
     res = []
     for e in search_res["hits"]["hits"]:
         _e = e["_source"]
-        del _e['summary']
+        del _e['summary'], _e['tags']
         res.append(_e)
-#     res = []
-#     ids = []
-#     for item in search_res["hits"]["hits"]:
-#         ids.append(item["_source"]["geo_gse_id"])
-#     ds_query = models.BiogpsDataset.objects.filter(geo_gse_id__in=ids)
-#     for ds in ds_query:
-#         temp_dic = {"id": ds.id, "name": ds.name, 'geo_gse_id':
-#                     ds.geo_gse_id, "sample_count": ds.sample_count,
-#                     'factor_count': ds.factor_count}
-#         res.append(temp_dic)
-
     res = {"current_page": 1, "total_page": total_page, "count": count,
            "results": res}
     return general_json_response(detail={'default': res_default,
