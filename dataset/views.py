@@ -508,6 +508,7 @@ def dataset_info_4_biogps(request, _id):
     s = json.dumps(ds, cls=ComplexEncoder)
     oj = json.loads(s)
     del oj['metadata']
+    oj['id'] = ds.id
 #     ret = _contruct_meta(ds)
 #     fa = get_ds_factors_keys(ds)
 #     ret.update({'factors': ds.factors})
