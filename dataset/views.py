@@ -514,6 +514,12 @@ def dataset_info_4_biogps(request, _id):
     oj['created'] = ds.created.strftime('%b.%d, %Y')
     oj['summary_wrapped'] = ds.summary_wrapped
     oj['owner'] = ds.metadata['owner']
+    factors = []
+    for e in oj['factors']:
+        i = oj['factors'].index(e)
+        k = ds.metadata['factors'][i].keys()[0]
+        factors.append({k: e})
+    oj['factors'] = factors
 #     ret = _contruct_meta(ds)
 #     fa = get_ds_factors_keys(ds)
 #     ret.update({'factors': ds.factors})
