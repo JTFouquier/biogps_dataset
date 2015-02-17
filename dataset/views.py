@@ -13,6 +13,7 @@ from dataset.util import general_json_response, GENERAL_ERRORS
 import StringIO
 import mygene
 from django.core.exceptions import ObjectDoesNotExist
+from .util import ComplexEncoder
 
 
 def adopt_dataset(ds_id):
@@ -504,10 +505,13 @@ def dataset_info_4_biogps(request, _id):
         get information about a dataset
     """
     ds = models.BiogpsDataset.objects.get(id=_id)
-    ret = _contruct_meta(ds)
-    fa = get_ds_factors_keys(ds)
-    ret.update({'factors': ds.factors})
-    return general_json_response(detail=ret)
+    s = json.dumps(ds, cls=ComplexEncoder)
+    oj = json.load(s)
+    del oj['metadata']
+#     ret = _contruct_meta(ds)
+#     fa = get_ds_factors_keys(ds)
+#     ret.update({'factors': ds.factors})
+    return general_json_response(detail=oj)
 
 
 def dataset_csv(request, ds_id, gene_id):
@@ -662,7 +666,6 @@ def dataset_correlation(request, ds_id, reporter_id, min_corr):
                            round(rep_cor[i['query']], 4)})
         ret_type = request.GET.get('type', None)
         if ret_type is None:
-            from .util import ComplexEncoder
             return HttpResponse(json.dumps(result, cls=ComplexEncoder),
                                 content_type="application/json")
         else:
