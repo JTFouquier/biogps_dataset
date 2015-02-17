@@ -506,7 +506,7 @@ def dataset_info_4_biogps(request, _id):
     """
     ds = models.BiogpsDataset.objects.get(id=_id)
     s = json.dumps(ds, cls=ComplexEncoder)
-    oj = json.load(s)
+    oj = json.loads(s)
     del oj['metadata']
 #     ret = _contruct_meta(ds)
 #     fa = get_ds_factors_keys(ds)
