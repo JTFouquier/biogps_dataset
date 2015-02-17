@@ -518,6 +518,7 @@ def dataset_info_4_biogps(request, _id):
     for e in oj['factors']:
         i = oj['factors'].index(e)
         k = ds.metadata['factors'][i].keys()[0]
+        k = k.rstrip(' 1')
         factors.append({k: e})
     oj['factors'] = factors
 #     ret = _contruct_meta(ds)
