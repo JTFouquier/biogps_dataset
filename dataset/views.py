@@ -1,4 +1,10 @@
 # -*-coding: utf-8 -*-
+from __future__ import print_function
+import sys
+if sys.version > '3':
+    PY3 = True
+else:
+    PY3 = False
 import csv
 from django.conf import settings
 from django.views.decorators.http import require_http_methods
@@ -10,7 +16,6 @@ import requests
 import math
 from tagging.models import Tag, TaggedItem
 from dataset.util import general_json_response, GENERAL_ERRORS
-import StringIO
 import mygene
 from django.core.exceptions import ObjectDoesNotExist
 from .util import ComplexEncoder
@@ -653,6 +658,10 @@ def dataset_correlation(request, ds_id, reporter_id, min_corr):
     if reporter_id in reporters:
         rep_pos = reporters.index(reporter_id)
         # Pearson correlations for provided reporter
+        if PY3:
+            from io import StringIO
+        else:
+            import StringIO
         matrix_data = np.load(StringIO.StringIO(_matrix.matrix))
         rep_vector = matrix_data[rep_pos]
         corrs = pearsonr(rep_vector, matrix_data)
