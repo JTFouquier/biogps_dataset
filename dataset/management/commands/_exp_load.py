@@ -9,6 +9,8 @@ import json
 from dataset import models
 from django.core.exceptions import ObjectDoesNotExist
 
+requests_cache.install_cache('ds_cache')
+
 
 class ResourceRequest:
     @staticmethod

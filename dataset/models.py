@@ -6,7 +6,7 @@ import types
 import textwrap
 from django.db import models
 # from django.utils.encoding import smart_unicode
-from django.template.defaultfilters import slugify
+from django.template.defaultfilters import slugify, default
 from django_extensions.db.fields import AutoSlugField
 # https://github.com/bradjasper/django-jsonfield
 from jsonfield import JSONField
@@ -198,9 +198,9 @@ class BiogpsDataset(models.Model):
 
 class BiogpsDatasetPopularity(models.Model):
     dataset = models.ForeignKey(BiogpsDataset, related_name='dataset_pop')
-    total = models.IntegerField
-    month = models.IntegerField
-    week = models.IntegerField
+    total = models.IntegerField(default=0)
+    month = models.IntegerField(default=0)
+    week = models.IntegerField(default=0)
 
 
 class BiogpsDatasetData(models.Model):
