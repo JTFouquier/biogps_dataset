@@ -628,10 +628,7 @@ def dataset_default(request):
                                          'dataset': ds_id})
 
 
-def dataset_correlation(request, ds_id, reporter_id, min_corr):
-    """Return NumPy correlation matrix for provided ID, reporter,
-       and correlation coefficient
-    """
+def calc_correlation(rep, mat, min_corr):
     import numpy as np
 
     def pearsonr(v, m):
@@ -644,7 +641,43 @@ def dataset_correlation(request, ds_id, reporter_id, min_corr):
         r = r_num / r_den
         return r
 
-    # Reconstruct dataset matrix
+    rep_pos = mat.reporters.index(rep)
+    # Pearson correlations for provided reporter
+    if PY3:
+        from io import StringIO
+    else:
+        import StringIO
+    matrix_data = np.load(StringIO.StringIO(mat.matrix))
+    rep_vector = matrix_data[rep_pos]
+    corrs = pearsonr(rep_vector, matrix_data)
+    # Get indices of sufficiently correlated reporters
+    min_corr = float(min_corr)
+    idx_corrs = np.where(corrs > min_corr)[0]
+    # Get values for those indices
+    val_corrs = corrs.take(idx_corrs)
+    # Return highest correlated first
+    corrs = zip(val_corrs, idx_corrs)
+    corrs.sort(reverse=True)
+    rep_cor = {mat.reporters[i[1]]: i[0] for i in corrs}
+    # query mygene to get symbol from reporter
+    mg = mygene.MyGeneInfo()
+    res = mg.querymany(rep_cor.keys(), scopes='reporter', fields='symbol')
+    result = []
+    for i in res:
+        if 'notfound' in i:
+            gene_id, symbol = '', ''
+        else:
+            gene_id, symbol = i['_id'], i['symbol']
+        result.append({'id': gene_id, 'reporter': i['query'],
+                       'symbol': symbol, 'value':
+                       round(rep_cor[i['query']], 4)})
+    return result
+
+
+def dataset_correlation(request, ds_id, reporter_id, min_corr):
+    """Return NumPy correlation matrix for provided ID, reporter,
+       and correlation coefficient
+    """
     ds = adopt_dataset(ds_id)
     try:
         _matrix = models.BiogpsDatasetMatrix.objects.get(dataset=ds)
@@ -652,40 +685,10 @@ def dataset_correlation(request, ds_id, reporter_id, min_corr):
         return general_json_response(
             GENERAL_ERRORS.ERROR_NOT_FOUND, "Cannot\
              get matrix of dataset: %s." % ds_id)
-    reporters = _matrix.reporters
 
     # Get position of reporter
-    if reporter_id in reporters:
-        rep_pos = reporters.index(reporter_id)
-        # Pearson correlations for provided reporter
-        if PY3:
-            from io import StringIO
-        else:
-            import StringIO
-        matrix_data = np.load(StringIO.StringIO(_matrix.matrix))
-        rep_vector = matrix_data[rep_pos]
-        corrs = pearsonr(rep_vector, matrix_data)
-        # Get indices of sufficiently correlated reporters
-        min_corr = float(min_corr)
-        idx_corrs = np.where(corrs > min_corr)[0]
-        # Get values for those indices
-        val_corrs = corrs.take(idx_corrs)
-        # Return highest correlated first
-        corrs = zip(val_corrs, idx_corrs)
-        corrs.sort(reverse=True)
-        rep_cor = {reporters[i[1]]: i[0] for i in corrs}
-        # query mygene to get symbol from reporter
-        mg = mygene.MyGeneInfo()
-        res = mg.querymany(rep_cor.keys(), scopes='reporter', fields='symbol')
-        result = []
-        for i in res:
-            if 'notfound' in i:
-                gene_id, symbol = '', ''
-            else:
-                gene_id, symbol = i['_id'], i['symbol']
-            result.append({'id': gene_id, 'reporter': i['query'],
-                           'symbol': symbol, 'value':
-                           round(rep_cor[i['query']], 4)})
+    if reporter_id in _matrix.reporters:
+        result = calc_correlation(reporter_id, _matrix, min_corr)
         ret_type = request.GET.get('type', None)
         if ret_type is None:
             return HttpResponse(json.dumps(result, cls=ComplexEncoder),
