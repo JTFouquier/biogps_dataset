@@ -60,3 +60,12 @@ DEFAULT_DS_ACCESSION = [u'BDS_00001', u'BDS_00002', u'BDS_00003', u'BDS_00004',
                         u'BDS_00014']
 
 MAX_SUPPORTED_SAMPLES = 50
+
+# for dataset with more samples than this, 
+# we can not calculate its correlation
+MAX_SAMPLE_4_CORRELATION = 200
+
+# keys for taging dataset
+NCBO_ANNO_KEY = 'xxxxxxx'
+# popular factors among all datasets
+POPULAR_FACTORS = ['TREATMENT', 'xxxx']

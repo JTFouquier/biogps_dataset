@@ -679,6 +679,10 @@ def dataset_correlation(request, ds_id, reporter_id, min_corr):
        and correlation coefficient
     """
     ds = adopt_dataset(ds_id)
+    if ds.sample_count > settings.MAX_SAMPLE_4_CORRELATION:
+        return general_json_response(
+            GENERAL_ERRORS.ERROR_INTERNAL, "Cannot\
+             calculate, sample count: %s too big." % ds.sample_count)
     try:
         _matrix = models.BiogpsDatasetMatrix.objects.get(dataset=ds)
     except models.BiogpsDatasetMatrix.DoesNotExist:
