@@ -1347,7 +1347,7 @@
                     var corrUrl = this.buildCorrURL();
 //                    start : 0,
 //                    limit : 20
-                    if ($('#DC_026887848_corr-grid').html()) {
+                    if ($('.flexigrid').html()) {
                         $('#DC_026887848_corr-grid').flexOptions({url : corrUrl + "?start=0&limit=20"}).flexReload();
                     }else{
                         $('#DC_026887848_corr-grid').flexigrid({
@@ -1392,7 +1392,8 @@
                             rp: 20,
                             useRp: false,
                             procmsg: 'Loading',
-                            pagestat: '{from}-{to} of {total}'
+                            pagestat: '{from}-{to} of {total}',
+                            page: 1
                         });
                     }
 /*
