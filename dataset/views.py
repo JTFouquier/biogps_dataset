@@ -514,11 +514,14 @@ def dataset_info_4_biogps(request, _id):
     oj = json.loads(s)
     del oj['metadata']
     oj['id'] = ds.id
-    oj['source'] = ds.metadata['source']
     oj['lastmodified'] = ds.lastmodified.strftime('%b.%d, %Y')
     oj['created'] = ds.created.strftime('%b.%d, %Y')
     oj['summary_wrapped'] = ds.summary_wrapped
     oj['owner'] = ds.metadata['owner']
+    if oj['owner'] == "ArrayExpress Uploader":
+        oj['sample_source'] = 'http://www.ebi.ac.uk/arrayexpress/experiments/'\
+            + oj['geo_gse_id'] + 'sample'
+        oj['source'] = ds.metadata['source']
     factors = []
     for e in oj['factors']:
         i = oj['factors'].index(e)
