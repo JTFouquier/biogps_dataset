@@ -678,6 +678,23 @@ def calc_correlation(rep, mat, min_corr):
     return result
 
 
+def dataset_correlation_usable(request, ds_id):
+    ds = adopt_dataset(ds_id)
+    if ds.sample_count > settings.MAX_SAMPLE_4_CORRELATION:
+        return general_json_response(
+            GENERAL_ERRORS.ERROR_INTERNAL, "This dataset contains too many\
+             samples (%s) for us to compute pair-wise correlations, \
+             so we disabled this feature \
+             for this dataset." % ds.sample_count)
+    try:
+        _matrix = models.BiogpsDatasetMatrix.objects.get(dataset=ds)
+    except models.BiogpsDatasetMatrix.DoesNotExist:
+        return general_json_response(
+            GENERAL_ERRORS.ERROR_NOT_FOUND, "Cannot\
+             get matrix of dataset: %s." % ds_id)
+    return general_json_response(detail='ok')
+
+
 def dataset_correlation(request, ds_id, reporter_id, min_corr):
     """Return NumPy correlation matrix for provided ID, reporter,
        and correlation coefficient
