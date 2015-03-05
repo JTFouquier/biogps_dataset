@@ -25,6 +25,8 @@ urlpatterns = patterns(
     url(r'^correlation/(?P<ds_id>.+)/reporter/(?P<reporter_id>.+)/min/(?P<min_corr>.+)/$',
         views.dataset_correlation,
         name='dataset correlation'),
+    url(r'^correlation/(?P<ds_id>.+)/$', views.dataset_correlation_usable,
+        name='dataset correlation usable test'),
     url(r'^factors/(?P<ds_id>.+)/$', views.dataset_factors,
         name='dataset factors'),
     # Tag related
