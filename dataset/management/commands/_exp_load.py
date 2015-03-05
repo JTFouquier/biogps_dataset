@@ -44,7 +44,7 @@ class Platform(ResourceRequest):
         split = split[start:]
         self.reporters = []
         for s in split:
-            self.reporters.append(s.strip().split('\s')[0])
+            self.reporters.append(s.strip().split('\t')[0])
         self.reporters.sort()
 
     def load_exps(self):
