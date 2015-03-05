@@ -1347,50 +1347,54 @@
                     var corrUrl = this.buildCorrURL();
 //                    start : 0,
 //                    limit : 20
-                    $('#DC_026887848_corr-grid').flexigrid({
-                        url : corrUrl + "?start=0&limit=20",
-                        method: 'GET',
-                        errormsg: 'something wrong',
-                        dataType : 'json',
-                        striped: true,
-                        colModel : [ {
-                            display : 'Correlation',
-                            name : 'value',
-                            width : 80,
-                            sortable : true,
-                            align : 'center'
-                        }, {
-                            display : 'ID',
-                            name : 'id',
-                            width : 60,
-                            sortable : true,
-                            align : 'center'
-                        }, {
-                            display : 'Gene_Symbol',
-                            name : 'symbol',
-                            width : 100,
-                            sortable : true,
-                            align : 'center'
-                        }, {
-                            display : 'Probe',
-                            name : 'reporter',
-                            width : 100,
-                            sortable : true,
-                            align : 'center'
-                        } ],
-                        buttons : [ {
-                            name : 'Download Correlation',
-                            bclass : 'download',
-                            onpress : this.DLCorr
-                        } ],
-                        width : 388,
-                        height : 520,
-                        usepager : true,
-                        rp: 20,
-                        useRp: false,
-                        procmsg: 'Loading',
-                        pagestat: '{from}-{to} of {total}'
-                    });
+                    if ($('#DC_026887848_corr-grid').html()) {
+                        $('#DC_026887848_corr-grid').flexOptions({url : corrUrl + "?start=0&limit=20"}).flexReload();
+                    }else{
+                        $('#DC_026887848_corr-grid').flexigrid({
+                            url : corrUrl + "?start=0&limit=20",
+                            method: 'GET',
+                            errormsg: 'something wrong',
+                            dataType : 'json',
+                            striped: true,
+                            colModel : [ {
+                                display : 'Correlation',
+                                name : 'value',
+                                width : 80,
+                                sortable : true,
+                                align : 'center'
+                            }, {
+                                display : 'ID',
+                                name : 'id',
+                                width : 60,
+                                sortable : true,
+                                align : 'center'
+                            }, {
+                                display : 'Gene_Symbol',
+                                name : 'symbol',
+                                width : 100,
+                                sortable : true,
+                                align : 'center'
+                            }, {
+                                display : 'Probe',
+                                name : 'reporter',
+                                width : 100,
+                                sortable : true,
+                                align : 'center'
+                            } ],
+                            buttons : [ {
+                                name : 'Download Correlation',
+                                bclass : 'download',
+                                onpress : this.DLCorr
+                            } ],
+                            width : 388,
+                            height : 520,
+                            usepager : true,
+                            rp: 20,
+                            useRp: false,
+                            procmsg: 'Loading',
+                            pagestat: '{from}-{to} of {total}'
+                        });
+                    }
 /*
                     Ext.Ajax.timeout = 300000;
                     //increase default timeout to 5min
@@ -1604,7 +1608,7 @@
                     </div>
                 </div>
                 <div style='width: 80%; display:block'>
-                    <div id="datasetProbes" style="float:left;">
+                    <div id="datasetProbes">
                         <b>Probeset:</b>
                         <select id="DC_026887848_probe" onchange="DC_026887848.setProbe(); DC_026887848.clearCorrData()">
 
