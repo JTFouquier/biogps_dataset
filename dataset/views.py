@@ -534,6 +534,9 @@ def dataset_info_4_biogps(request, _id):
 #     ret = _contruct_meta(ds)
 #     fa = get_ds_factors_keys(ds)
 #     ret.update({'factors': ds.factors})
+    ts = Tag.objects.get_for_object(ds)
+    tags = [t.name for t in ts]
+    oj['tags'] = tags
     return general_json_response(detail=oj)
 
 
