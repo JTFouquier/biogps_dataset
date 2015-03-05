@@ -6,6 +6,8 @@
  * http://jquery.org/license
  *
  */
+ var cacheData = [];
+ var total = 0;
 (function ($) {
 	$.addFlex = function (t, p) {
 		if (t.grid) return false; //return if already exist
@@ -304,12 +306,16 @@
 			},
 			addData: function (data) { //parse data
                 console.log(data);
+                if (!p.newp) {
+					p.newp = 1;
+				}
                 var custom_data = {
-                    'total' : data.length,
-                    'page' : 1,
+                    'total' : cacheData.length,
+                    'page' : p.newp,
                     'rows' : []
                 };
-                for(var i = 0; i < data.length; i++){
+
+                for(var i = 0; i < p.rp && data[i]; i++){
                     custom_data['rows'][i] = {'id' : i, 'cell' : data[i]};
                 }
                 console.log(custom_data);
@@ -538,20 +544,41 @@
 						param[param.length] = p.params[pi];
 					}
 				}
-				$.ajax({
-					type: p.method,
-					url: p.url,
-					data: param,
-					dataType: p.dataType,
-					success: function (data) {
-						g.addData(data);
-					},
-					error: function (XMLHttpRequest, textStatus, errorThrown) {
-						try {
-							if (p.onError) p.onError(XMLHttpRequest, textStatus, errorThrown);
-						} catch (e) {}
+				console.log(param[0].value);
+				if(cacheData.length == 0){
+					$.ajax({
+						type: p.method,
+						url: p.url,
+						data: param,
+						dataType: p.dataType,
+						success: function (data) {
+							cacheData = data;
+							total = Math.ceil(data.length / p.rp);
+							g.addData(data);
+						},
+						error: function (XMLHttpRequest, textStatus, errorThrown) {
+							try {
+								if (p.onError) p.onError(XMLHttpRequest, textStatus, errorThrown);
+							} catch (e) {}
+						}
+					});
+				}else{
+					data = [];
+					console.log(p.page + "   " + param[0].value);
+					page = param[0].value;
+					rp = param[1].value;
+					if(page == 1){
+						for (var i = 0, j = 0; i < page * rp + rp && i < cacheData.length; i++, j++) {
+							data[j] = cacheData[i];
+						};
+					}else{
+						for (var i = (page -1) * rp, j = 0; i < page * rp + rp && i < cacheData.length; i++, j++) {
+							data[j] = cacheData[i];
+						};
 					}
-				});
+					
+					g.addData(data);
+				}
 			},
 			doSearch: function () {
 				p.query = $('input[name=q]', g.sDiv).val();
@@ -1208,6 +1235,7 @@
 		});
 	}; //end flexigrid
 	$.fn.flexReload = function (p) { // function to reload grid
+		cacheData = [];
 		return this.each(function () {
 			if (this.grid && this.p.url) this.grid.populate();
 		});
