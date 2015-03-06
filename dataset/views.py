@@ -487,21 +487,27 @@ def dataset_search_all(request):
 
 def dataset_search_4_biogps(request):
     query = request.GET.get("query", None)
+    page_by = request.GET.get("page_by", 10)
+    page = request.GET.get('page', 1)
     if query is None:
         return general_json_response(
             code=GENERAL_ERRORS.ERROR_BAD_ARGS, detail='must\
             input a keyword for search.')
-    body = {"from": 0, "size": 15}
+    body = {"from": page_by*(page-1), "size": page_by}
     body["query"] = {
         "multi_match": {"query": query, "fields": ["summary", "name"]}}
     data = json.dumps(body)
     r = requests.post(settings.ES_URLS['SCH'], data=data)
     r = r.json()
-    res = []
+    hits = []
+    count = r["hits"]["total"]
+    total_page = int(math.ceil(float(count) / float(page_by)))
     for e in r["hits"]["hits"]:
         _e = e["_source"]
         del _e['summary']
-        res.append(_e)
+        hits.append(_e)
+    res = {"count": count, "current_page": page, "results": hits,
+           "total_page": total_page}
     return general_json_response(detail=res)
 
 
