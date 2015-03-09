@@ -489,6 +489,12 @@ def dataset_search_4_biogps(request):
     query = request.GET.get("query", None)
     page_by = request.GET.get("page_by", 10)
     page = request.GET.get('page', 1)
+    try:
+        page_by = int(page_by)
+        page = int(page)
+    except Exception, e:
+        page_by = 10
+        page = 1
     if query is None:
         return general_json_response(
             code=GENERAL_ERRORS.ERROR_BAD_ARGS, detail='must\
