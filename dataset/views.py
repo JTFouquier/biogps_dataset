@@ -706,9 +706,8 @@ def dataset_correlation_usable(request, ds_id):
         _matrix = models.BiogpsDatasetMatrix.objects.get(dataset=ds)
     except models.BiogpsDatasetMatrix.DoesNotExist:
         return general_json_response(
-            GENERAL_ERRORS.ERROR_NOT_FOUND, "Cannot\
-             get matrix of dataset: %s." % ds_id)
-    return general_json_response(detail='ok')
+            GENERAL_ERRORS.ERROR_NOT_FOUND, {'sample_count': ds.sample_count})
+    return general_json_response(detail={'sample_count': ds.sample_count})
 
 
 def dataset_correlation(request, ds_id, reporter_id, min_corr):
