@@ -698,10 +698,7 @@ def dataset_correlation_usable(request, ds_id):
     ds = adopt_dataset(ds_id)
     if ds.sample_count > settings.MAX_SAMPLE_4_CORRELATION:
         return general_json_response(
-            GENERAL_ERRORS.ERROR_INTERNAL, "This dataset contains too many\
-             samples (%s) for us to compute pair-wise correlations, \
-             so we disabled this feature \
-             for this dataset." % ds.sample_count)
+            GENERAL_ERRORS.ERROR_INTERNAL, {'sample_count': ds.sample_count})
     try:
         _matrix = models.BiogpsDatasetMatrix.objects.get(dataset=ds)
     except models.BiogpsDatasetMatrix.DoesNotExist:
