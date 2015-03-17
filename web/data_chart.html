@@ -1228,19 +1228,23 @@
                         if (code != "success") {
                             //DCCG.buildCanvasError(DC_026887848.getCanvas());
                         } else {
+                            var html;
                             if (dataJson.code != 0)
                             {
-                                //DCCG.buildCanvasError(DC_026887848.getCanvas());
-                                $("#DC_026887848_correlationContainer").css({'display':'none'});
-                                $('#limitation_ins').html("This dataset contains too many samples ("+
-                                    dataJson.details.sample_count+") for us to compute pair-wise correlations, so we disabled this feature for this dataset.");
-                                $("#reach_limitaion").css({'display':'block'});
+                                html = '<span><p>This dataset contains too many samples ("'
+                                    +dataJson.details.sample_count+') for us to compute pair-wise correlations, so we \
+                                    disabled this feature for this dataset.</p></span>';
                             }
                             else
                             {
-                                $("#DC_026887848_correlationContainer").css({'display':'block'});
-                                $("#reach_limitaion").css({'display':'none'});
+                                html = '<span id="DC_026887848_correlationContainer" style="">\
+                                    <p style="margin:5px;font-size: 2em;">Correlation Cutoff:\
+                                    <input type="text" id="DC_026887848_cor_val" size="5" value="0.9">\
+                                    <input type="button" id="DC_026887848_cor_button&quot;" value="Go!" onclick="DC_026887848.loadCorr()">\
+                                    </p> <div id="DC_026887848_corr-grid" style="margin:5px; margin-left: 0px;"></div>\
+                                    </span>';
                             }
+                            $("#DC_026887848_correlation").html(html);
                         }
                     });
                 },
@@ -1731,7 +1735,7 @@
                     <div id="DC_026887848_dataset_image" class="">
                         <img id="DC_026887848_probe_set_image" title="Data Chart Image" alt="Data Chart Image" src="">
                     </div>
-                    <div id="DC_026887848_correlation" class="">
+                    <div id="DC_026887848_correlation" class="" onclick=>
                         <span id="DC_026887848_correlationContainer">
                             <p style="margin:5px;font-size: 2em;">
                                 Correlation Cutoff:
