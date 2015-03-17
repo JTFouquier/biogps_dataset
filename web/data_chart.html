@@ -1231,15 +1231,15 @@
                             if (dataJson.code != 0)
                             {
                                 //DCCG.buildCanvasError(DC_026887848.getCanvas());
-                                $("#DC_026887848_correlationContainer").hide();
-                                $('#limitation_ins').html("This dataset contains too many samples("+
+                                $("#DC_026887848_correlationContainer").css({'display':'none'});
+                                $('#limitation_ins').html("This dataset contains too many samples ("+
                                     dataJson.details.sample_count+") for us to compute pair-wise correlations, so we disabled this feature for this dataset.");
-                                $("#reach_limitaion").show();
+                                $("#reach_limitaion").css({'display':'block'});
                             }
                             else
                             {
-                                $("#DC_026887848_correlationContainer").show();
-                                $("#reach_limitaion").hide();
+                                $("#DC_026887848_correlationContainer").css({'display':'block'});
+                                $("#reach_limitaion").css({'display':'none'});
                             }
                         }
                     });
