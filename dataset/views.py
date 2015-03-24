@@ -144,7 +144,7 @@ def dataset_list(request):
     page = request.GET.get('page', 1)
     page_by = request.GET.get('page_by', 15)
     if order == 'pop':
-        qs = models.BiogpsDataset.objects.all()
+        qs = models.BiogpsDataset.objects.all().order_by('-pop_total')
     elif order == 'new':
         qs = models.BiogpsDataset.objects.all().order_by('-created')
     else:
@@ -828,7 +828,6 @@ def dataset_factors(request, ds_id):
                 return cmp(kx, ky)
     print(ret)
     ret.sort(key=lambda x: list(x)[0] in settings.POPULAR_FACTORS)
-    
     return general_json_response(detail=ret)
 
 
