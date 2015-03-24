@@ -502,9 +502,9 @@ def dataset_search_4_biogps(request):
     if tag is not None or species is not None:
         filter = {"filter": {"bool": {}}}
         if tag is not None:
-            filter["filter"]["bool"].append({"must": {"term": {"tags": tag}}})
+            filter["filter"]["bool"].update({"must": {"term": {"tags": tag}}})
         if species is not None:
-            filter["filter"]["bool"].append({"must": {"term": {"species": species}}})
+            filter["filter"]["bool"].update({"must": {"term": {"species": species}}})
     if q is not None:
         query = {"query": {
             "multi_match": {"query": q, "fields": ["summary", "name"]}}}
@@ -515,7 +515,14 @@ def dataset_search_4_biogps(request):
             input a keyword for search or tag or species.')
     else:
         body = {"from": page_by*(page-1), "size": page_by}
-        body["filtered"] = {filter, query}
+        if filter is not None and query is None:
+            body.update(filter)
+        elif query is not None and filter is None:
+            body.update(query)
+        else:
+            body['query'] = {'filtered':{}}
+            body['query']['filtered'].update(filter)
+            body['query']['filtered'].update(query)
     data = json.dumps(body)
     r = requests.post(settings.ES_URLS['SCH'], data=data)
     r = r.json()
