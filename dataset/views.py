@@ -39,12 +39,12 @@ def get_sample_name_list(ds, from_factor=None):
     names = []
     for f in ds.metadata['factors']:
         if from_factor is not None:
-            if from_factor in f[f.keys()[0]]['factorvalue']:
-                name = f[f.keys()[0]]['factorvalue'][from_factor]
+            if from_factor in f[list(f)[0]]['factorvalue']:
+                name = f[list(f)[0]]['factorvalue'][from_factor]
             else:
                 return []
         else:
-            name = f.keys()[0]
+            name = list(f)[0]
         names.append(name)
     return names
 
@@ -78,7 +78,7 @@ def get_ds_factors_keys(ds, group=None, collapse=False, naming=None):
         # no group, order by sequence or preset 'order_idx'
         i = 1
         for f in ds.metadata['factors']:
-            content = f[f.keys()[0]]
+            content = f[list(f)[0]]
             if 'order_idx' in content and 'color_idx' in content:
                 order_idx = content['order_idx']
                 color_idx = content['color_idx']
@@ -492,7 +492,7 @@ def dataset_search_4_biogps(request):
     try:
         page_by = int(page_by)
         page = int(page)
-    except Exception, e:
+    except Exception as e:
         page_by = 10
         page = 1
     if query is None:
@@ -539,7 +539,7 @@ def dataset_info_4_biogps(request, _id):
     if oj['factors'] is not None:
         for e in oj['factors']:
             i = oj['factors'].index(e)
-            k = ds.metadata['factors'][i].keys()[0]
+            k = list(ds.metadata['factors'][i])[0]
             k = k.rstrip(' 1')
             factors.append({k: e})
     oj['factors'] = factors
@@ -564,7 +564,7 @@ def dataset_csv(request, ds_id, gene_id):
     row_list = ['Samples']
     val_list = []
     for item in data_list:
-        key_list = item.keys()
+        key_list = list(item)
         for key_item in key_list:
             row_list.append(key_item)
             val_list.append(item[key_item]['values'])
@@ -616,7 +616,7 @@ def dataset_full_data(request, ds_id, gene_id):
     factors = get_ds_factors_keys(ds, group, collapse, naming)
     res = {}
     for e in data_lists:
-        r = e.keys()[0]
+        r = list(e)[0]
         vals = [float(item) for item in e[r]['values']]
         back = prepare_chart_data(vals, factors)
         res[r] = back
@@ -681,7 +681,7 @@ def calc_correlation(rep, mat, min_corr):
     rep_cor = {mat.reporters[i[1]]: i[0] for i in corrs}
     # query mygene to get symbol from reporter
     mg = mygene.MyGeneInfo()
-    res = mg.querymany(rep_cor.keys(), scopes='reporter', fields='symbol')
+    res = mg.querymany(list(rep_cor), scopes='reporter', fields='symbol')
     result = []
     for i in res:
         if 'notfound' in i:
@@ -737,7 +737,7 @@ def dataset_correlation(request, ds_id, reporter_id, min_corr):
             response['Content-Disposition'] = 'attachment; filename=%s.csv' \
                 % ds.geo_gse_id
             writer = csv.writer(response)
-            writer.writerow(result[0].keys())
+            writer.writerow(list(result[0]))
             i = 0
             while(i < len(result)):
                 writer.writerow(result[i].values())
@@ -761,11 +761,11 @@ def dataset_factors(request, ds_id):
     factor_keys = {}
     for fv in ds.factors:
         for f in fv:
-            if f in factor_keys.keys():
+            if f in list(factor_keys):
                 factor_keys[f].add(fv[f])
             else:
                 factor_keys[f] = set([fv[f]])
-    keys = factor_keys.keys()
+    keys = list(factor_keys)
     for e in keys:
         # remove factors with only 1 options
         if len(factor_keys[e]) == 1:
@@ -774,13 +774,17 @@ def dataset_factors(request, ds_id):
         factor_keys[e] = list(factor_keys[e])
 
         # sort, 'not specified' always put last
-        def c(x, y):
-            if x == 'not specified':
-                return 1
-            if y == 'not specified':
-                return -1
-            return cmp(x, y)
-        factor_keys[e].sort(c)
+        # def c(x, y):
+        #     if x == 'not specified':
+        #         return 1
+        #     if y == 'not specified':
+        #         return -1
+        #     return cmp(x, y)
+        factor_keys[e].sort(key=lambda x: x.lower())
+        if 'not specified' in factor_keys[e]:
+            p = factor_keys[e].index('not specified')
+            factor_keys[e].append(factor_keys[e][p])
+            del factor_keys[e][p]
     if len(factor_keys) == 0:
         return general_json_response(code=GENERAL_ERRORS.ERROR_NOT_FOUND)
     # dict to array to dicts, then sorting
@@ -801,7 +805,9 @@ def dataset_factors(request, ds_id):
                 return 1
             else:
                 return cmp(kx, ky)
-    ret.sort(c2)
+    print(ret)
+    ret.sort(key=lambda x: list(x)[0] in settings.POPULAR_FACTORS)
+    
     return general_json_response(detail=ret)
 
 
