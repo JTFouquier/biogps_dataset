@@ -570,7 +570,7 @@ def dataset_csv(request, ds_id, gene_id):
             val_list.append(item[key_item]['values'])
     length = len(val_list[0])
     name_list = get_sample_name_list(ds)
-    response = HttpResponse(mimetype='text/csv')
+    response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename=%s.csv' \
         % ds.geo_gse_id
     writer = csv.writer(response)
@@ -733,7 +733,7 @@ def dataset_correlation(request, ds_id, reporter_id, min_corr):
             return HttpResponse(json.dumps(result, cls=ComplexEncoder),
                                 content_type="application/json")
         else:
-            response = HttpResponse(mimetype='text/csv')
+            response = HttpResponse(content_type='text/csv')
             response['Content-Disposition'] = 'attachment; filename=%s.csv' \
                 % ds.geo_gse_id
             writer = csv.writer(response)
