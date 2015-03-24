@@ -71,6 +71,8 @@ class BiogpsDataset(models.Model):
                                        verbose_name='no. of factors')
     factors = JSONField(blank=False, editable=True)
     is_default = models.BooleanField(default=False)
+    pop_total = models.IntegerField(default=0,
+                                    verbose_name='popularity')
 #     @property
 #     def factors_text(self):
 #         def format_factor(factor):
