@@ -486,7 +486,9 @@ def dataset_search_all(request):
 
 
 def dataset_search_4_biogps(request):
-    query = request.GET.get("query", None)
+    q = request.GET.get("query", None)
+    tag = request.GET.get("tag", None)
+    species = request.GET.get("species", None)
     page_by = request.GET.get("page_by", 10)
     page = request.GET.get('page', 1)
     try:
@@ -495,13 +497,25 @@ def dataset_search_4_biogps(request):
     except Exception as e:
         page_by = 10
         page = 1
-    if query is None:
+
+    filter, query = None, None
+    if tag is not None or species is not None:
+        filter = {"filter": {"bool": {}}}
+        if tag is not None:
+            filter["filter"]["bool"].append({"must": {"term": {"tags": tag}}})
+        if species is not None:
+            filter["filter"]["bool"].append({"must": {"term": {"species": species}}})
+    if q is not None:
+        query = {"query": {
+            "multi_match": {"query": q, "fields": ["summary", "name"]}}}
+
+    if filter is None and query is None:
         return general_json_response(
             code=GENERAL_ERRORS.ERROR_BAD_ARGS, detail='must\
-            input a keyword for search.')
-    body = {"from": page_by*(page-1), "size": page_by}
-    body["query"] = {
-        "multi_match": {"query": query, "fields": ["summary", "name"]}}
+            input a keyword for search or tag or species.')
+    else:
+        body = {"from": page_by*(page-1), "size": page_by}
+        body["filtered"] = {filter, query}
     data = json.dumps(body)
     r = requests.post(settings.ES_URLS['SCH'], data=data)
     r = r.json()
