@@ -835,8 +835,9 @@ def dataset_tags(request):
     # no factor value
     page = int(request.GET.get("page", 1))
     page_by = int(request.GET.get("page_by", 8))
+    count = int(request.GET.get("count", 0))
     from tagging.models import Tag
-    qs = Tag.objects.all()
+    qs = Tag.objects.annotate(Count('items')).filter(items__count__gt=1)
     total = qs.count()
     total_page = int(math.ceil(float(total) / float(page_by)))
     li = qs[(page-1)*page_by: page*page_by]
