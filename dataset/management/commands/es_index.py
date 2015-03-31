@@ -39,14 +39,14 @@ class Command(BaseCommand):
                 "properties": {
                     "id": {"type": "integer"},
                     "is_default": {"type": "boolean"},
-                    "name": {"type": "string", "store": True},
-                    "slug": {"type": "string", "store": True},
-                    "summary": {"type": "string", "store": True},
-                    "geo_gse_id": {"type": "string", "store": True},
+                    "name": {"type": "string"},
+                    "slug": {"type": "string"},
+                    "summary": {"type": "string"},
+                    "geo_gse_id": {"type": "string"},
                     "factor_count": {"type": "integer"},
                     "sample_count": {"type": "integer"},
-                    "species": {"type": "string", "store": True},
-                    "tags": {"type": "string", "index_name": "tag"}
+                    "species": {"type": "string"},
+                    "tags": {"type": "string", "index": "not_analyzed"}
                     }}})
         requests.put(settings.ES_URLS['DS_C'], data=data)
         print "create dataset mapping success"
@@ -73,11 +73,11 @@ class Command(BaseCommand):
 
         print "added %d platform , added %d dataset" %\
             (plt_count, bio_count)
-# 
+#
 #         dataset = models.BiogpsDataset.objects.using("default_dataset").\
 #             filter(geo_gse_id__in=settings.DEFAULT_DS_ACCESSION)
 #         plt_ds, bio_ds = plt_count, bio_count
-# 
+#
 #         plt_dic = {}
 #         for ds in dataset:
 #             plt_temp = ds.platform
