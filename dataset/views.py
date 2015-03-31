@@ -1,6 +1,7 @@
 # -*-coding: utf-8 -*-
 from __future__ import print_function
 import sys
+from django.db.models.aggregates import Count
 if sys.version > '3':
     PY3 = True
 else:
