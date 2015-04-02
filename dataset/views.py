@@ -144,6 +144,8 @@ def dataset_list(request):
     order = request.GET.get('order', None)
     page = request.GET.get('page', 1)
     page_by = request.GET.get('page_by', 15)
+    page = int(page)
+    page_by = int(page_by)
     if order == 'pop':
         qs = models.BiogpsDataset.objects.all().order_by('-pop_total')
     elif order == 'new':
