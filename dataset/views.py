@@ -156,7 +156,7 @@ def dataset_list(request):
     count = qs.count()
     total_page = int(math.ceil(float(count) / float(page_by)))
     ret = [{'id': ds.id, 'name': ds.name, 'slug': ds.slug,
-            'geo_gse_id': ds.geo_gse_id} for ds in
+            'geo_gse_id': ds.geo_gse_id, 'species': ds.species} for ds in
            qs[(page-1)*page_by: page*page_by]]
 #     ds = qs.values_list('id', 'name', 'slug',
 #                         'summary')[(page-1)*page_by: page*page_by]
