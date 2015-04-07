@@ -851,8 +851,11 @@ def dataset_tags(request):
     page = int(request.GET.get("page", 1))
     page_by = int(request.GET.get("page_by", 8))
     count = int(request.GET.get("count", 0))
+    order = request.GET.get("order", None)
     from tagging.models import Tag
     qs = Tag.objects.annotate(Count('items')).filter(items__count__gt=count)
+    if order == 'pop':
+        qs = qs.order_by('-items__count')
     total = qs.count()
     total_page = int(math.ceil(float(total) / float(page_by)))
     li = qs[(page-1)*page_by: page*page_by]
