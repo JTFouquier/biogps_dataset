@@ -146,18 +146,24 @@ def dataset_list(request):
     page_by = request.GET.get('page_by', 15)
     page = int(page)
     page_by = int(page_by)
+    qs = models.BiogpsDataset.objects.all()
     if order == 'pop':
-        qs = models.BiogpsDataset.objects.all().order_by('-pop_total')
+        qs = qs.order_by('-pop_total')
     elif order == 'new':
-        qs = models.BiogpsDataset.objects.all().order_by('-created')
+        qs = qs.order_by('-created')
     else:
-        qs = models.BiogpsDataset.objects.all().order_by('created')
+        qs = qs.order_by('created')
+    count = qs.count()
+    total_page = int(math.ceil(float(count) / float(page_by)))
     ret = [{'id': ds.id, 'name': ds.name, 'slug': ds.slug,
             'geo_gse_id': ds.geo_gse_id} for ds in
            qs[(page-1)*page_by: page*page_by]]
 #     ds = qs.values_list('id', 'name', 'slug',
 #                         'summary')[(page-1)*page_by: page*page_by]
-    return general_json_response(detail=ret)
+    return general_json_response(detail={"current_page": page,
+                                         "total_page": total_page,
+                                         "count": count,
+                                         "results": ret})
 
 
 @require_http_methods(["GET"])
