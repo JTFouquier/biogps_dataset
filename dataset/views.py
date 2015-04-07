@@ -158,7 +158,10 @@ def dataset_list(request):
     ret = [{'id': ds.id, 'name': ds.name, 'slug': ds.slug,
             'geo_gse_id': ds.geo_gse_id, 'species': ds.species,
             'sample_count': ds.sample_count,
-            'factor_count': ds.factor_count} for ds in
+            'factor_count': ds.factor_count,
+            "tags": list(Tag.objects.get_for_object(ds).values_list
+                         ("name", flat=True))
+            } for ds in
            qs[(page-1)*page_by: page*page_by]]
 #     ds = qs.values_list('id', 'name', 'slug',
 #                         'summary')[(page-1)*page_by: page*page_by]
