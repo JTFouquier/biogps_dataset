@@ -558,7 +558,8 @@ def dataset_info_4_biogps(request, _id):
     if oj['owner'] == "ArrayExpress Uploader":
         oj['sample_source'] = 'http://www.ebi.ac.uk/arrayexpress/experiments/'\
             + oj['geo_gse_id'] + '/samples/'
-        oj['source'] = ds.metadata['source']
+        oj['source'] = 'http://www.ebi.ac.uk/arrayexpress/experiments/'\
+                       + oj['geo_gse_id']
     factors = []
     if oj['factors'] is not None:
         for e in oj['factors']:
