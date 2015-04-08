@@ -505,6 +505,7 @@ def dataset_search_4_biogps(request):
     species = request.GET.get("species", None)
     page_by = request.GET.get("page_by", 10)
     page = request.GET.get('page', 1)
+    agg = request.GET.get('agg', False)
     try:
         page_by = int(page_by)
         page = int(page)
@@ -512,31 +513,23 @@ def dataset_search_4_biogps(request):
         page_by = 10
         page = 1
 
-    filter, query = None, None
-    if tag is not None or species is not None:
-        filter = {"filter": {"bool": {}}}
-        if tag is not None:
-            filter["filter"]["bool"].update({"must": {"term": {"tags": tag}}})
-        if species is not None:
-            filter["filter"]["bool"].update({"must": {"term": {"species": species}}})
+    filter = {"filter": {"bool": {"must": []}}}
+    if tag is not None:
+        filter["filter"]["bool"]["must"].append({"term": {"tags": tag}})
+    if species is not None:
+        filter["filter"]["bool"]["must"].append({"term": {"species": species}})
+    filtered_query = {"query": {"filtered": filter}}
     if q is not None:
         query = {"query": {
             "multi_match": {"query": q, "fields": ["summary", "name"]}}}
+        filtered_query["query"]["filtered"].update(query)
+    if agg is not False:
+        filtered_query.update({"aggs":
+                               {"tag_list": {"terms": {"field": "tags"}}}})
 
-    if filter is None and query is None:
-        return general_json_response(
-            code=GENERAL_ERRORS.ERROR_BAD_ARGS, detail='must\
-            input a keyword for search or tag or species.')
-    else:
-        body = {"from": page_by*(page-1), "size": page_by}
-        if filter is not None and query is None:
-            body.update(filter)
-        elif query is not None and filter is None:
-            body.update(query)
-        else:
-            body['query'] = {'filtered':{}}
-            body['query']['filtered'].update(filter)
-            body['query']['filtered'].update(query)
+    body = {"from": page_by*(page-1), "size": page_by}
+    body.update(filtered_query)
+    print(body)
     data = json.dumps(body)
     r = requests.post(settings.ES_URLS['SCH'], data=data)
     r = r.json()
