@@ -542,7 +542,11 @@ def dataset_search_4_biogps(request):
     res = {"count": count, "current_page": page, "results": hits,
            "total_page": total_page}
     if agg is not None:
-        res.update({"aggregations": r["aggregations"]})
+        tags_agg = []
+        aggs_raw = r["aggregations"]["tag_list"]["buckets"]
+        for e in aggs_raw:
+            tags_agg.append({"name": e["key"]})
+        res.update({"aggregations": tags_agg})
     return general_json_response(detail=res)
 
 
