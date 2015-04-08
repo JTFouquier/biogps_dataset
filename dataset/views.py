@@ -505,7 +505,7 @@ def dataset_search_4_biogps(request):
     species = request.GET.get("species", None)
     page_by = request.GET.get("page_by", 10)
     page = request.GET.get('page', 1)
-    agg = request.GET.get('agg', False)
+    agg = request.GET.get('agg', None)
     try:
         page_by = int(page_by)
         page = int(page)
@@ -523,13 +523,12 @@ def dataset_search_4_biogps(request):
         query = {"query": {
             "multi_match": {"query": q, "fields": ["summary", "name"]}}}
         filtered_query["query"]["filtered"].update(query)
-    if agg is not False:
+    if agg is not None:
         filtered_query.update({"aggs":
                                {"tag_list": {"terms": {"field": "tags"}}}})
 
     body = {"from": page_by*(page-1), "size": page_by}
     body.update(filtered_query)
-    print(body)
     data = json.dumps(body)
     r = requests.post(settings.ES_URLS['SCH'], data=data)
     r = r.json()
@@ -542,6 +541,8 @@ def dataset_search_4_biogps(request):
         hits.append(_e)
     res = {"count": count, "current_page": page, "results": hits,
            "total_page": total_page}
+    if agg is not None:
+        res.update({"aggregations": r["aggregations"]})
     return general_json_response(detail=res)
 
 
