@@ -119,4 +119,4 @@ BAR_COLORS = ['#9400D3', '#2F4F4F', '#483D8B', '#8FBC8B', '#E9967A', '#8B0000',
               '#00FFFF']
 
 
-from settings_dev import *
+from .settings_dev import *
