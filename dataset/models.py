@@ -10,6 +10,11 @@ from django.template.defaultfilters import slugify, default
 from django_extensions.db.fields import AutoSlugField
 # https://github.com/bradjasper/django-jsonfield
 from jsonfield import JSONField
+import sys
+if sys.version > '3':
+    PY3 = True
+else:
+    PY3 = False
 
 
 def wrap_str(_str, max_len):
@@ -227,7 +232,10 @@ class BiogpsDatasetMatrix(models.Model):
     _matrix = models.TextField(db_column='matrix')
 
     def get_data(self):
-        return base64.decodestring(self._matrix)
+        if PY3:
+            return base64.b64decode(self._matrix).decode('ascii')
+        else:
+            return base64.decodestring(self._matrix)
 
     def set_data(self, matrix):
         self._matrix = base64.encodestring(matrix)
