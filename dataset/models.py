@@ -232,9 +232,11 @@ class BiogpsDatasetMatrix(models.Model):
     _matrix = models.TextField(db_column='matrix')
 
     def get_data(self):
+        # return bytes under py3
         if PY3:
-            return base64.b64decode(self._matrix).decode('ascii')
+            return base64.b64decode(self._matrix)
         else:
+            # return string
             return base64.decodestring(self._matrix)
 
     def set_data(self, matrix):
