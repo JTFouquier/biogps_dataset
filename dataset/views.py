@@ -698,10 +698,12 @@ def calc_correlation(rep, mat, min_corr):
     rep_pos = mat.reporters.index(rep)
     # Pearson correlations for provided reporter
     if PY3:
-        from io import StringIO
+        from io import BytesIO
+        s = BytesIO(mat.matrix)
     else:
-        import StringIO
-    matrix_data = np.load(StringIO.StringIO(mat.matrix))
+        from StringIO import StringIO
+        s = StringIO(mat.matrix)
+    matrix_data = np.load(s)
     rep_vector = matrix_data[rep_pos]
     corrs = pearsonr(rep_vector, matrix_data)
     # Get indices of sufficiently correlated reporters
@@ -710,7 +712,7 @@ def calc_correlation(rep, mat, min_corr):
     # Get values for those indices
     val_corrs = corrs.take(idx_corrs)
     # Return highest correlated first
-    corrs = zip(val_corrs, idx_corrs)
+    corrs = list(zip(val_corrs, idx_corrs))
     corrs.sort(reverse=True)
     rep_cor = {mat.reporters[i[1]]: i[0] for i in corrs}
     # query mygene to get symbol from reporter
