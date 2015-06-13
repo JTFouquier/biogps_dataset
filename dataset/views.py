@@ -710,7 +710,7 @@ def calc_correlation(rep, mat, min_corr):
     min_corr = float(min_corr)
     idx_corrs = np.where(corrs > min_corr)[0]
     # Get values for those indices
-    val_corrs = corrs.take(idx_corrs)
+    val_corrs = corrs.take(idx_corrs).tolist()
     # Return highest correlated first
     corrs = list(zip(val_corrs, idx_corrs))
     corrs.sort(reverse=True)
