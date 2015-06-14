@@ -1,0 +1,8 @@
+.pydevproject
+.project
+.pyc$
+.*~
+db.sqlite3
+arrayexpress_cache.sqlite
+exp_loader/
+static/
