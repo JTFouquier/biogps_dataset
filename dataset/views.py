@@ -25,7 +25,7 @@ from .util import ComplexEncoder
 def adopt_dataset(ds_id):
     if ds_id in settings.DEFAULT_DS_ACCESSION:
         try:
-            return models.BiogpsDataset.objects.using('default_dataset')\
+            return models.BiogpsDataset.objects\
                 .get(geo_gse_id=ds_id)
         except ObjectDoesNotExist:
             return None
@@ -665,8 +665,7 @@ def dataset_default(request):
     if gene_id is None:
         gene_id = settings.DEFAULT_GENE_ID
     mg = mygene.MyGeneInfo()
-    res = mg.querymany([gene_id], scopes='_id', fields='taxid')
-    data_json = res[0]
+    data_json = mg.getgene(gene_id, fields='taxid')
     if 'taxid' not in data_json:
         return general_json_response(
             GENERAL_ERRORS.ERROR_BAD_ARGS, "Gene id: %s \
@@ -679,7 +678,8 @@ def dataset_default(request):
             GENERAL_ERRORS.ERROR_BAD_ARGS, "Cannot get default\
             dataset with gene id: %s." % gene_id)
     return general_json_response(detail={'gene': int(gene_id),
-                                         'dataset': ds_id})
+                                         'dataset': ds_id,
+                                         'taxid': species)
 
 
 def calc_correlation(rep, mat, min_corr):
