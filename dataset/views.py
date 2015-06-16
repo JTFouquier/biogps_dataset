@@ -57,7 +57,7 @@ def get_ds_factors_keys(ds, group=None, collapse=False, naming=None):
     """
     factors = []
     names = []
-    tag = []
+    # tag = []
     fvs = []
     if group is not None:
         for j, f in enumerate(ds.factors):
@@ -679,7 +679,7 @@ def dataset_default(request):
             dataset with gene id: %s." % gene_id)
     return general_json_response(detail={'gene': int(gene_id),
                                          'dataset': ds_id,
-                                         'taxid': species)
+                                         'taxid': species})
 
 
 def calc_correlation(rep, mat, min_corr):
@@ -828,20 +828,20 @@ def dataset_factors(request, ds_id):
     for e in factor_keys:
         ret.append({e: factor_keys[e]})
 
-    def c2(x, y):
-        kx = x.keys()[0]
-        ky = y.keys()[0]
-        if kx in settings.POPULAR_FACTORS:
-            if ky in settings.POPULAR_FACTORS:
-                return cmp(kx, ky)
-            else:
-                return -1
-        else:
-            if ky in settings.POPULAR_FACTORS:
-                return 1
-            else:
-                return cmp(kx, ky)
-    print(ret)
+    # def c2(x, y):
+    #     kx = x.keys()[0]
+    #     ky = y.keys()[0]
+    #     if kx in settings.POPULAR_FACTORS:
+    #         if ky in settings.POPULAR_FACTORS:
+    #             return cmp(kx, ky)
+    #         else:
+    #             return -1
+    #     else:
+    #         if ky in settings.POPULAR_FACTORS:
+    #             return 1
+    #         else:
+    #             return cmp(kx, ky)
+    # print(ret)
     ret.sort(key=lambda x: list(x)[0] in settings.POPULAR_FACTORS)
     return general_json_response(detail=ret)
 
