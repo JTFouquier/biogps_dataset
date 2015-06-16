@@ -46,6 +46,7 @@
                 dsCanvas : false,
                 dsID : -1,
                 geneID : -1,
+                taxID: -1,   // the taxid for the input geneid
                 dsName : "",
                 dsPage : 1,
                 dsPages : 1,
@@ -152,12 +153,11 @@
 
                 setDatasetCookie : function() {
                     // Check for last-viewed dataset, otherwise use default
-                    var org_cookie_name = "org_10116";
-                    var ds = "5";
-                    if (this.dsID != -1) {
+                    if (this.dsID != -1 && this.taxID != -1) {
+                        var org_cookie_name = "org_" + this.taxID;
                         ds = this.dsID;
+                        document.cookie = org_cookie_name + "=" + encodeURIComponent(ds) + "; max-age=" + (60 * 60 * 12);
                     }
-                    document.cookie = org_cookie_name + "=" + encodeURIComponent(ds) + "; max-age=" + (60 * 60 * 12);
                 },
 
                 handleNoData : function() {
@@ -974,7 +974,7 @@
                             // then cookie
                             if (dsID == null)
                             {
-                                var org_cookie_name = "org_10116";
+                                var org_cookie_name = "org_" + this.taxID;
                                 var allcookies = document.cookie;
                                 var cpos = allcookies.indexOf(org_cookie_name + "=");
                                 if (cpos > -1) {
@@ -1007,6 +1007,8 @@
                                     {
                                         DC_026887848.geneID = dataJson.details.gene;
                                         DC_026887848.dsID = dataJson.details.dataset;
+                                        DC_026887848.taxID = dataJson.details.taxid;
+
                                         if (dsID)
                                             DC_026887848.dsID = dsID;
                                         DC_026887848.setDatasetCookie();
