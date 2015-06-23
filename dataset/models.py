@@ -6,7 +6,7 @@ import types
 import textwrap
 from django.db import models
 # from django.utils.encoding import smart_unicode
-from django.template.defaultfilters import slugify, default
+from django.template.defaultfilters import slugify
 from django_extensions.db.fields import AutoSlugField
 # https://github.com/bradjasper/django-jsonfield
 from jsonfield import JSONField
@@ -272,7 +272,7 @@ class BiogpsDatasetGeoLoaded(models.Model):
     """Model definition for BiogpsDatasetGeoLoaded. This model tracks what
        GEO datasets have been loaded."""
     geo_type = models.CharField(max_length=20)
-    dataset = models.OneToOneField(BiogpsDataset, \
+    dataset = models.OneToOneField(BiogpsDataset,
                                    related_name='dataset_geo_loaded')
     with_platform = models.CharField(max_length=100)
 
@@ -281,7 +281,7 @@ class BiogpsDatasetGeoFlagged(models.Model):
     """Model definition for BiogpsDatasetGeoFlagged. This model tracks what
        GEO datasets have been flagged, and the reason why."""
     geo_type = models.CharField(max_length=10)
-    dataset = models.OneToOneField(BiogpsDataset, \
+    dataset = models.OneToOneField(BiogpsDataset,
                                    related_name='dataset_geo_flagged')
     reason = models.CharField(max_length=1000)
 
