@@ -148,6 +148,9 @@ class BiogpsDataset(models.Model):
     def __unicode__(self):
         return self.geo_gse_id
 
+    def __str__(self):
+        return "{}_{}".format(self.id, self.geo_gse_id)
+
     @models.permalink
     def get_absolute_url(self):
         """ Return the appropriate URL for this dataset. """
