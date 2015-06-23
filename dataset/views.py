@@ -13,6 +13,7 @@ from dataset import models
 from django.http.response import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
+import shelve
 import requests
 import math
 from tagging.models import Tag, TaggedItem
@@ -23,15 +24,16 @@ from .util import ComplexEncoder
 
 
 def adopt_dataset(ds_id):
-    if ds_id in settings.DEFAULT_DS_ACCESSION:
-        try:
-            return models.BiogpsDataset.objects\
-                .get(geo_gse_id=ds_id)
-        except ObjectDoesNotExist:
-            return None
-
     try:
-        return models.BiogpsDataset.objects.get(geo_gse_id=ds_id)
+        _id = int(ds_id)
+        is_pk = True
+    except ValueError:
+        is_pk = False
+    try:
+        if is_pk:
+            return models.BiogpsDataset.objects.get(pk=_id)
+        else:
+            return models.BiogpsDataset.objects.get(geo_gse_id=ds_id)
     except ObjectDoesNotExist:
         return None
 
@@ -192,17 +194,46 @@ def dataset_info(request, ds_id):
     return general_json_response(detail=ret)
 
 
+def _get_flat_list(a_list):
+    out_list = []
+    for val in a_list:
+        if isinstance(val, list):
+            out_list += val
+        else:
+            out_list.append(val)
+    return out_list
+
+
+def alwayslist(value, tuple_as_single=False):
+    if value is None:
+        return []
+    if (tuple_as_single and isinstance(value, list)) or \
+       (not tuple_as_single and isinstance(value, (list, tuple))):
+        return value
+    else:
+        return [value]
+
+
 def _get_reporter_from_gene(gene):
     mg = mygene.MyGeneInfo()
-    # res = mg.querymany([gene], scopes='_id', fields='reporter')
-    data_json = mg.getgene(gene, fields='reporter')
-    if 'reporter' not in data_json:
-        return None
+    # these are the fields reporters are taken from
+    rep_fields = ['entrezgene', 'reporter', 'refseq.rna']
+    data_json = mg.getgene(gene, fields=rep_fields)
     reporters = []
-    for i in data_json['reporter'].values():
-        if type(i) is not list:
-            i = [i]
-        reporters = reporters + i
+    for field in rep_fields:
+        if field in data_json:
+            _rep = data_json[field]
+            if field == 'reporter':
+                _rep = _get_flat_list(_rep.values())
+            reporters.append(_rep)
+    reporters = [str(x) for x in _get_flat_list(reporters)]
+
+    # temporarily add miRNA reporters via flat file; remove when miRNA reporters are directly
+    # returned by mygene.info
+    d = shelve.open('/opt/biogps/gene2mirna_20120911.db', 'r')
+    if str(gene) in d:
+        reporters += alwayslist(d[str(gene)])
+    d.close()
     return reporters
 
 
