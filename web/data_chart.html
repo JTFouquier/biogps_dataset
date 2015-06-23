@@ -161,6 +161,8 @@
                 },
 
                 handleNoData : function() {
+                    // In case previous dataset/gene combo had no data, clean up/reset
+                    $(".ds-error").remove();
                     // Update canvas, etc when no data found
                     var _msg = "No data for current gene in the \"" + DC_026887848.dsName + "\" data set.";
                     var _htmlMsg = "<p class=\"ds-error\">" + _msg + "</p>";
@@ -170,6 +172,7 @@
                         var _content = $("#" + containers[i]);
                         _content.before(_htmlMsg);
                         _content.hide();
+                        break;
                     }
 
                     // Determine position for dataset dialog
