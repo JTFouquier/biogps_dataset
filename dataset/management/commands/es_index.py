@@ -12,26 +12,27 @@ class Command(BaseCommand):
         try:
             r = requests.delete(settings.ES_URLS['BGPS'])
             r.raise_for_status()
-            print "delete biogps index success"
+            print("delete biogps index success")
         except HTTPError:
-            print "no existing biogps index, continue."
-        except Exception, e:
-            print e
-            print 'clear exist biogps index failed, leave.'
+            print("no existing biogps index, continue.")
+        except Exception as e:
+            print(e)
+            print('clear exist biogps index failed, leave.')
             return
 
         requests.put(settings.ES_URLS['BGPS'])
-        print 'create index for biogps success'
+        print('create index for biogps success')
 
         data = json.dumps({
             "platform": {
                 "properties": {
-                    "platform": {"type": "string", "store": True},
-                    "reporters": {"type": "string", "store": True},
-                    "species": {"type": "string"},
+                    "platform": {"type": "string", "store": False, "include_in_all": False},
+                    "reporters": {"type": "string", "store": False,
+                                  'index': 'not_analyzed', "include_in_all": False},
+                    "species": {"type": "string", "include_in_all": False}
                     }}})
         requests.put(settings.ES_URLS['PF_C'], data=data)
-        print "create platform mapping success"
+        print("create platform mapping success")
 
         data = json.dumps({
             "dataset": {
@@ -49,7 +50,7 @@ class Command(BaseCommand):
                     "tags": {"type": "string", "index": "not_analyzed"}
                     }}})
         requests.put(settings.ES_URLS['DS_C'], data=data)
-        print "create dataset mapping success"
+        print("create dataset mapping success")
 
         plt_body = {"platform": "", "reporters": ""}
         platform = models.BiogpsDatasetPlatform.objects.all()
@@ -71,8 +72,7 @@ class Command(BaseCommand):
                 requests.put(url, data=data)
                 bio_count = bio_count + 1
 
-        print "added %d platform , added %d dataset" %\
-            (plt_count, bio_count)
+        print("added {} platform , added {} dataset".format(plt_count, bio_count))
 #
 #         dataset = models.BiogpsDataset.objects.using("default_dataset").\
 #             filter(geo_gse_id__in=settings.DEFAULT_DS_ACCESSION)
@@ -93,7 +93,7 @@ class Command(BaseCommand):
 #                 plt_dic[str(plt_temp.id)] = plt_id
 #             else:
 #                 plt_id = plt_dic.get(str(plt_temp.id))
-# 
+#
 #             # temp_data中的default字段表面了该document来自那个数据库，整数1表明来自数据库default_ds
 #             temp_data = ds.es_index_serialize()
 #             temp_data["default"] = 1

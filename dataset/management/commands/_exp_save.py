@@ -2,7 +2,7 @@ import logging
 import numpy as np
 from dataset import models
 from django.core.exceptions import ObjectDoesNotExist
-import StringIO
+from io import BytesIO
 
 
 class ExperimentSave:
@@ -84,7 +84,7 @@ class ExperimentSave:
                 data=list(self.data.loc[idx, :].values)))
         models.BiogpsDatasetData.objects.bulk_create(datasetdata)
         # tmp file
-        s = StringIO.StringIO()
+        s = BytesIO()
         np.save(s, self.data.values)
         s.seek(0)
         mat = models.BiogpsDatasetMatrix(
@@ -115,8 +115,7 @@ class ExperimentSave:
             dataset['secondaryaccession'] = ''
         try:
             dataset['pubmed_id'] =\
-                data_json["experiments"]["experiment"]\
-                ["bibliography"]["accession"]
+                data_json["experiments"]["experiment"]["bibliography"]["accession"]
         except Exception:
             dataset['pubmed_id'] = ''
         dataset['factors'] = []

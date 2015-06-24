@@ -41,7 +41,7 @@ class DP_E_GEOD_4006(Pattern):
         platform_key = self.match_any(self.platform_keys, sdrf.columns)
         if platform_key is None:
             return None
-        f = data.values()[0]
+        f = list(data.values())[0]
         f.seek(0)
         header = f.readline().strip().split('\t')
         if self.match_any(self.data_keys, header) is None:
@@ -80,9 +80,9 @@ class DP_E_GEOD_26688(Pattern):
         sample_key = self.match_any(self.sample_keys, sdrf.columns)
         if sample_key is None:
             return None
-        f = data.values()[0]
+        f = list(data.values())[0]
         f.seek(0)
-        header = f.readline().split('\t')
+        header = f.readline().decode('utf-8').split('\t')
         if self.match_any(self.data_keys, header) is None:
             return None
         platform_key = self.match_any(self.platform_keys, sdrf.columns)
