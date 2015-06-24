@@ -63,7 +63,7 @@ class Command(NoArgsCommand):
         # Read in fma susbset from file: {"full_id": "preferred_name"}
         fma_annos = read_fma_file()
         if not fma_annos:
-            print 'No fma annotations found, quitting.'
+            print('No fma annotations found, quitting.')
             return
         fma_full_ids = fma_annos.keys()
 

@@ -134,10 +134,11 @@ class Command(BaseCommand):
                 continue
             try:
                 self.save_dataset(exp, p)
-            except Exception, e:
+            except Exception as e:
                 logging.error('Exception: %s' % e)
-                res = models.BiogpsDatasetFailed.objects.get_or_create(\
-                    platform=p, dataset=exp)
+                res = models.BiogpsDatasetFailed.objects.get_or_create(
+                    platform=p, dataset=exp
+                )
                 res[0].reason = e
                 res[0].save()
 
@@ -151,8 +152,8 @@ class Command(BaseCommand):
         logging.info('%d experiments in total' % len(po.exps))
         po.exps.sort()
         for exp in po.exps[start:]:
-            logging.info('No.%d experiment of total %d, %s' %\
-                          (po.exps.index(exp), len(po.exps), exp))
+            logging.info('No.%d experiment of total %d, %s' %
+                         (po.exps.index(exp), len(po.exps), exp))
             if exp in skips:
                 logging.info('skip %s' % exp)
                 continue
@@ -161,9 +162,10 @@ class Command(BaseCommand):
                 continue
             try:
                 self.save_dataset(exp, p)
-            except Exception, e:
+            except Exception as e:
                 logging.error('Exception: %s' % e)
-                res = models.BiogpsDatasetFailed.objects.get_or_create(\
-                    platform=p, dataset=exp)
+                res = models.BiogpsDatasetFailed.objects.get_or_create(
+                    platform=p, dataset=exp
+                )
                 res[0].reason = e
                 res[0].save()

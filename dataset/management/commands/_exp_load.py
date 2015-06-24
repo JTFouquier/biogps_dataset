@@ -3,9 +3,7 @@ import os
 import requests
 import requests_cache
 import zipfile
-import csv
-import StringIO
-import json
+from io import BytesIO as StringIO
 from dataset import models
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -38,7 +36,7 @@ class Platform(ResourceRequest):
         url = 'http://www.ebi.ac.uk/arrayexpress/files/%s/%s.adf.txt'\
             % (self.name, self.name)
         response = ResourceRequest.get(url)
-        raw = response.content.strip()
+        raw = response.text.strip()
         split = raw.split('\n')
         start = split.index('[main]') + 2
         split = split[start:]
@@ -65,7 +63,7 @@ class Platform(ResourceRequest):
             self.platform = ps
         except ObjectDoesNotExist:
             self.platform = models.BiogpsDatasetPlatform.objects.\
-              create(platform=self.name, reporters=self.reporters)
+                create(platform=self.name, reporters=self.reporters)
 
 
 class ExperimentRaw(ResourceRequest):
@@ -95,7 +93,7 @@ class ExperimentRaw(ResourceRequest):
         return res.json()
 
     def get_stringio_by_url(self, url):
-        raw = StringIO.StringIO()
+        raw = StringIO()
         response = ResourceRequest.get(url)
         raw.write(response.content)
         return raw
@@ -105,7 +103,7 @@ class ExperimentRaw(ResourceRequest):
         zobj = zipfile.ZipFile(zfile)
         ret = {}
         for name in zobj.namelist():
-            output = StringIO.StringIO()
+            output = StringIO()
             output.write(zobj.read(name))
             ret[name] = output
         return ret
