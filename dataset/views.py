@@ -23,6 +23,13 @@ from django.core.exceptions import ObjectDoesNotExist
 from .util import ComplexEncoder
 
 
+def to_int(s):
+    try:
+        return int(s)
+    except ValueError:
+        return s
+
+
 def adopt_dataset(ds_id):
     try:
         _id = int(ds_id)
@@ -425,7 +432,7 @@ def _es_search(rpt, q=None, dft=False, start=0, size=8):
     body['query'] = {"filtered": {"filter": {"bool": {
         "must": [{"term": {"is_default": dft}},
                  {"has_parent": {"parent_type": "platform", "query":
-                                 {"match": {"reporters": rpt}}}}]}}
+                                 {"terms": {"reporters": rpt}}}}]}}
     }}
     # set query if query word is not None
     if q is not None:
@@ -456,8 +463,7 @@ def dataset_search(request):
              data for gene %s.' % gene)
     page = int(page)
     page_by = int(page_by)
-    rep = ' '.join(reporters)
-    search_res = _es_search(rep, query, False, (page-1)*page_by, page_by)
+    search_res = _es_search(reporters, query, False, (page-1)*page_by, page_by)
     count = search_res["hits"]["total"]
     total_page = int(math.ceil(float(count) / float(page_by)))
     res = []
@@ -482,13 +488,13 @@ def dataset_search_default(request):
             code=GENERAL_ERRORS.ERROR_NOT_FOUND, detail='no\
             matched data for gene %s.' % gene)
     # retrive all results
-    search_res = _es_search(' '.join(reporters), query, True, 0, 9999)
+    search_res = _es_search(reporters, query, True, 0, 9999)
     res = []
     for e in search_res["hits"]["hits"]:
         _e = e["_source"]
         del _e['summary'], _e['tags']
         res.append(_e)
-    res = {"count": len(res),   "results": res}
+    res = {"count": len(res), "results": res}
     return general_json_response(detail=res)
 
 
@@ -504,19 +510,18 @@ def dataset_search_all(request):
             code=GENERAL_ERRORS.ERROR_NOT_FOUND, detail='no\
             matched data for gene %s.' % gene)
     # retrive all default results(9999)
-    rep = ' '.join(reporters)
-    search_res = _es_search(rep, query, True, 0, 9999)
+    search_res = _es_search(reporters, query, True, 0, 9999)
     res_dft = []
     for e in search_res["hits"]["hits"]:
         _e = e["_source"]
         del _e['summary'], _e['tags']
         res_dft.append(_e)
-    res_default = {"count": len(res_dft),   "results": res_dft}
+    res_default = {"count": len(res_dft), "results": res_dft}
 
     # retrive fist page non-default ds
     page_by = request.GET.get("page_by", 8)
     page_by = int(page_by)
-    search_res = _es_search(rep, query, False, 0, page_by)
+    search_res = _es_search(reporters, query, False, 0, page_by)
     count = search_res["hits"]["total"]
     total_page = int(math.ceil(float(count) / float(page_by)))
     res = []
@@ -690,11 +695,66 @@ def dataset_full_data(request, ds_id, gene_id):
     return general_json_response(detail=ret)
 
 
+def _get_default_ds(gene_id, species=None):
+    """
+    Get a valid default dataset id for the given gene.
+    if species is None, it will get its value (taxid) from MyGene.info.
+
+    return None if no valid dataset id found.
+    """
+    if not species:
+        mg = mygene.MyGeneInfo()
+        data_json = mg.getgene(gene_id, fields='taxid')
+        if 'taxid' not in data_json:
+            return None
+        species = data_json['taxid']
+    ds_id = settings.DEFAULT_DATASET_MAPPING.get(species, None)
+    if ds_id:
+        # check if ds_id is valid for the given gene
+        reporters = _get_reporter_from_gene(gene_id)
+        if reporters is None:
+            return None
+        body = {"fields": [], "size": 1}
+        body['query'] = {"filtered": {"filter": {"bool": {
+            "must": [{"term": {"geo_gse_id": ds_id}},
+                     {"has_parent": {"parent_type": "platform", "query":
+                                     {"terms": {"reporters": reporters}}}}]}}
+        }}
+        data = json.dumps(body)
+        r = requests.post(settings.ES_URLS['SCH'], data=data).json()
+        if r["hits"]["total"] > 0:
+            # found a default ds_id from ES query result
+            return ds_id
+        else:
+            # take a valid ds_id from the ES
+            body = {"fields": ["geo_gse_id"], "size": 1}
+            body['query'] = {
+                "has_parent": {
+                    "parent_type": "platform",
+                    "query": {
+                        "terms": {
+                            "reporters": reporters
+                        }
+                    }
+                }
+            }
+            body["sort"] = [{
+                "is_default": {
+                    "order": "desc"
+                }
+            }]
+            data = json.dumps(body)
+            r = requests.post(settings.ES_URLS['SCH'], data=data).json()
+            if r["hits"]["total"] > 0:
+                return r["hits"]["hits"][0]["fields"]["geo_gse_id"][0]
+
+
 @require_http_methods(["GET"])
 def dataset_default(request):
     gene_id = request.GET.get('gene', None)
     if gene_id is None:
         gene_id = settings.DEFAULT_GENE_ID
+
     mg = mygene.MyGeneInfo()
     data_json = mg.getgene(gene_id, fields='taxid')
     if 'taxid' not in data_json:
@@ -702,15 +762,16 @@ def dataset_default(request):
             GENERAL_ERRORS.ERROR_BAD_ARGS, "Gene id: %s \
             may be invalid." % gene_id)
     species = data_json['taxid']
-    try:
-        ds_id = settings.DEFAULT_DATASET_MAPPING[species]
-    except IndexError:
+
+    default_ds_id = _get_default_ds(gene_id, species=species)
+    if default_ds_id:
+        return general_json_response(detail={'gene': to_int(gene_id),
+                                             'dataset': default_ds_id,
+                                             'taxid': species})
+    else:
         return general_json_response(
             GENERAL_ERRORS.ERROR_BAD_ARGS, "Cannot get default\
             dataset with gene id: %s." % gene_id)
-    return general_json_response(detail={'gene': int(gene_id),
-                                         'dataset': ds_id,
-                                         'taxid': species})
 
 
 def calc_correlation(rep, mat, min_corr):
@@ -767,7 +828,7 @@ def dataset_correlation_usable(request, ds_id):
         return general_json_response(
             GENERAL_ERRORS.ERROR_INTERNAL, {'sample_count': ds.sample_count})
     try:
-        _matrix = models.BiogpsDatasetMatrix.objects.get(dataset=ds)
+        models.BiogpsDatasetMatrix.objects.get(dataset=ds)
     except models.BiogpsDatasetMatrix.DoesNotExist:
         return general_json_response(
             GENERAL_ERRORS.ERROR_NOT_FOUND, {'sample_count': ds.sample_count})
@@ -847,7 +908,7 @@ def dataset_factors(request, ds_id):
         #     if y == 'not specified':
         #         return -1
         #     return cmp(x, y)
-        factor_keys[e].sort(key=lambda x: x.lower())
+        factor_keys[e].sort(key=lambda x: x.lower() if isinstance(x, str) else x)
         if 'not specified' in factor_keys[e]:
             p = factor_keys[e].index('not specified')
             factor_keys[e].append(factor_keys[e][p])
