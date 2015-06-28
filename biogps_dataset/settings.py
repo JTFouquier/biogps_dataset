@@ -156,12 +156,12 @@ MAX_SAMPLE_4_CORRELATION = 400 #200
 
 
 ES_URLS = {
-    'BGPS': "http://localhost:9200/biogps/",
-    'PF_C': "http://localhost:9200/biogps/platform/_mapping",
-    'DS_C': "http://localhost:9200/biogps/dataset/_mapping",
-    'PF': "http://localhost:9200/biogps/platform/",
-    'DS': "http://localhost:9200/biogps/dataset/",
-    'SCH': "http://localhost:9200/biogps/dataset/_search",
+    'BGPS': "http://localhost:9200/biogps_ds/",
+    'PF_C': "http://localhost:9200/biogps_ds/platform/_mapping",
+    'DS_C': "http://localhost:9200/biogps_ds/dataset/_mapping",
+    'PF': "http://localhost:9200/biogps_ds/platform/",
+    'DS': "http://localhost:9200/biogps_ds/dataset/",
+    'SCH': "http://localhost:9200/biogps_ds/dataset/_search",
 }
 
 # DEFAULT_DS_TOKEN = ['GSE952', 'GSE10246']
