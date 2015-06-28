@@ -42,7 +42,13 @@ class Platform(ResourceRequest):
         split = split[start:]
         self.reporters = []
         for s in split:
-            self.reporters.append(s.strip().split('\t')[0])
+            rptr = s.strip().split('\t')[0]
+            if rptr.startswith('Affymetrix'):
+                # e.g "Affymetrix:CompositeSequence:HG-U133_Plus_2:200022_at"
+                assert len(rptr.split()[0].split(':')) == 4
+                rptr = rptr.split()[0].split(':')[-1]
+            rptr = rptr.lower()
+            self.reporters.append(rptr)
         self.reporters.sort()
 
     def load_exps(self):
