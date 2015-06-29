@@ -991,6 +991,8 @@
                             }
                             // finally, server end default
                             geneID = this._getUrlParam('gene');
+                            // set geneID first, just in case this gene has no dataset returned.
+                            DC_026887848.geneID = geneID;
                             var prox_url;
                             if (geneID != null){
                                 prox_url = "/dataset/default/?gene="+geneID;
