@@ -716,7 +716,7 @@ def _get_default_ds(gene_id, species=None):
             return None
         body = {"fields": [], "size": 1}
         body['query'] = {"filtered": {"filter": {"bool": {
-            "must": [{"term": {"geo_gse_id": ds_id}},
+            "must": [{"term": {"geo_gse_id": ds_id.lower()}},  # string is indexed in lower case at ES
                      {"has_parent": {"parent_type": "platform", "query":
                                      {"terms": {"reporters": reporters}}}}]}}
         }}
