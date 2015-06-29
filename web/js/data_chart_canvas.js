@@ -802,7 +802,7 @@ DCCG = {
     buildCanvasError:function(ctx) {
         this.clearCanvas(ctx);
 
-        ctx.font = "9px sans-serif";
+        ctx.font = "14px sans-serif";
         ctx.textAlign = "left";
         ctx.fillStyle = "rgba(0, 0, 0, 1)";
         ctx.fillText("No Data to Display",10,15);
@@ -811,7 +811,7 @@ DCCG = {
     buildCanvasLoading:function(ctx) {
         this.clearCanvas(ctx);
 
-        ctx.font = "9px sans-serif";
+        ctx.font = "14px sans-serif";
         ctx.textAlign = "left";
         ctx.fillStyle = "rgba(0, 0, 0, 1)";
         ctx.fillText("Loading...",10,15);
