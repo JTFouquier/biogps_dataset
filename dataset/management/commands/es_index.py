@@ -1,4 +1,5 @@
 # -*-coding: utf-8 -*-
+from optparse import make_option
 from dataset import models
 from django.core.management.base import BaseCommand
 import json
@@ -8,7 +9,17 @@ from requests.exceptions import HTTPError
 
 
 class Command(BaseCommand):
-    def handle(self, *args, **options):
+    option_list = BaseCommand.option_list + (
+        make_option("-c", "--create-index",
+                    action="store_true",
+                    dest="create-index",
+                    default=False,
+                    help='Create new ES index, delete the old one if exists.'
+        )
+    )
+
+    def _create_es_index(self):
+        '''Create the ES index, delete it first if exists'''
         try:
             r = requests.delete(settings.ES_URLS['BGPS'])
             r.raise_for_status()
@@ -52,6 +63,8 @@ class Command(BaseCommand):
         requests.put(settings.ES_URLS['DS_C'], data=data)
         print("create dataset mapping success")
 
+    def _index_datasets(self):
+        '''Do the actual indexing on an existing ES index.'''
         plt_body = {"platform": "", "reporters": ""}
         platform = models.BiogpsDatasetPlatform.objects.all()
         plt_count, bio_count = 0, 0
@@ -73,6 +86,13 @@ class Command(BaseCommand):
                 bio_count = bio_count + 1
 
         print("added {} platform , added {} dataset".format(plt_count, bio_count))
+
+    def handle(self, *args, **options):
+        if options['create-index']:
+            self._create_es_index()
+        self._index_datasets()
+
+
 #
 #         dataset = models.BiogpsDataset.objects.using("default_dataset").\
 #             filter(geo_gse_id__in=settings.DEFAULT_DS_ACCESSION)
