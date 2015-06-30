@@ -15,8 +15,7 @@ class Command(BaseCommand):
                     dest="create-index",
                     default=False,
                     help='Create new ES index, delete the old one if exists.'
-        )
-    )
+        ),)
 
     def _create_es_index(self):
         '''Create the ES index, delete it first if exists'''
