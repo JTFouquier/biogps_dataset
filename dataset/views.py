@@ -587,11 +587,15 @@ def dataset_search_4_biogps(request):
 
 
 @require_http_methods(["GET"])
-def dataset_info_4_biogps(request, _id):
+def dataset_info_4_biogps(request, ds_id):
     """
         get information about a dataset
     """
-    ds = models.BiogpsDataset.objects.get(geo_gse_id=_id)
+    ds = adopt_dataset(ds_id)
+    if ds is None:
+        return general_json_response(GENERAL_ERRORS.ERROR_NOT_FOUND,
+                                     "dataset with this id not found")
+
     s = json.dumps(ds, cls=ComplexEncoder)
     oj = json.loads(s)
     del oj['metadata']
