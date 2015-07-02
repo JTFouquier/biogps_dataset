@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.conf.urls.static import static
 admin.autodiscover()
 
-urlpatterns = patterns(
+urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
     # grappelli URLS
     url(r'^grappelli/', include('grappelli.urls')),
