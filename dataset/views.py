@@ -872,7 +872,7 @@ def dataset_correlation(request, ds_id, reporter_id, min_corr):
             writer.writerow(list(result[0]))
             i = 0
             while(i < len(result)):
-                writer.writerow(result[i].values())
+                writer.writerow(list(result[i].values()))
                 i = i + 1
             return response
 
