@@ -1,6 +1,7 @@
 # -*-coding: utf-8 -*-
 from __future__ import print_function
 import sys
+import os.path
 from django.db.models.aggregates import Count
 if sys.version > '3':
     PY3 = True
@@ -237,10 +238,12 @@ def _get_reporter_from_gene(gene):
 
     # temporarily add miRNA reporters via flat file; remove when miRNA reporters are directly
     # returned by mygene.info
-    d = shelve.open('/opt/biogps/gene2mirna_20120911.db', 'r')
-    if str(gene) in d:
-        reporters += alwayslist(d[str(gene)])
-    d.close()
+    g2mirna_file = '/opt/biogps/gene2mirna_20120911.db'
+    if os.path.exists(g2mirna_file):
+        d = shelve.open(g2mirna_file, 'r')
+        if str(gene) in d:
+            reporters += alwayslist(d[str(gene)])
+        d.close()
     return reporters
 
 
