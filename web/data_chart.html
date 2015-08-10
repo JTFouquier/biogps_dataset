@@ -962,6 +962,22 @@
                 //END CANVAS GRAPHING ROUTINES
                 //
                 //
+                getDsFromCookie: function(taxID){
+                    //get saved dsID from the cookie for the given species (as taxID)
+                    var dsID = null;
+                    var org_cookie_name = "org_" + taxID;
+                    var allcookies = document.cookie;
+                    var cpos = allcookies.indexOf(org_cookie_name + "=");
+                    if (cpos > -1) {
+                        var start = allcookies.indexOf("=", cpos) + 1;
+                        var end = allcookies.indexOf(";", start);
+                        if (end == -1) {
+                            end = allcookies.length;
+                        }
+                        dsID = decodeURIComponent(allcookies.substring(start, end));
+                    }
+                    return dsID;
+                },
 
                 loadDataset : function(dsID) {
                     if (this.dsID == dsID) {
@@ -972,24 +988,6 @@
                         //ds is null, will initial ds and gene id
                         if (!dsID)
                         {
-                            //1st try url
-                            dsID = this._getUrlParam('dataset');
-                            // then cookie
-                            if (dsID == null)
-                            {
-                                var org_cookie_name = "org_" + this.taxID;
-                                var allcookies = document.cookie;
-                                var cpos = allcookies.indexOf(org_cookie_name + "=");
-                                if (cpos > -1) {
-                                    var start = allcookies.indexOf("=", cpos) + 1;
-                                    var end = allcookies.indexOf(";", start);
-                                    if (end == -1) {
-                                        end = allcookies.length;
-                                    }
-                                    dsID = decodeURIComponent(allcookies.substring(start, end));
-                                }
-                            }
-                            // finally, server end default
                             geneID = this._getUrlParam('gene');
                             // set geneID first, just in case this gene has no dataset returned.
                             DC_026887848.geneID = geneID;
@@ -1011,10 +1009,21 @@
                                     else
                                     {
                                         DC_026887848.geneID = dataJson.details.gene;
-                                        DC_026887848.dsID = dataJson.details.dataset;
                                         DC_026887848.taxID = dataJson.details.taxid;
-                                        if (dsID)
+                                        //Now set dsID
+                                        //first from url parameter
+                                        dsID = DC_026887848._getUrlParam('dataset');
+                                        if (!dsID){
+                                            // then cookie based on taxID
+                                            dsID = DC_026887848.getDsFromCookie(DC_026887848.taxID);
+                                            if (!dsID){
+                                                // finally, use the server-side default
+                                                dsID = dataJson.details.dataset;
+                                            }
+                                        }
+                                        if (dsID){
                                             DC_026887848.dsID = dsID;
+                                        }
                                         DC_026887848.setDatasetCookie();
                                         DC_026887848.loadFactors();
                                         DC_026887848.loadProbes();
