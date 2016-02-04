@@ -99,8 +99,6 @@ STATICFILES_DIRS = (
     os.path.join(os.path.dirname(__file__), '../web/'),
 )
 
-
-
 # List of finder classes that know how to find static files in
 # various locations.
 STATICFILES_FINDERS = (
@@ -108,8 +106,6 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
-
-
 
 
 ##################################################
@@ -130,15 +126,15 @@ DEFAULT_DATASET_MAPPING = {
     # rat
     10116: 'GSE952',
     # fruit fly
-    7227: 10,
+    #7227: 10,
     # nematode
-    6239: 10,
+    #6239: 10,
     # zebrafish
-    7955: 10,
+    #7955: 10,
     # thale-cress
-    3702: 10,
+    #3702: 10,
     # frog
-    8364: 10,
+    #8364: 10,
     # pig
     9823: 'BDS_00012',
 }
@@ -146,14 +142,34 @@ DEFAULT_DATASET_MAPPING = {
 # DEFAULT_DS_TOKEN = ['GSE952', 'GSE10246']
 # [ds.id for ds in BiogpsDataset.objects.all() if ds.metadata['default']]
 # DEFAULT_DS_ID = [6, 8, 9, 10, 11, 12, 13, 14, 3, 4, 5, 1, 2428, 2, 2427, 2430, 7]
-DEFAULT_DS_ACCESSION = [u'BDS_00001', u'BDS_00002', u'BDS_00003', u'BDS_00004', u'BDS_00005', u'BDS_00006', u'BDS_00007', u'BDS_00008', u'BDS_00009', u'GSE10246', u'GSE952', u'GSE1133', u'BDS_00010', u'BDS_00011', u'BDS_00012', u'BDS_00013', u'BDS_00014']
+DEFAULT_DS_ACCESSION = ['BDS_00001', 'BDS_00002', 'BDS_00003', 'BDS_00004', 'BDS_00005', 'BDS_00006',
+                        'BDS_00007', 'BDS_00008', 'BDS_00009', 'GSE10246', 'GSE952', 'GSE1133',
+                        'BDS_00010', 'BDS_00011', 'BDS_00012', 'BDS_00013', 'BDS_00014']
 
 MAX_SUPPORTED_SAMPLES = 1000
 NCBO_ANNO_KEY = '055e682a-0ea9-4f3c-af0d-4e8692d94bcf'
-POPULAR_FACTORS = ['TREATMENT', 'GENOTYPE', 'CELL TYPE', 'AGE', 'CELL LINE', 'ORGANISM PART', 'TIME', 'SEX', 'genotype', 'VARIATION', 'compound', 'TISSUE', 'Compound', 'COMPOUND', 'GENOTYPE/VARIATION', 'DISEASE STATE', 'time', 'dose', 'STRAIN', 'GENDER', 'Time', 'Genotype', 'disease state', 'AGENT', 'DiseaseState', 'STRAIN OR LINE', 'DOSE', 'cell type', 'TRANSFECTION', 'DEVELOPMENTAL STAGE', 'PHENOTYPE', 'PROTOCOL', 'disease', 'growth condition', 'INFECTION', 'OrganismPart', 'SAMPLE TYPE', 'INDIVIDUAL', 'DIET', 'DISEASE STATUS', 'organism part', 'cell line', 'Age', 'CellType', 'CHIP ANTIBODY', 'Dose', 'clinical information', 'CONDITION', 'PATIENT', 'STAGE', 'Treatment', 'TIME POINT', 'TREATED WITH', 'TISSUE TYPE', 'GROUP', 'GrowthCondition', 'Individual', 'DISEASE_STATE', 'StrainOrLine', 'REPLICATE', 'HISTOLOGY', 'GRADE', 'SUBJECT', 'ANTIBODY', 'SIRNA', 'RNAi', 'PASSAGE', 'DIAGNOSIS', 'infect', 'age', 'CellLine', 'CELL POPULATION', 'TREATMENT GROUP', 'DevelopmentalStage', 'BIOSOURCEPROVIDER', 'KNOCKDOWN', 'phenotype', 'STATUS', 'DISEASE', 'STRESS', 'Phenotype', 'Sex', 'treatment', 'SAMPLE ID', 'TRANSDUCTION', 'CELL_TYPE', 'DONOR', 'developmental stage', 'GeneticModification', 'strain', 'diet', 'GENETIC BACKGROUND', 'ETHNICITY', 'CONCENTRATION', 'EnvironmentalStress', 'RNA interference', 'CULTURE CONDITION', 'TUMOR STAGE', 'SAMPLE', 'BATCH', 'GENOME/VARIATION', 'BIOLOGICAL REPLICATE', 'RACE', 'SMOKING STATUS', 'ORGANISM_PART', 'DISEASESTATE', 'TREATMENT DURATION', 'PATIENT IDENTIFIER', 'TYPE', 'STIMULATION', 'PATIENT ID', 'SHRNA', 'ClinicalInformation', 'KARYOTYPE', 'SAMPLE GROUP', 'ORIGIN', 'SUBTYPE', 'ClinicalTreatment', 'TRANSGENE']
+POPULAR_FACTORS = ['TREATMENT', 'GENOTYPE', 'CELL TYPE', 'AGE', 'CELL LINE', 'ORGANISM PART',
+                   'TIME', 'SEX', 'genotype', 'VARIATION', 'compound', 'TISSUE', 'Compound',
+                   'COMPOUND', 'GENOTYPE/VARIATION', 'DISEASE STATE', 'time', 'dose', 'STRAIN',
+                   'GENDER', 'Time', 'Genotype', 'disease state', 'AGENT', 'DiseaseState',
+                   'STRAIN OR LINE', 'DOSE', 'cell type', 'TRANSFECTION', 'DEVELOPMENTAL STAGE',
+                   'PHENOTYPE', 'PROTOCOL', 'disease', 'growth condition', 'INFECTION', 'OrganismPart',
+                   'SAMPLE TYPE', 'INDIVIDUAL', 'DIET', 'DISEASE STATUS', 'organism part', 'cell line',
+                   'Age', 'CellType', 'CHIP ANTIBODY', 'Dose', 'clinical information', 'CONDITION',
+                   'PATIENT', 'STAGE', 'Treatment', 'TIME POINT', 'TREATED WITH', 'TISSUE TYPE', 'GROUP',
+                   'GrowthCondition', 'Individual', 'DISEASE_STATE', 'StrainOrLine', 'REPLICATE', 'HISTOLOGY',
+                   'GRADE', 'SUBJECT', 'ANTIBODY', 'SIRNA', 'RNAi', 'PASSAGE', 'DIAGNOSIS', 'infect', 'age',
+                   'CellLine', 'CELL POPULATION', 'TREATMENT GROUP', 'DevelopmentalStage', 'BIOSOURCEPROVIDER',
+                   'KNOCKDOWN', 'phenotype', 'STATUS', 'DISEASE', 'STRESS', 'Phenotype', 'Sex', 'treatment',
+                   'SAMPLE ID', 'TRANSDUCTION', 'CELL_TYPE', 'DONOR', 'developmental stage', 'GeneticModification',
+                   'strain', 'diet', 'GENETIC BACKGROUND', 'ETHNICITY', 'CONCENTRATION', 'EnvironmentalStress',
+                   'RNA interference', 'CULTURE CONDITION', 'TUMOR STAGE', 'SAMPLE', 'BATCH', 'GENOME/VARIATION',
+                   'BIOLOGICAL REPLICATE', 'RACE', 'SMOKING STATUS', 'ORGANISM_PART', 'DISEASESTATE',
+                   'TREATMENT DURATION', 'PATIENT IDENTIFIER', 'TYPE', 'STIMULATION', 'PATIENT ID', 'SHRNA',
+                   'ClinicalInformation', 'KARYOTYPE', 'SAMPLE GROUP', 'ORIGIN', 'SUBTYPE', 'ClinicalTreatment', 'TRANSGENE']
 
 
-MAX_SAMPLE_4_CORRELATION = 400 #200
+MAX_SAMPLE_4_CORRELATION = 400   # 200
 
 
 ES_URLS = {
