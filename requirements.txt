@@ -7,9 +7,9 @@ django-grappelli==2.6.5
 django-jsonfield==0.9.13
 Werkzeug==0.10.4
 
-requests==2.7.0
+requests==2.9.1
 requests-cache==0.4.10
-mygene==2.2.0
+mygene==2.3.0
 
 # numpy is better installed globally as "apt-get install python-numpy"
 numpy>=1.9.2
