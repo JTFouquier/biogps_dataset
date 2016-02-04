@@ -226,7 +226,7 @@ def _get_reporter_from_gene(gene):
     mg = mygene.MyGeneInfo()
     # these are the fields reporters are taken from
     rep_fields = ['entrezgene', 'reporter', 'refseq.rna']
-    data_json = mg.getgene(gene, fields=rep_fields)
+    data_json = mg.getgene(gene, fields=rep_fields) or {}
     reporters = []
     for field in rep_fields:
         if field in data_json:
@@ -712,7 +712,7 @@ def _get_default_ds(gene_id, species=None):
     if not species:
         mg = mygene.MyGeneInfo()
         data_json = mg.getgene(gene_id, fields='taxid')
-        if 'taxid' not in data_json:
+        if data_json is None or 'taxid' not in data_json:
             return None
         species = data_json['taxid']
     ds_id = settings.DEFAULT_DATASET_MAPPING.get(species, None)
@@ -764,10 +764,9 @@ def dataset_default(request):
 
     mg = mygene.MyGeneInfo()
     data_json = mg.getgene(gene_id, fields='taxid')
-    if 'taxid' not in data_json:
+    if data_json is None or 'taxid' not in data_json:
         return general_json_response(
-            GENERAL_ERRORS.ERROR_BAD_ARGS, "Gene id: %s \
-            may be invalid." % gene_id)
+            GENERAL_ERRORS.ERROR_BAD_ARGS, "Gene id: %s may be invalid." % gene_id)
     species = data_json['taxid']
 
     default_ds_id = _get_default_ds(gene_id, species=species)
@@ -777,8 +776,7 @@ def dataset_default(request):
                                              'taxid': species})
     else:
         return general_json_response(
-            GENERAL_ERRORS.ERROR_BAD_ARGS, "Cannot get default\
-            dataset with gene id: %s." % gene_id)
+            GENERAL_ERRORS.ERROR_BAD_ARGS, "Cannot get default dataset with gene id: %s." % gene_id)
 
 
 def calc_correlation(rep, mat, min_corr):
