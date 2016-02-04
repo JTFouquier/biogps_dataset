@@ -64,7 +64,7 @@
                     this.showCanvasControls();
                     this.initSlider();
                     this.initCanvas();
-                    this.loadDataset("");
+                    this.loadDataset();
                     this.checkDatasetImageSize();
                 },
 
@@ -332,7 +332,7 @@
                 showFactors: function(){
 
                     var fd = _factor_dialog.dialog({
-                        draggable : false,
+                        draggable : true,
                         modal : true,
                         position : "top",
                         resizable : true,
@@ -1013,6 +1013,11 @@
                                         //Now set dsID
                                         //first from url parameter
                                         dsID = DC_026887848._getUrlParam('dataset');
+                                        if (!dsID){
+                                            // try "show_dataset" url parameter as well, for back compatibility
+                                            // needed for biogps.org
+                                            dsID = DC_026887848._getUrlParam('show_dataset');
+                                        }
                                         if (!dsID){
                                             // then cookie based on taxID
                                             dsID = DC_026887848.getDsFromCookie(DC_026887848.taxID);
