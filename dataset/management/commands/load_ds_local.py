@@ -24,9 +24,11 @@ sample. This comes from a user's metadata sheet in a tab-delimited text file.
 """
 
 # we provide this sheet to them to fill out
-info_sheet = '/Users/fouquier/repos/biogps_dataset/dataset/management/local_data_load/info_sheet.txt'
+info_sheet = '/Users/fouquier/repos/biogps_dataset/dataset/management/\
+local_data_load/info_sheet.txt'
 # this is the metadata file from the user
-rna_seq_metadata_file = '/Users/fouquier/repos/biogps_dataset/dataset/management/local_data_load/Baldwin-Metadata-InducedNeurons.txt'
+rna_seq_metadata_file = '/Users/fouquier/repos/biogps_dataset/dataset/\
+management/local_data_load/Baldwin-Metadata-InducedNeurons.txt'
 
 
 class Command(BaseCommand):
@@ -55,12 +57,11 @@ class Command(BaseCommand):
                 'geo_gpl_id': df.loc['geo_gpl_id']['description'],
                 'geo_gds_id': df.loc['geo_gds_id']['description'],
                 'geo_gse_id': df.loc['geo_gse_id']['description'],
-                 #(TODO) what is this
-                'secondaryaccession' : df.loc['secondaryaccession']['description']
+                # (TODO) what is this
+                'secondaryaccession': df.loc['secondaryaccession']['description']
             }
             print('STEP 1: END')
             return info_dict
-
 
         def create_factors_metadata_json(rna_seq_metadata_file):
             """Create the "factors" section which has information or "comments"
@@ -69,13 +70,14 @@ class Command(BaseCommand):
             RNA sequence metadata file:
 
             MUST be a tab delimited .txt file, that contains
-            an index column (i.e. numbers for each row, starting with 1, and not
-            including the header row).
+            an index column (i.e. numbers for each row, starting with 1,
+            and not including the header row).
 
             All column titles/headers must be named uniquely.
             """
             print('STEP 2: START')
-            print('STEP 2: "create factors" for meta, using metadata file from user')
+            print('STEP 2: "create factors" for meta, using metadata file\
+            from user')
             lines = []
             with open(rna_seq_metadata_file, 'U') as rna_seq_metadata_file:
                 for line in rna_seq_metadata_file:
@@ -93,14 +95,15 @@ class Command(BaseCommand):
                 # In non average data file the names are A1-B2-3, not A1-B2
                 # (TODO) working
                 # sample_name = line[2].strip()  # THIS LINE WORKS
-                sample_name = line[3].strip()  # THIS LINE WORKS (TODO) this theoretically adds the condition
+                # THIS LINE WORKS (TODO) this theoretically adds the condition
+                sample_name = line[3].strip()
 
                 column_id = 1
                 for column_name in column_name_list:
                     small_json_data[column_name] = line[column_id].strip()
                     column_id += 1
 
-                large_json_data = {sample_name : {'comment': small_json_data} }
+                large_json_data = {sample_name: {'comment': small_json_data}}
                 factor_list.append(large_json_data)
 
             print('STEP 2: END')
@@ -149,7 +152,8 @@ class Command(BaseCommand):
                 factor_count = len(fvs[0].keys())
 
             if models.BiogpsDataset.objects.filter(name=info_dict['name']):
-                print('dataset already created, script terminated. To rerun dataset load, delete the dataset first in shell_plus')
+                print('dataset already created, script terminated. To rerun\
+                dataset load, delete the dataset first in shell_plus')
                 return
 
             else:
