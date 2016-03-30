@@ -34,7 +34,6 @@ rnaseq_data_fixed_reporters = '/Users/fouquier/repos/biogps_dataset/dataset/util
                               'rnaseq_data_fixed_reporters.txt'
 """
 
-
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
@@ -95,7 +94,6 @@ class Command(BaseCommand):
             for line in lines[1:]:
 
                 small_json_data = {}
-                sample_name = line[2].strip()
                 condition = line[3].strip()
 
                 # If the condition is the same as the other condition, then color_order_id is the same
@@ -109,8 +107,8 @@ class Command(BaseCommand):
                     small_json_data[column_name] = line[column_id].strip()
                     column_id += 1
 
-                large_json_data = {sample_name: {"comment": small_json_data, "order_idx": color_order_id,
-                                                 "color_idx": color_order_id, "title": condition}}
+                large_json_data = {condition: {"comment": small_json_data, "order_idx": color_order_id,
+                                               "color_idx": color_order_id, "title": condition}}
                 factor_list.append(large_json_data)
                 color_order_id += 1
 

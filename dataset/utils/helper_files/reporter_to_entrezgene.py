@@ -26,6 +26,7 @@ from remote data repositories (hosted online) and not local data.
 # local_data_load/2016.02.10_normalizedcounts_iNswithMEFs.txt'
 # output_file = 'rnaseq_data_fixed_reporters.txt'
 
+
 def read_file_get_reporter_query_list(input_seq_file):
     """Take a users input file from their sequencing run and get a list of the
     reporter genes used. They should all be entrezgene IDs, but most are
@@ -41,7 +42,7 @@ def read_file_get_reporter_query_list(input_seq_file):
     return reporter_query_list, df
 
 
-def query_mygene_for_entrezIDs(reporter_query_list_symbol_search):
+def query_mygene_for_entrez_ids(reporter_query_list_symbol_search):
     """User a query list to query mygene.info for the entrezgene ID and make a
     dictionary that can be used to access the entrezgene ID.
     """
@@ -105,7 +106,7 @@ def query_mygene_for_entrezIDs(reporter_query_list_symbol_search):
     return mygene_dict
 
 
-def new_list_with_mygene_IDs(reporter_query_list, mygene_dict):
+def new_list_with_mygene_ids(reporter_query_list, mygene_dict):
     """Check all the symbols or IDs and find entrezgene/NCBI IDs if they exist.
     If they do not exist, then just keep symbol.
 
@@ -143,7 +144,7 @@ def new_list_with_mygene_IDs(reporter_query_list, mygene_dict):
     return output_list
 
 
-def replace_reporter_gene_symbols_with_entrezgene_IDs(df, output_list):
+def replace_reporter_gene_symbols_with_entrezgene_ids(df, output_list):
     print("Step 4: START")
     print("Step 4: replace gene symbols with entrezgene IDs")
     df.index = output_list
@@ -154,9 +155,9 @@ def replace_reporter_gene_symbols_with_entrezgene_IDs(df, output_list):
 
 def main(input_seq_file, output_file, species):
     reporter_query_list, df = read_file_get_reporter_query_list(input_seq_file)
-    mygene_dict = query_mygene_for_entrezIDs(reporter_query_list)
-    output_list = new_list_with_mygene_IDs(reporter_query_list, mygene_dict)
-    df = replace_reporter_gene_symbols_with_entrezgene_IDs(df, output_list)
+    mygene_dict = query_mygene_for_entrez_ids(reporter_query_list)
+    output_list = new_list_with_mygene_ids(reporter_query_list, mygene_dict)
+    df = replace_reporter_gene_symbols_with_entrezgene_ids(df, output_list)
     # (TODO) *** Not sure the proper location of inputs and output files.
     # write the pandas dataframe to a tab delimited text file
     df.to_csv(output_file, sep='\t')
