@@ -23,12 +23,16 @@ METADATA SHEET:
 sample. This comes from a user's metadata sheet in a tab-delimited text file.
 """
 
+
+"""
 # we provide this sheet to them to fill out
-info_sheet = '/Users/fouquier/repos/biogps_dataset/dataset/management/\
-local_data_load/info_sheet.txt'
+info_sheet = '/Users/fouquier/repos/biogps_dataset/dataset/management/local_data_load/info_sheet.txt'
 # this is the metadata file from the user
-rna_seq_metadata_file = '/Users/fouquier/repos/biogps_dataset/dataset/\
-management/local_data_load/Baldwin-Metadata-InducedNeurons.txt'
+metadata_file = '/Users/fouquier/repos/biogps_dataset/dataset/management/local_data_load/' \
+                'Baldwin-Metadata-InducedNeurons.txt'
+rnaseq_data_fixed_reporters = '/Users/fouquier/repos/biogps_dataset/dataset/utils/helper_files/' \
+                              'rnaseq_data_fixed_reporters.txt'
+"""
 
 
 class Command(BaseCommand):
@@ -57,13 +61,12 @@ class Command(BaseCommand):
                 'geo_gpl_id': df.loc['geo_gpl_id']['description'],
                 'geo_gds_id': df.loc['geo_gds_id']['description'],
                 'geo_gse_id': df.loc['geo_gse_id']['description'],
-                # (TODO) what is this
                 'secondaryaccession': df.loc['secondaryaccession']['description']
             }
-            print('STEP 1: END')
+            print('STEP 1: END\n')
             return info_dict
 
-        def create_factors_metadata_json(rna_seq_metadata_file):
+        def create_factors_metadata_json(metadata_file):
             """Create the "factors" section which has information or "comments"
             about the samples.
 
@@ -76,40 +79,43 @@ class Command(BaseCommand):
             All column titles/headers must be named uniquely.
             """
             print('STEP 2: START')
-            print('STEP 2: "create factors" for meta, using metadata file\
-            from user')
+            print('STEP 2: "create factors" for meta, using metadata file '
+                  'from user')
             lines = []
-            with open(rna_seq_metadata_file, 'U') as rna_seq_metadata_file:
-                for line in rna_seq_metadata_file:
+            with open(metadata_file, 'U') as metadata_file:
+                for line in metadata_file:
                     new_line = line.strip().split('\t')
                     lines.append(new_line)
 
             factor_list = []
             column_name_list = lines[0]
 
+            color_order_id = 1
+            condition_previous = ""
             for line in lines[1:]:
 
                 small_json_data = {}
-                # (TODO) confused about this and sample name.
+                sample_name = line[2].strip()
+                condition = line[3].strip()
 
-                # In non average data file the names are A1-B2-3, not A1-B2
-                # (TODO) working
-                # sample_name = line[2].strip()  # THIS LINE WORKS
-                # THIS LINE WORKS (TODO) this theoretically adds the condition
-                sample_name = line[3].strip()
+                # If the condition is the same as the other condition, then color_order_id is the same
+                # IMPORTANT, this assumes that there are two biological replicates. This may vary.
+                if condition_previous == condition:
+                    color_order_id += -1
+                condition_previous = condition
 
                 column_id = 1
                 for column_name in column_name_list:
                     small_json_data[column_name] = line[column_id].strip()
                     column_id += 1
 
-                large_json_data = {sample_name: {'comment': small_json_data}}
+                large_json_data = {sample_name: {"comment": small_json_data, "order_idx": color_order_id,
+                                                 "color_idx": color_order_id, "title": condition}}
                 factor_list.append(large_json_data)
+                color_order_id += 1
 
-            print('STEP 2: END')
-            fout = open('factor_meta_file_line_of_2_TEST.txt', 'w')
-            fout.write(str(factor_list))
-            fout.close()
+            print('STEP 2: END\n')
+
             return factor_list
 
         def fill_in_metadata(info_dict, factors):
@@ -129,19 +135,19 @@ class Command(BaseCommand):
                 'secondaryaccession': info_dict['secondaryaccession'],
                 'factors': factors
             }
-            print('STEP 3: END')
+            print('STEP 3: END\n')
+
             return metadata
 
-        def create_biogps_dataset(info_dict, metadata):
-
+        def create_biogps_dataset(rnaseq_data, info_dict, metadata):
+            print('STEP 4: START')
+            print('STEP 4: Create BioGPS "dataset" object, "dataset data" object, '
+                  'and "dataset matrix" object')
             factors = metadata['factors']
             sample_count = len(factors)
-            print('sample count', sample_count)
+            print('STEP 4: dataset sample count: ' + str(sample_count))
             factor_count = 0
 
-            # (TODO) confused about this. this is from _exp_save,
-            # where BiogpsDatasetData comes from
-            # Why isn't it showing up
             fvs = []
             for e in factors:
                 e = e[e.keys()[0]]
@@ -152,8 +158,9 @@ class Command(BaseCommand):
                 factor_count = len(fvs[0].keys())
 
             if models.BiogpsDataset.objects.filter(name=info_dict['name']):
-                print('dataset already created, script terminated. To rerun\
-                dataset load, delete the dataset first in shell_plus')
+                print('STEP 4: Dataset already created, script terminated. To rerun'
+                      'dataset load, delete the dataset first in shell_plus')
+
                 return
 
             else:
@@ -172,36 +179,41 @@ class Command(BaseCommand):
                                                     pop_total=0
                                                     )
             dataset = models.BiogpsDataset.objects.get(name=info_dict['name'])
-            print(dataset)
-            print(dataset.id)
-            print(dataset.name)
+            # For logging purposes:
+            print('STEP 4: dataset instance: ' + str(dataset))
+            print('STEP 4: dataset.id: ' + str(dataset.id))
+            print('STEP 4: dataset.name: ' + str(dataset.name))
 
-            dataframe = pd.read_csv('/Users/fouquier/repos/biogps_dataset/dataset/utils/helper_files/rnaseq_dataframe_file.txt', index_col=0, sep='\t')
-
+            dataframe = pd.read_csv(rnaseq_data, index_col=0, sep='\t')
             datasetdata = []
             for idx in dataframe.index:
                 datasetdata.append(models.BiogpsDatasetData(dataset=dataset,
                                                             reporter=idx,
-                                                            data=list(dataframe.loc[idx, :].values)))
+                                                            data=dataframe.loc[idx, :].values.tolist()))
 
             # create all the individual **DATA** items (BiogpsDatasetData)
             models.BiogpsDatasetData.objects.bulk_create(datasetdata)
-
             # create and save the **MATRIX** (BiogpsDatasetMatrix)
             # tmp file
             s = BytesIO()
             np.save(s, dataframe.values)
             s.seek(0)
             matrix = models.BiogpsDatasetMatrix(dataset=dataset,
-                                                reporters=list(dataframe.index),
+                                                reporters=dataframe.index.tolist(),
                                                 matrix=s.read())
             matrix.save()
+            print('STEP 4: END')
 
-
-        def main():
+        def main(rnaseq_data_fixed_reporters, info_sheet, metadata_file):
             info_dict = parse_info_sheet(info_sheet)
-            factors = create_factors_metadata_json(rna_seq_metadata_file)
+            factors = create_factors_metadata_json(metadata_file)
             metadata = fill_in_metadata(info_dict, factors)
-            create_biogps_dataset(info_dict, metadata)
+            create_biogps_dataset(rnaseq_data_fixed_reporters, info_dict, metadata)
 
-        main()
+        """
+        Below is an example of how you would call this sheet using the rnaseq_data_fixed_reporters which comes
+        from reporter_to_entrezgene.py helper file, and the metadata and info sheet.
+        If your RNAseq data file already contains Entrezgene IDs, then no need to run the helper file.
+        """
+
+        # main(rnaseq_data_fixed_reporters, info_sheet, metadata_file)
