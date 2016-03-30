@@ -1,0 +1,10 @@
+.pydevproject
+.project
+.pyc$
+.*~
+biogps_dataset/settings_dev.py
+biogps_dataset/settings_prod.py
+ds_cache.sqlite
+arrayexpress_cache.sqlite
+exp_loader/
+static/
