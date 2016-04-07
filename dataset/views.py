@@ -814,7 +814,7 @@ def calc_correlation(rep, mat, min_corr):
     rep_cor = {mat.reporters[i[1]]: i[0] for i in corrs}
     # query mygene to get symbol from reporter
     mg = mygene.MyGeneInfo()
-    res = mg.querymany(list(rep_cor), scopes='reporter', fields='symbol')
+    res = mg.querymany(list(rep_cor), scopes='reporter, entrezgene, ensemblgene', fields='symbol')
     result = []
     for i in res:
         if 'notfound' in i:
