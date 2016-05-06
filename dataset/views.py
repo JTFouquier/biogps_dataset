@@ -17,6 +17,7 @@ import json
 import shelve
 import requests
 import math
+from operator import itemgetter
 from tagging.models import Tag, TaggedItem
 from dataset.util import general_json_response, GENERAL_ERRORS
 import mygene
@@ -824,6 +825,7 @@ def calc_correlation(rep, mat, min_corr):
         result.append({'id': gene_id, 'reporter': i['query'],
                        'symbol': symbol, 'value':
                        round(rep_cor[i['query']], 4)})
+    result = sorted(result, key=itemgetter('value'), reverse=True)
     return result
 
 
