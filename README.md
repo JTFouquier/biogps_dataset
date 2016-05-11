@@ -4,12 +4,11 @@
 
 ## Setting up your local development environment:
 
-### Download Mercurial (hg), which is the version control software of choice used by BioGPS
-[Mercurial Version Control Download](https://www.mercurial-scm.org/downloads)
+Make sure you use git for version control (May 2016 Biogps_dataset was migrated to Github)
 
 ### Make virtual environment and clone repository (use your Bitbucket username of course!)
 
-- `hg clone https://JTFouquier@bitbucket.org/sulab/biogps_dataset`
+- `git clone https://github.com/JTFouquier/biogps_dataset.git`
 - `virtualenv biogps`
 - `source biogps/bin/activate`
 - `pip install -r requirements.txt`
@@ -28,6 +27,8 @@
 
 ### 2) Run the local host server
 
+The settings_dev file is a "secret file." Please see Chunlei or BioGPS project manager
+
 - `python manage.py runserver_plus --settings=biogps_dataset.settings_dev`
 
 ### 3) Run Elastic Search
@@ -37,7 +38,12 @@
 - `./bin/elasticsearch`
 
 ## Get data from a BioGPS user/researcher
-### You will need to get an information sheet, metadata sheet and RNAseq data file from a scientist.
+### You will need to get an information sheet, metadata sheet and RNAseq data/matrix file from a scientist.
+
+### Does the local dataset you are loading have gene symbols in it?
+#### If yes, then you MUST run reporter_to_entrezgene.py, which will use mygene.info to replace gene symbols with entrezgene IDs.
+
+#### Entrezgene IDs are absolutely necessary for Biogps.org data display.
 
 ## Dataset Parsers:
 
@@ -115,13 +121,14 @@ ds = BiogpsDataset.objects.get(name='Transient overexpression of transcription f
 
 Dropdown menu in "probeset" is also considered the reporter gene on BioGPS
 
-Go to the URL for the specific gene and dataset model(10044 is the primary key, which will vary b
+Go to the URL for the specific gene and dataset name (primary key of dataset or geo_gse_id)
+geo_gse_id is also important: will be BDS_XXXXX next number in sequence)
 
-
+Examples
 `http://localhost:8000/static/data_chart.html?gene=67669&dataset=10044`
-
 `http://localhost:8000/static/data_chart.html?gene=12566&dataset=10044`
-
+`http://localhost:8000/static/data_chart.html?gene=100152011&dataset=10078`
+`http://localhost:8000/admin/dataset/biogpsdataset/2427/`
 
 Standard test gene is 1017, which is a *human* gene! So if you are using mouse
 data, this will understandably be missing:
@@ -132,6 +139,12 @@ Gene ID: 1017, updated on 6-Mar-2016
 Cdk2 cyclin-dependent kinase 2, Mus musculus (house mouse)
 Gene ID: 12566, updated on 6-Mar-2016
 
+You can also check the "fixed reporters" data file to see which Entrezgene IDs are actually in your dataset for
+viewing.
+
+## To view the full data for a dataset and gene:
 http://localhost:8000/dataset/full-data/geo_gse_id%20test/gene/12566/
 http://localhost:8000/dataset/full-data/E-GEOD-16054/gene/1017/
 http://localhost:8000/dataset/full-data/BDS_00001/gene/1017/
+
+#### Does your dataset have interesting tissue groups or organ systems? If so, then change the color_idx in the json metadata (ex: admin/dataset/biogpsdataset/2509/) accordingly to group samples into meaningful groups. This is done manually due to the numerous variations of possible sample groupings

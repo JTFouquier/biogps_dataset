@@ -21,6 +21,10 @@ METADATA SHEET:
 
 "factors" are where sample name and detailed information goes about every
 sample. This comes from a user's metadata sheet in a tab-delimited text file.
+
+NOTE/IMPORTANT: The fourth column (line[3].strip() below) MUST contain replicate information.
+  ie. biological replicates will have the same name or condition. This can also be their name or
+  if there are no biological replicates for samples. This is needed for averaging, as well as display names.
 """
 
 
@@ -29,7 +33,7 @@ sample. This comes from a user's metadata sheet in a tab-delimited text file.
 info_sheet = '/Users/fouquier/repos/biogps_dataset/dataset/management/local_data_load/info_sheet.txt'
 # this is the metadata file from the user
 metadata_file = '/Users/fouquier/repos/biogps_dataset/dataset/management/local_data_load/' \
-                'Baldwin-Metadata-InducedNeurons.txt'
+                'sheep_atlas_metadata.txt'
 rnaseq_data_fixed_reporters = '/Users/fouquier/repos/biogps_dataset/dataset/utils/helper_files/' \
                               'rnaseq_data_fixed_reporters.txt'
 """

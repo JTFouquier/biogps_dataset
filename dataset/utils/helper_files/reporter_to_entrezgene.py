@@ -21,9 +21,8 @@ from remote data repositories (hosted online) and not local data.
 
 # these 3 variables will be be input as arguments by the user in terminal,
 # not in this script
-# species = 'mouse'
-# input_seq_file = '/Users/fouquier/repos/biogps_dataset/dataset/management/\
-# local_data_load/2016.02.10_normalizedcounts_iNswithMEFs.txt'
+# species = 'sheep'
+# input_seq_file = '/Users/fouquier/repos/biogps_dataset/dataset/management/local_data_load/sheep_atlas.txt'
 # output_file = 'rnaseq_data_fixed_reporters.txt'
 
 
