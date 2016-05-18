@@ -29,7 +29,7 @@ Make sure you use git for version control (May 2016 Biogps_dataset was migrated 
 
 The settings_dev file is a "secret file." Please see Chunlei or BioGPS project manager
 
-- `python manage.py runserver_plus --settings=biogps_dataset.settings_dev`
+- `python3 manage.py runserver_plus --settings=biogps_dataset.settings_dev`
 
 ### 3) Run Elastic Search
 
@@ -52,12 +52,12 @@ The settings_dev file is a "secret file." Please see Chunlei or BioGPS project m
 
 ### Run the command like this, where "load_ds_local" can be other commands
 
-- `python manage.py load_ds_local --settings=biogps_dataset.settings_dev`
+- `python3 manage.py load_ds_local --settings=biogps_dataset.settings_dev`
 
-### Then you must use the command index_es to "index the data", then newly loaded data should appear in the chart file.
+### Then you must use the command es_index to "index the data", then newly loaded data should appear in the chart file.
 
 #### index the dataset (more explanation between this and load)
-- `python manage.py es_index --settings=biogps_dataset.settings_dev`
+- `python3 manage.py es_index --settings=biogps_dataset.settings_dev`
 
 #### Output looks something like this:
 added 16 platform, added 5914 dataset (example of output)
@@ -68,7 +68,7 @@ added 16 platform, added 5914 dataset (example of output)
 *Must sometimes restart the localhost and server that is containing the database, as well as elasticsearch.*
 
 **For help:**
-- `python manage.py load_ds -help --settings=biogps_dataset.settings_dev`
+- `python3 manage.py load_ds -help --settings=biogps_dataset.settings_dev`
 
 ## Instances (models) to create during data load:
 #### P.S. If you don't know what a model is, then read about [Django](https://www.djangoproject.com/)!

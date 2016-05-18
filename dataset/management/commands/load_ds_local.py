@@ -15,7 +15,7 @@ from django.conf import settings
 INFO SHEET:
 
 An information sheet will need to be filled out by dataset owner, we provide
-this sheet in a specific format.
+this sheet in a specific format. MUST ADD text to blank fields.
 
 METADATA SHEET:
 
@@ -27,15 +27,15 @@ NOTE/IMPORTANT: The fourth column (line[3].strip() below) MUST contain replicate
   if there are no biological replicates for samples. This is needed for averaging, as well as display names.
 """
 
-
 """
-# we provide this sheet to them to fill out
-info_sheet = '/Users/fouquier/repos/biogps_dataset/dataset/management/local_data_load/info_sheet.txt'
-# this is the metadata file from the user
-metadata_file = '/Users/fouquier/repos/biogps_dataset/dataset/management/local_data_load/' \
-                'sheep_atlas_metadata.txt'
-rnaseq_data_fixed_reporters = '/Users/fouquier/repos/biogps_dataset/dataset/utils/helper_files/' \
-                              'rnaseq_data_fixed_reporters.txt'
+# we provide the info sheet for users to fill out
+# from data load folder:
+info_sheet = '/Users/fouquier/repos/biogps_dataset/dataset/utils/helper_files/local_data_load/info_sheet.txt'
+metadata_file = '/Users/fouquier/repos/biogps_dataset/dataset/utils/helper_files/local_data_load/sheep_atlas_metadata.txt'
+
+# from data output folder:
+# NOTE, this file can be ouput from reporter_to_enrezgene.py or RNAseq data already containing Entrezgene IDs.
+rnaseq_data_fixed_reporters = '/Users/fouquier/repos/biogps_dataset/dataset/utils/helper_files/local_data_output/rnaseq_data_fixed_reporters.txt'
 """
 
 class Command(BaseCommand):
@@ -111,7 +111,7 @@ class Command(BaseCommand):
                     small_json_data[column_name] = line[column_id].strip()
                     column_id += 1
 
-                large_json_data = {condition: {"comment": small_json_data, "order_idx": color_order_id,
+                large_json_data = {condition: {"factorvalue": small_json_data, "order_idx": color_order_id,
                                                "color_idx": color_order_id, "title": condition}}
                 factor_list.append(large_json_data)
                 color_order_id += 1
@@ -145,19 +145,16 @@ class Command(BaseCommand):
             print('STEP 4: START')
             print('STEP 4: Create BioGPS "dataset" object, "dataset data" object, '
                   'and "dataset matrix" object')
-            factors = metadata['factors']
-            sample_count = len(factors)
+            sample_count = len(metadata['factors'])
             print('STEP 4: dataset sample count: ' + str(sample_count))
-            factor_count = 0
 
-            fvs = []
-            for e in factors:
-                e = e[e.keys()[0]]
-                if 'factorvalue' not in e:
-                    break
-                fvs.append(e['factorvalue'])
-            if len(fvs) > 0:
-                factor_count = len(fvs[0].keys())
+            factor_data = metadata
+
+            final_factor_list = []
+            for d in factor_data['factors']:
+                final_factor_list.append(list(d.values())[0]['factorvalue'])
+
+            final_factors = json.dumps(final_factor_list)
 
             if models.BiogpsDataset.objects.filter(name=info_dict['name']):
                 print('STEP 4: Dataset already created, script terminated. To rerun'
@@ -176,8 +173,8 @@ class Command(BaseCommand):
                                                     metadata=metadata,
                                                     species=info_dict['species'],
                                                     sample_count=sample_count,
-                                                    factor_count=factor_count,
-                                                    factors=fvs,
+                                                    factor_count=len(final_factor_list[0]),
+                                                    factors=final_factors,
                                                     pop_total=0
                                                     )
             dataset = models.BiogpsDataset.objects.get(name=info_dict['name'])
