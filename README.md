@@ -6,7 +6,7 @@
 
 Make sure you use git for version control (May 2016 Biogps_dataset was migrated to Github)
 
-### Make virtual environment and clone repository (use your Bitbucket username of course!)
+### Make virtual environment and clone repository (use your Github username of course!)
 
 - `git clone https://github.com/JTFouquier/biogps_dataset.git`
 - `virtualenv biogps`
@@ -143,8 +143,8 @@ You can also check the "fixed reporters" data file to see which Entrezgene IDs a
 viewing.
 
 ## To view the full data for a dataset and gene:
-http://localhost:8000/dataset/full-data/geo_gse_id%20test/gene/12566/
-http://localhost:8000/dataset/full-data/E-GEOD-16054/gene/1017/
-http://localhost:8000/dataset/full-data/BDS_00001/gene/1017/
+`http://localhost:8000/dataset/full-data/geo_gse_id%20test/gene/12566/`
+`http://localhost:8000/dataset/full-data/E-GEOD-16054/gene/1017/`
+`http://localhost:8000/dataset/full-data/BDS_00001/gene/1017/`
 
 #### Does your dataset have interesting tissue groups or organ systems? If so, then change the color_idx in the json metadata (ex: admin/dataset/biogpsdataset/2509/) accordingly to group samples into meaningful groups. This is done manually due to the numerous variations of possible sample groupings
