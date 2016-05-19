@@ -1,5 +1,5 @@
 
-# Detailed steps needed to have a local development version of [BioGPS](http://biogps.org/#goto=welcome), for dataset loading
+## Detailed steps needed to have a local development version of [BioGPS](http://biogps.org/#goto=welcome), for dataset loading
 
 
 ## Setting up your local development environment:
@@ -100,15 +100,11 @@ This is a sequencing platform, so does not have to be recreated every time.
 
 symbol examples from mygene.info used to get the Entrezgene IDs inside the helper file:
 
-
-`http://mygene.info/v2/query?q=symbol:0610005C13Rik`
-
-`http://mygene.info/v2/query?q=symbol:42430`
-
+- `http://mygene.info/v2/query?q=symbol:0610005C13Rik`
+- `http://mygene.info/v2/query?q=symbol:42430`
 
 ## To access code via the shell inside the Django project, run:
 - `python manage.py shell_plus --settings=biogps_dataset.settings_dev`
-
 
 #### Run these commands from shell:
 
@@ -125,10 +121,10 @@ Go to the URL for the specific gene and dataset name (primary key of dataset or 
 geo_gse_id is also important: will be BDS_XXXXX next number in sequence)
 
 Examples
-`http://localhost:8000/static/data_chart.html?gene=67669&dataset=10044`
-`http://localhost:8000/static/data_chart.html?gene=12566&dataset=10044`
-`http://localhost:8000/static/data_chart.html?gene=100152011&dataset=10078`
-`http://localhost:8000/admin/dataset/biogpsdataset/2427/`
+- `http://localhost:8000/static/data_chart.html?gene=67669&dataset=10044`
+- `http://localhost:8000/static/data_chart.html?gene=12566&dataset=10044`
+- `http://localhost:8000/static/data_chart.html?gene=100152011&dataset=10078`
+- `http://localhost:8000/admin/dataset/biogpsdataset/2427/`
 
 Standard test gene is 1017, which is a *human* gene! So if you are using mouse
 data, this will understandably be missing:
@@ -143,8 +139,8 @@ You can also check the "fixed reporters" data file to see which Entrezgene IDs a
 viewing.
 
 ## To view the full data for a dataset and gene:
-`http://localhost:8000/dataset/full-data/geo_gse_id%20test/gene/12566/`
-`http://localhost:8000/dataset/full-data/E-GEOD-16054/gene/1017/`
-`http://localhost:8000/dataset/full-data/BDS_00001/gene/1017/`
+- `http://localhost:8000/dataset/full-data/geo_gse_id%20test/gene/12566/`
+- `http://localhost:8000/dataset/full-data/E-GEOD-16054/gene/1017/`
+- `http://localhost:8000/dataset/full-data/BDS_00001/gene/1017/`
 
 #### Does your dataset have interesting tissue groups or organ systems? If so, then change the color_idx in the json metadata (ex: admin/dataset/biogpsdataset/2509/) accordingly to group samples into meaningful groups. This is done manually due to the numerous variations of possible sample groupings
