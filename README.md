@@ -144,3 +144,5 @@ viewing.
 - `http://localhost:8000/dataset/full-data/BDS_00001/gene/1017/`
 
 #### Does your dataset have interesting tissue groups or organ systems? If so, then change the color_idx in the json metadata (ex: admin/dataset/biogpsdataset/2509/) accordingly to group samples into meaningful groups. This is done manually due to the numerous variations of possible sample groupings
+
+
