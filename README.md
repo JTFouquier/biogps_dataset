@@ -40,9 +40,11 @@ From within the elasticsearch folder that you set up, run:
 ## Next, get data from a BioGPS user/researcher
 You will need to get an info sheet, factors sheet and RNAseq data/matrix file from a scientist.
 
-### Does the local dataset you are loading have gene symbols in it?
+### Does the local dataset you are loading have gene symbols in it and is it an RNAseq dataset?
 
 If yes, then you **must** run **`reporter_to_entrezgene.py`**, which will use mygene.info to replace **gene symbols** with **Entrezgene IDs.**
+
+For microarray data, keep the probe set reporters.
 
 #### Entrezgene IDs are absolutely necessary for Biogps.org data display.
 
@@ -146,8 +148,12 @@ viewing.
 - `http://localhost:8000/dataset/full-data/E-GEOD-16054/gene/1017/`
 - `http://localhost:8000/dataset/full-data/BDS_00001/gene/1017/`
 
+
+## Misc. Information
+
 ### Does your dataset have interesting tissue groups or organ systems?
 
 If so, then change the color_idx in the json metadata (ex: admin/dataset/biogpsdataset/2509/) accordingly to group samples into meaningful groups. This is done manually due to the numerous variations of possible sample groupings
 
+### Make sure to run Flake8, prior to pushing code to biogps_dataset repository.
 

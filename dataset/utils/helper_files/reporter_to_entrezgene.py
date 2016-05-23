@@ -28,6 +28,7 @@ output_file = '/Users/fouquier/repos/biogps_dataset/dataset/utils/helper_files/l
 gene_symbol_output_file = '/Users/fouquier/repos/biogps_dataset/dataset/utils/helper_files/local_data_output/gene_symbols_without_entrezgeneID.txt'
 """
 
+
 def read_file_get_reporter_query_list(input_seq_file):
     """Take a users input file from their sequencing run and get a list of the
     reporter genes used. They should all be entrezgene IDs, but most are
