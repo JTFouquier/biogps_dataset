@@ -1,5 +1,4 @@
 # -*-coding: utf-8 -*-
-import json
 from io import BytesIO
 
 import pandas as pd
@@ -7,8 +6,6 @@ import numpy as np
 
 from dataset import models
 from django.core.management.base import BaseCommand
-from django.conf import settings
-
 
 """Parsing user supplied information:
 
@@ -17,24 +14,31 @@ INFO SHEET:
 An information sheet will need to be filled out by dataset owner, we provide
 this sheet in a specific format. MUST ADD text to blank fields.
 
-METADATA SHEET:
+FACTORS SHEET:
 
 "factors" are where sample name and detailed information goes about every
-sample. This comes from a user's metadata sheet in a tab-delimited text file.
+sample. This comes from a user's factor sheet in a tab-delimited text file.
 
-NOTE/IMPORTANT: The fourth column (line[3].strip() below) MUST contain replicate information.
-  ie. biological replicates will have the same name or condition. This can also be their name or
-  if there are no biological replicates for samples. This is needed for averaging, as well as display names.
+NOTE/IMPORTANT: The fourth column (line[3].strip() below) MUST contain replicate
+  information. ie. biological replicates will have the same name or condition.
+  This can also be their name or if there are no biological replicates for samples.
+  This is needed for averaging, as well as display names.
 """
 
 """
 # we provide the info sheet for users to fill out
 # from data load folder:
 info_sheet = '/Users/fouquier/repos/biogps_dataset/dataset/utils/helper_files/local_data_load/info_sheet.txt'
-metadata_file = '/Users/fouquier/repos/biogps_dataset/dataset/utils/helper_files/local_data_load/sheep_atlas_metadata.txt'
+factors_file = '/Users/fouquier/repos/biogps_dataset/dataset/utils/helper_files/local_data_load/sheep_atlas_factors.txt'
 
-# from data output folder:
-# NOTE, this file can be ouput from reporter_to_enrezgene.py or RNAseq data already containing Entrezgene IDs.
+# This platform id must be entered by developer after manually determining
+# which platform is correct, OR after you
+# create the appropriate platform.
+seq_platform_id = '1'
+
+# From data output folder:
+# NOTE, this file can be ouput from reporter_to_enrezgene.py or RNAseq data
+# already containing Entrezgene IDs.
 rnaseq_data_fixed_reporters = '/Users/fouquier/repos/biogps_dataset/dataset/utils/helper_files/local_data_output/rnaseq_data_fixed_reporters.txt'
 """
 
@@ -55,7 +59,7 @@ class Command(BaseCommand):
 
             df["info"] = df["info"].map(str.strip)
 
-            info_dict = {
+            metadata_dict = {
                 'name': df.loc['name']['description'],
                 'summary': df.loc['summary']['description'],
                 'owner': df.loc['owner']['description'],
@@ -67,13 +71,13 @@ class Command(BaseCommand):
                 'secondaryaccession': df.loc['secondaryaccession']['description']
             }
             print('STEP 1: END\n')
-            return info_dict
+            return metadata_dict
 
-        def create_factors_metadata_json(metadata_file):
+        def create_factors_metadata_json(factors_file):
             """Create the "factors" section which has information or "comments"
             about the samples.
 
-            RNA sequence metadata file:
+            RNAseq factors file:
 
             MUST be a tab delimited .txt file, that contains
             an index column (i.e. numbers for each row, starting with 1,
@@ -82,17 +86,17 @@ class Command(BaseCommand):
             All column titles/headers must be named uniquely.
             """
             print('STEP 2: START')
-            print('STEP 2: "create factors" for meta, using metadata file '
-                  'from user')
+            print('STEP 2: "create factors" for meta, using factors file from user')
             lines = []
-            with open(metadata_file, 'U') as metadata_file:
-                for line in metadata_file:
+            with open(factors_file, 'U') as factors_file:
+                for line in factors_file:
                     new_line = line.strip().split('\t')
                     lines.append(new_line)
 
             factor_list = []
             column_name_list = lines[0]
-
+            # sort by condition/biological replicate
+            sorted(lines, key=lambda x: x[3])
             color_order_id = 1
             condition_previous = ""
             for line in lines[1:]:
@@ -100,8 +104,10 @@ class Command(BaseCommand):
                 small_json_data = {}
                 condition = line[3].strip()
 
-                # If the condition is the same as the other condition, then color_order_id is the same
-                # IMPORTANT, this assumes that there are two biological replicates. This may vary.
+                # If the condition is the same as the other condition,
+                # then color_order_id is the same
+                # IMPORTANT, this assumes that there are zero or two biological replicates.
+                # This may vary.
                 if condition_previous == condition:
                     color_order_id += -1
                 condition_previous = condition
@@ -111,8 +117,12 @@ class Command(BaseCommand):
                     small_json_data[column_name] = line[column_id].strip()
                     column_id += 1
 
-                large_json_data = {condition: {"factorvalue": small_json_data, "order_idx": color_order_id,
-                                               "color_idx": color_order_id, "title": condition}}
+                large_json_data = {condition:
+                                   {"factorvalue": small_json_data,
+                                    "order_idx": color_order_id,
+                                    "color_idx": color_order_id,
+                                    "title": condition}
+                                   }
                 factor_list.append(large_json_data)
                 color_order_id += 1
 
@@ -120,28 +130,28 @@ class Command(BaseCommand):
 
             return factor_list
 
-        def fill_in_metadata(info_dict, factors):
+        def fill_in_metadata(metadata_dict, factors):
             print('STEP 3: START')
             print('STEP 3: fill in meta for database data information')
 
             # metadata includes items from metadata sheet AND user info sheet
             metadata = {
-                'geo_gds_id': info_dict['geo_gds_id'],
-                'name': info_dict['name'],
+                'geo_gds_id': metadata_dict['geo_gds_id'],
+                'name': metadata_dict['name'],
                 'default': False,
-                'summary': info_dict['summary'],
-                'geo_gse_id': info_dict['geo_gse_id'],
-                'pubmed_id': info_dict['pubmed_id'],
-                'owner': info_dict['owner'],
-                'geo_gpl_id': info_dict['geo_gpl_id'],
-                'secondaryaccession': info_dict['secondaryaccession'],
+                'summary': metadata_dict['summary'],
+                'geo_gse_id': metadata_dict['geo_gse_id'],
+                'pubmed_id': metadata_dict['pubmed_id'],
+                'owner': metadata_dict['owner'],
+                'geo_gpl_id': metadata_dict['geo_gpl_id'],
+                'secondaryaccession': metadata_dict['secondaryaccession'],
                 'factors': factors
             }
             print('STEP 3: END\n')
 
             return metadata
 
-        def create_biogps_dataset(rnaseq_data, info_dict, metadata):
+        def create_biogps_dataset(rnaseq_data, metadata_dict, metadata, seq_platform_id):
             print('STEP 4: START')
             print('STEP 4: Create BioGPS "dataset" object, "dataset data" object, '
                   'and "dataset matrix" object')
@@ -150,34 +160,32 @@ class Command(BaseCommand):
 
             factor_data = metadata
 
-            final_factor_list = []
+            final_factors = []
             for d in factor_data['factors']:
-                final_factor_list.append(list(d.values())[0]['factorvalue'])
+                final_factors.append(list(d.values())[0]['factorvalue'])
 
-            final_factors = json.dumps(final_factor_list)
-
-            if models.BiogpsDataset.objects.filter(name=info_dict['name']):
+            if models.BiogpsDataset.objects.filter(name=metadata_dict['name']):
                 print('STEP 4: Dataset already created, script terminated. To rerun'
                       'dataset load, delete the dataset first in shell_plus')
 
                 return
 
             else:
-                models.BiogpsDataset.objects.create(name=info_dict['name'],
-                                                    summary=info_dict['summary'],
-                                                    ownerprofile_id=info_dict['owner'],
-                                                    platform=models.BiogpsDatasetPlatform.objects.all().first(),
-                                                    geo_gds_id=info_dict['geo_gds_id'],
-                                                    geo_gse_id=info_dict['geo_gse_id'],
-                                                    geo_id_plat=info_dict['geo_gpl_id'],
+                models.BiogpsDataset.objects.create(name=metadata_dict['name'],
+                                                    summary=metadata_dict['summary'],
+                                                    ownerprofile_id=metadata_dict['owner'],
+                                                    platform=models.BiogpsDatasetPlatform.objects.get(id=seq_platform_id),
+                                                    geo_gds_id=metadata_dict['geo_gds_id'],
+                                                    geo_gse_id=metadata_dict['geo_gse_id'],
+                                                    geo_id_plat=metadata_dict['geo_gpl_id'],
                                                     metadata=metadata,
-                                                    species=info_dict['species'],
+                                                    species=metadata_dict['species'],
                                                     sample_count=sample_count,
-                                                    factor_count=len(final_factor_list[0]),
+                                                    factor_count=len(final_factors[0]),
                                                     factors=final_factors,
                                                     pop_total=0
                                                     )
-            dataset = models.BiogpsDataset.objects.get(name=info_dict['name'])
+            dataset = models.BiogpsDataset.objects.get(name=metadata_dict['name'])
             # For logging purposes:
             print('STEP 4: dataset instance: ' + str(dataset))
             print('STEP 4: dataset.id: ' + str(dataset.id))
@@ -203,16 +211,19 @@ class Command(BaseCommand):
             matrix.save()
             print('STEP 4: END')
 
-        def main(rnaseq_data_fixed_reporters, info_sheet, metadata_file):
-            info_dict = parse_info_sheet(info_sheet)
-            factors = create_factors_metadata_json(metadata_file)
-            metadata = fill_in_metadata(info_dict, factors)
-            create_biogps_dataset(rnaseq_data_fixed_reporters, info_dict, metadata)
+        def main(rnaseq_data_fixed_reporters, info_sheet, factors_file,
+                 seq_platform_id):
+            metadata_dict = parse_info_sheet(info_sheet)
+            factors = create_factors_metadata_json(factors_file)
+            metadata = fill_in_metadata(metadata_dict, factors)
+            create_biogps_dataset(rnaseq_data_fixed_reporters, metadata_dict,
+                                  metadata, seq_platform_id)
 
         """
-        Below is an example of how you would call this sheet using the rnaseq_data_fixed_reporters which comes
-        from reporter_to_entrezgene.py helper file, and the metadata and info sheet.
-        If your RNAseq data file already contains Entrezgene IDs, then no need to run the helper file.
+        Below is an example of how you would call this sheet using 1) rnaseq_data_fixed_reporters
+        which comes from reporter_to_entrezgene.py helper file, and the 2) factors sheet and 3)
+        info sheet. If your RNAseq data file already contains Entrezgene IDs or you are loading
+        Microarray data, then no need to run reporter_to_entrezgene.py the helper file.
         """
 
-        # main(rnaseq_data_fixed_reporters, info_sheet, metadata_file)
+        # main(rnaseq_data_fixed_reporters, info_sheet, factors_file, seq_platform_id)
