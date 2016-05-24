@@ -62,10 +62,27 @@ class Command(BaseCommand):
             print('STEP 1: START')
             print('STEP 1: parse information sheet from user')
             df = pd.read_table(info_sheet, sep='\t')
+            # replace nans with strings
+            df = df.fillna('')
             # set the index to the info names; easier to parse
             df.index = df['info']
 
             df["info"] = df["info"].map(str.strip)
+
+            def _make_new_geo_gse_number():
+                datasets = models.BiogpsDataset.objects.all()
+
+                id_list = []
+                for ds in datasets:
+                    if 'BDS' in ds.geo_gse_id:
+                        id_list.append(ds.geo_gse_id)
+
+                old_gse_number = max(id_list)
+                _, old_gse_number = old_gse_number.split('_')
+                new_gse_number = int(old_gse_number) + 1
+                new_gse_string = 'BDS_' + (str(new_gse_number)).zfill(5)
+
+                return new_gse_string
 
             metadata_dict = {
                 'name': df.loc['name']['description'],
@@ -75,7 +92,7 @@ class Command(BaseCommand):
                 'pubmed_id': df.loc['pubmed_id']['description'],
                 'geo_gpl_id': df.loc['geo_gpl_id']['description'],
                 'geo_gds_id': df.loc['geo_gds_id']['description'],
-                'geo_gse_id': df.loc['geo_gse_id']['description'],
+                'geo_gse_id': _make_new_geo_gse_number(),
                 'secondaryaccession': df.loc['secondaryaccession']['description']
             }
             print('STEP 1: END\n')
@@ -198,6 +215,7 @@ class Command(BaseCommand):
             print('STEP 4: dataset instance: ' + str(dataset))
             print('STEP 4: dataset.id: ' + str(dataset.id))
             print('STEP 4: dataset.name: ' + str(dataset.name))
+            print('STEP 4: dataset.geo_gse_id: ' + str(dataset.geo_gse_id))
 
             dataframe = pd.read_csv(rnaseq_data, index_col=0, sep='\t')
             datasetdata = []
@@ -217,6 +235,15 @@ class Command(BaseCommand):
                                                 reporters=dataframe.index.tolist(),
                                                 matrix=s.read())
             matrix.save()
+            get_random_test_genes = models.BiogpsDatasetData.objects.filter(dataset=dataset)[0:5]
+            print('STEP 4: test url: ' +  'http://localhost:8000/static/data_chart.html?gene='
+                  + str(get_random_test_genes[0].reporter) + '&dataset=' + str(dataset.geo_gse_id))
+
+            gene_list = []
+            for gene in get_random_test_genes:
+                gene_list.append(str(gene.reporter))
+
+            print('STEP 4: other genes to test: ' + str(gene_list))
             print('STEP 4: END')
 
         def main(rnaseq_data_fixed_reporters, info_sheet, factors_file,
