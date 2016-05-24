@@ -15,7 +15,7 @@ Make sure you use **git** for version control (May 2016 Biogps_dataset was migra
 
 ### You must have three main components running in order to see datasets
 
-#### 1) SSH into the remote BioGPS dataset
+#### 1) SSH into the remote BioGPS database
 
 Because the dataset database is much too large to install on computer for local development, you need to request a connection to our dev db server
 
@@ -29,8 +29,11 @@ The settings_dev file is a "secret file." Please see Chunlei or BioGPS project m
 
 **Install Elastic Search using [these directions](https://www.astic.co/guide/en/elasticsearch/reference/current/_installation.html):**
 
-Elastic search is a search server based on Lucene. It provides a distributed, multitenant-capable full-text search
-engine with an HTTP web interface and schema-free JSON documents. Elastic search is developed in Java and is released
+Elastic search is a search server based on Lucene.
+
+It is a full-text search engine with an HTTP web interface and schema-free JSON documents.
+
+Elastic search is developed in Java and is released
 as open source under the terms of the Apache License.
 
 From within the elasticsearch folder that you set up, run:
@@ -44,25 +47,20 @@ You will need to get an info sheet, factors sheet and RNAseq data/matrix file fr
 
 If yes, then you **must** run **`reporter_to_entrezgene.py`**, which will use mygene.info to replace **gene symbols** with **Entrezgene IDs.**
 
-For microarray data, keep the probe set reporters.
-
-#### Entrezgene IDs are absolutely necessary for Biogps.org data display.
+Entrezgene IDs are absolutely necessary for Biogps.org data display, but for microarray datasets, keep the probe set reporters.
 
 ## Dataset Parsers:
 
-- **load_ds** command which will load *remote* (Microarray data from [ArrayExpress](https://www.ebi.ac.uk/arrayexpress/)) data to remote server for dev or prod.
-- **load_ds_local** command will load *local* data to the remote server for dev or prod. (written for RNAseq)
+- **load_ds** command which will load *remote* datasets (Microarray data from [ArrayExpress](https://www.ebi.ac.uk/arrayexpress/)) to remote server for dev or prod.
+- **load_ds_local** command will load *local* datasets to the remote server for dev or prod. (written for RNAseq)
 
-### Run the command like this, where "load_ds_local" can be other commands
-
+Run the command like this using Django manage.py, where "load_ds_local" can be other commands:
 - `python3 manage.py load_ds_local --settings=biogps_dataset.settings_dev`
 
-### Then you must use the command es_index to "index the data", then the newly loaded dataset should appear in the chart file.
-
-#### index the dataset (more explanation between this and load)
+Then you must use the command es_index to "index the data", then the newly loaded dataset should appear in the chart file:
 - `python3 manage.py es_index --settings=biogps_dataset.settings_dev`
 
-#### Output looks something like this:
+Output looks something like this:
 - `added 16 platform, added 5914 dataset`
 
 ## Open this url and you should see bar charts!
@@ -74,7 +72,7 @@ For microarray data, keep the probe set reporters.
 - `python3 manage.py load_ds --help --settings=biogps_dataset.settings_dev`
 
 ## Instances (models) to create during dataset loading:
-**If you don't know what a model is, then read about [Django](https://www.djangoproject.com/)!**
+If you don't know what a model is, then read about [Django](https://www.djangoproject.com/)!
 
 * **dataset:**
     * Model with information about a certain dataset including metadata.
@@ -155,5 +153,4 @@ viewing.
 
 If so, then change the color_idx in the json metadata (ex: admin/dataset/biogpsdataset/2509/) accordingly to group samples into meaningful groups. This is done manually due to the numerous variations of possible sample groupings
 
-### Make sure to run Flake8, prior to pushing code to biogps_dataset repository.
-
+### Make sure to run Flake8 (to check for Pep8 compliance), prior to pushing code to biogps_dataset repository.

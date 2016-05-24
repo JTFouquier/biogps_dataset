@@ -9,12 +9,12 @@ from django.core.management.base import BaseCommand
 
 """Parsing user supplied information:
 
-INFO SHEET:
+1) INFO SHEET:
 
 An information sheet will need to be filled out by dataset owner, we provide
 this sheet in a specific format. MUST ADD text to blank fields.
 
-FACTORS SHEET:
+2) FACTORS SHEET:
 
 "factors" are where sample name and detailed information goes about every
 sample. This comes from a user's factor sheet in a tab-delimited text file.
@@ -23,24 +23,32 @@ NOTE/IMPORTANT: The fourth column (line[3].strip() below) MUST contain replicate
   information. ie. biological replicates will have the same name or condition.
   This can also be their name or if there are no biological replicates for samples.
   This is needed for averaging, as well as display names.
+
+3) DATA SHEET:
+
+The data is where the gene expression information is found. The sample names must
+be in the top/header row of the data sheet and the 2nd column of the factors sheet.
+
+SEE EXAMPLES in data_load_small_examples to make sure your files are
+preprocessed correctly
 """
 
 """
-# we provide the info sheet for users to fill out
-# from data load folder:
+# from local_data_load folder:
 info_sheet = '/Users/fouquier/repos/biogps_dataset/dataset/utils/helper_files/local_data_load/info_sheet.txt'
 factors_file = '/Users/fouquier/repos/biogps_dataset/dataset/utils/helper_files/local_data_load/sheep_atlas_factors.txt'
+
+# From local_data_output folder:
+# NOTE, this file can be ouput from reporter_to_enrezgene.py or RNAseq data
+# already containing Entrezgene IDs.
+rnaseq_data_fixed_reporters = '/Users/fouquier/repos/biogps_dataset/dataset/utils/helper_files/local_data_output/rnaseq_data_fixed_reporters.txt'
 
 # This platform id must be entered by developer after manually determining
 # which platform is correct, OR after you
 # create the appropriate platform.
 seq_platform_id = '1'
-
-# From data output folder:
-# NOTE, this file can be ouput from reporter_to_enrezgene.py or RNAseq data
-# already containing Entrezgene IDs.
-rnaseq_data_fixed_reporters = '/Users/fouquier/repos/biogps_dataset/dataset/utils/helper_files/local_data_output/rnaseq_data_fixed_reporters.txt'
 """
+
 
 class Command(BaseCommand):
 
@@ -222,7 +230,7 @@ class Command(BaseCommand):
         """
         Below is an example of how you would call this sheet using 1) rnaseq_data_fixed_reporters
         which comes from reporter_to_entrezgene.py helper file, and the 2) factors sheet and 3)
-        info sheet. If your RNAseq data file already contains Entrezgene IDs or you are loading
+        info sheet. If your RNAseq dataset file already contains Entrezgene IDs or you are loading
         Microarray data, then no need to run reporter_to_entrezgene.py the helper file.
         """
 
