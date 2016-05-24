@@ -104,7 +104,7 @@ urls from mygene.info used to get the Entrezgene IDs from gene symbol (from repo
 - `http://mygene.info/v2/query?q=symbol:0610005C13Rik`
 
 ## To access the dataset via the shell:
-- `python manage.py shell_plus --settings=biogps_dataset.settings_dev`
+- `python3 manage.py shell_plus --settings=biogps_dataset.settings_dev`
 
 #### Run these commands from shell:
 

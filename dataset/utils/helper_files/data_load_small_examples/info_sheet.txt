@@ -1,1 +1,1 @@
-info	descriptionname	JF Testsummary	JF Test, long summary goes herespecies	sheepowner	unknownpubmed_id	unknowngeo_gds_id	unknowngeo_gse_id	BDS_00020geo_gpl_id	unknownsecondaryaccession	unknowntags	unknown
+info	descriptionname	JF Testsummary	"JF Test, long summary goes here"species	sheepowner	pubmed_id	geo_gds_id	geo_gse_id	geo_gpl_id	secondaryaccession	tags	seq_platform_information	
