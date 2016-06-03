@@ -41,12 +41,14 @@ factors_file = '/Users/fouquier/repos/biogps_dataset/dataset/utils/helper_files/
 # From local_data_output folder:
 # NOTE, this file can be ouput from reporter_to_enrezgene.py or RNAseq data
 # already containing Entrezgene IDs.
-rnaseq_data_fixed_reporters = '/Users/fouquier/repos/biogps_dataset/dataset/utils/helper_files/local_data_output/rnaseq_data_fixed_reporters.txt'
+# rnaseq_data_fixed_reporters = '/Users/fouquier/repos/biogps_dataset/dataset/utils/helper_files/local_data_output/rnaseq_data_fixed_reporters.txt'
+# version using ensembl ID, which was not run through reporter_to_entrezgene.py (no need for this DS):
+rnaseq_data_fixed_reporters = '/Users/fouquier/repos/biogps_dataset/dataset/utils/helper_files/local_data_load/sheep_atlas_ensembl.txt'
 
 # This platform id must be entered by developer after manually determining
 # which platform is correct, OR after you
 # create the appropriate platform.
-seq_platform_id = '1'
+seq_platform_id = '16'
 """
 
 
@@ -58,24 +60,24 @@ class Command(BaseCommand):
             """This is an information sheet given to users in order to obtain
             info about their sequencing run.
             """
-            print('Parse user-supplied info sheet & metadata sheet')
+            print('Parse user-supplied info sheet & factors sheet')
             print('STEP 1: START')
             print('STEP 1: parse information sheet from user')
             df = pd.read_table(info_sheet, sep='\t')
             # replace nans with strings
-            df = df.fillna('')
+            df = df.fillna('unknown')
             # set the index to the info names; easier to parse
             df.index = df['info']
 
             df["info"] = df["info"].map(str.strip)
 
-            def _make_new_geo_gse_number():
-                datasets = models.BiogpsDataset.objects.all()
+            def _make_new_geo_gse_id():
+                # istartswith is case insensitive filter option in Django
+                datasets = models.BiogpsDataset.objects.filter(geo_gse_id__istartswith="BDS")
 
                 id_list = []
                 for ds in datasets:
-                    if 'BDS' in ds.geo_gse_id:
-                        id_list.append(ds.geo_gse_id)
+                    id_list.append(ds.geo_gse_id)
 
                 old_gse_number = max(id_list)
                 _, old_gse_number = old_gse_number.split('_')
@@ -92,7 +94,7 @@ class Command(BaseCommand):
                 'pubmed_id': df.loc['pubmed_id']['description'],
                 'geo_gpl_id': df.loc['geo_gpl_id']['description'],
                 'geo_gds_id': df.loc['geo_gds_id']['description'],
-                'geo_gse_id': _make_new_geo_gse_number(),
+                'geo_gse_id': _make_new_geo_gse_id(),
                 'secondaryaccession': df.loc['secondaryaccession']['description']
             }
             print('STEP 1: END\n')
@@ -210,7 +212,7 @@ class Command(BaseCommand):
                                                     factors=final_factors,
                                                     pop_total=0
                                                     )
-            dataset = models.BiogpsDataset.objects.get(name=metadata_dict['name'])
+            dataset = models.BiogpsDataset.objects.get(geo_gse_id=metadata_dict['geo_gse_id'])
             # For logging purposes:
             print('STEP 4: dataset instance: ' + str(dataset))
             print('STEP 4: dataset.id: ' + str(dataset.id))
@@ -236,8 +238,8 @@ class Command(BaseCommand):
                                                 matrix=s.read())
             matrix.save()
             get_random_test_genes = models.BiogpsDatasetData.objects.filter(dataset=dataset)[0:5]
-            print('STEP 4: test url: ' +  'http://localhost:8000/static/data_chart.html?gene='
-                  + str(get_random_test_genes[0].reporter) + '&dataset=' + str(dataset.geo_gse_id))
+            print('STEP 4: test url: ' + 'http://localhost:8000/static/data_chart.html?gene=' +
+                  str(get_random_test_genes[0].reporter) + '&dataset=' + str(dataset.geo_gse_id))
 
             gene_list = []
             for gene in get_random_test_genes:
