@@ -59,6 +59,8 @@ Run the command like this using Django manage.py, where "load_ds_local" can be o
 
 Then you must use the command es_index to "index the data", then the newly loaded dataset should appear in the chart file:
 - `python3 manage.py es_index --settings=biogps_dataset.settings_dev`
+Use the "-c" argument if you want to clear previous indexing
+- `python3 manage.py es_index -c --settings=biogps_dataset.settings_dev`
 
 Output looks something like this:
 - `added 16 platform, added 5914 dataset`
