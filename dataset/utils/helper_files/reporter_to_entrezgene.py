@@ -17,12 +17,15 @@ This specific helper file dataset was written for local RNAseq data.
 
 BioGPS typically handles Microarray data and also handles dataloading
 from remote data repositories (hosted online) and not local data.
+
+Taxid should typically be used in the species variable, unless it
+is a very common species such as human or mouse.
 """
 
 # these 3 variables will be be input as arguments by the user in terminal,
 # not in this script
 """
-species = 'sheep'
+species = '9940'  # sheep taxid.
 input_seq_file = '/Users/fouquier/repos/biogps_dataset/dataset/utils/helper_files/local_data_load/sheep_atlas.txt'
 output_file = '/Users/fouquier/repos/biogps_dataset/dataset/utils/helper_files/local_data_output/rnaseq_data_fixed_reporters.txt'
 gene_symbol_output_file = '/Users/fouquier/repos/biogps_dataset/dataset/utils/helper_files/local_data_output/gene_symbols_without_entrezgeneID.txt'
