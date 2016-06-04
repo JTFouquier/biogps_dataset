@@ -791,7 +791,7 @@ def dataset_default(request):
                 return general_json_response(GENERAL_ERRORS.ERROR_BAD_ARGS, "Dataset is not set correctly in settings.py mapping")
             else:
 
-                return general_json_response(GENERAL_ERRORS.ERROR_BAD_ARGS, "Cannot find BiogpsPlatform for this dataset: %s" % ds_id_from_map)
+                return general_json_response(GENERAL_ERRORS.ERROR_BAD_ARGS, "Cannot find BiogpsPlatform for this dataset: %s" % default_rnaseq_ds_id)
 
 
 def calc_correlation(rep, mat, min_corr):
