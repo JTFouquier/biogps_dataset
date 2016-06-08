@@ -717,6 +717,11 @@ def _get_default_ds(gene_id, species=None):
             return None
         species = data_json['taxid']
     ds_id = settings.DEFAULT_DATASET_MAPPING.get(species, None)
+    # the dataset id is in the rnaseq default dataset list AND the ds_id has any platform,
+    # then no need to do any more checks, just return the dataset id.
+    if ds_id in settings.DEFAULT_RNASEQ_DS_ACCESSION and (BiogpsDataset.objects.get(geo_gse_id=ds_id)).platform:
+        return ds_id
+
     if ds_id:
         # check if ds_id is valid for the given gene
         reporters = _get_reporter_from_gene(gene_id)
@@ -771,28 +776,13 @@ def dataset_default(request):
     species = data_json['taxid']
 
     default_ds_id = _get_default_ds(gene_id, species=species)
-    default_rnaseq_ds_id = settings.DEFAULT_DATASET_MAPPING.get(species, None)
     if default_ds_id:
         return general_json_response(detail={'gene': to_int(gene_id),
                                              'dataset': default_ds_id,
                                              'taxid': species})
-    if (BiogpsDataset.objects.get(geo_gse_id=default_rnaseq_ds_id)).platform and default_rnaseq_ds_id:
-
-        return general_json_response(detail={'gene': to_int(gene_id),
-                                             'dataset': default_rnaseq_ds_id,
-                                             'taxid': species})
     else:
-        if not default_ds_id:
-
-            return general_json_response(GENERAL_ERRORS.ERROR_BAD_ARGS, "Cannot get default dataset with gene id: %s." % gene_id)
-        else:
-            if not default_rnaseq_ds_id:
-
-                return general_json_response(GENERAL_ERRORS.ERROR_BAD_ARGS, "Dataset is not set correctly in settings.py mapping")
-            else:
-
-                return general_json_response(GENERAL_ERRORS.ERROR_BAD_ARGS, "Cannot find BiogpsPlatform for this dataset: %s" % default_rnaseq_ds_id)
-
+        return general_json_response(
+            GENERAL_ERRORS.ERROR_BAD_ARGS, "Cannot get default dataset with gene id: %s. Check settings file for correct default datasets" % gene_id)
 
 def calc_correlation(rep, mat, min_corr):
     import numpy as np
