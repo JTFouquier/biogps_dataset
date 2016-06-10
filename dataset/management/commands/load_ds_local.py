@@ -6,6 +6,7 @@ import numpy as np
 
 from dataset import models
 from django.core.management.base import BaseCommand
+from optparse import make_option
 
 """Parsing user supplied information:
 
@@ -53,6 +54,22 @@ seq_platform_id = '16'
 
 
 class Command(BaseCommand):
+
+    option_list = BaseCommand.option_list + (make_option("-i", "--info_sheet", action="store",
+                                             type="string", dest="info_sheet",
+                                             help='user supplied information sheet.',),)
+
+    option_list = option_list + (make_option("-f", "--factors_file", action="store",
+                                             type="string", dest="factors_file",
+                                             help='user supplied factors sheet for samples.', ),)
+
+    option_list = option_list + (make_option("-r", "--rnaseq_data_fixed_reporters", action="store",
+                                             type="string", dest="rnaseq_data_fixed_reporters",
+                                             help='rna seq data with correct reporters.', ),)
+
+    option_list = option_list + (make_option("-p", "--seq_platform_id", action="store",
+                                             type="string", dest="seq_platform_id",
+                                             help='Appropriate platform ID.', ),)
 
     def handle(self, *args, **options):
 
@@ -248,19 +265,8 @@ class Command(BaseCommand):
             print('STEP 4: other genes to test: ' + str(gene_list))
             print('STEP 4: END')
 
-        def main(rnaseq_data_fixed_reporters, info_sheet, factors_file,
-                 seq_platform_id):
-            metadata_dict = parse_info_sheet(info_sheet)
-            factors = create_factors_metadata_json(factors_file)
-            metadata = fill_in_metadata(metadata_dict, factors)
-            create_biogps_dataset(rnaseq_data_fixed_reporters, metadata_dict,
-                                  metadata, seq_platform_id)
-
-        """
-        Below is an example of how you would call this sheet using 1) rnaseq_data_fixed_reporters
-        which comes from reporter_to_entrezgene.py helper file, and the 2) factors sheet and 3)
-        info sheet. If your RNAseq dataset file already contains Entrezgene IDs or you are loading
-        Microarray data, then no need to run reporter_to_entrezgene.py the helper file.
-        """
-
-        # main(rnaseq_data_fixed_reporters, info_sheet, factors_file, seq_platform_id)
+        metadata_dict = parse_info_sheet(options['info_sheet'])
+        factors = create_factors_metadata_json(options['factors_file'])
+        metadata = fill_in_metadata(metadata_dict, factors)
+        create_biogps_dataset(options['rnaseq_data_fixed_reporters'], metadata_dict,
+                              metadata, options['seq_platform_id'])
