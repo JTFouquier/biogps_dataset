@@ -15,7 +15,8 @@ class Command(BaseCommand):
                     dest="create-index",
                     default=False,
                     help='Create new ES index, delete the old one if exists.'
-        ),)
+                    ),
+    )
 
     def _create_es_index(self):
         '''Create the ES index, delete it first if exists'''
@@ -64,15 +65,18 @@ class Command(BaseCommand):
 
     def _index_datasets(self):
         '''Do the actual indexing on an existing ES index.'''
-        plt_body = {"platform": "", "reporters": ""}
         platform = models.BiogpsDatasetPlatform.objects.all()
         plt_count, bio_count = 0, 0
         for item in platform:
-            plt_body["reporters"] = item.reporters
+            plt_body = {}
+            # add this check because RNAseq datasets don't need reporters listed in their platform
+            if item.reporters:
+                plt_body["reporters"] = item.reporters
             plt_body["platform"] = item.platform
             plt_body["species"] = item.species
+            plt_id = item.id
             data = json.dumps(plt_body)
-            plt_url = settings.ES_URLS['PF'] + str(plt_count)
+            plt_url = settings.ES_URLS['PF'] + str(plt_id)
             requests.post(plt_url, data=data)
             plt_count = plt_count + 1
             # temp_data中的default字段表面了该document来自那个数据库，整数1表明来自默认数据库
@@ -80,7 +84,7 @@ class Command(BaseCommand):
                 temp_data = ds.es_index_serialize()
                 data = json.dumps(temp_data)
                 url = settings.ES_URLS['DS'] + \
-                    str(bio_count) + "?parent=" + str(plt_count - 1)
+                    str(ds.id) + "?parent=" + str(plt_id)
                 requests.put(url, data=data)
                 bio_count = bio_count + 1
 

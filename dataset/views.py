@@ -433,6 +433,7 @@ def _es_search(rpt, q=None, dft=False, start=0, size=8):
     """
     body = {"from": start, "size": size}
     # setup filter, filter is faster that query
+    # (TODO) make this compatible with RNAseq datasets
     body['query'] = {"filtered": {"filter": {"bool": {
         "must": [{"term": {"is_default": dft}},
                  {"has_parent": {"parent_type": "platform", "query":
@@ -717,21 +718,45 @@ def _get_default_ds(gene_id, species=None):
             return None
         species = data_json['taxid']
     ds_id = settings.DEFAULT_DATASET_MAPPING.get(species, None)
-    # the dataset id is in the rnaseq default dataset list AND the ds_id has any platform,
-    # then no need to do any more checks, just return the dataset id.
-    if ds_id in settings.DEFAULT_RNASEQ_DS_ACCESSION and (BiogpsDataset.objects.get(geo_gse_id=ds_id)).platform:
-        return ds_id
-
+    species = settings.TAXONOMY_MAPPING.get(species, species)
+    # check if ds_id is valid for the given gene
+    reporters = _get_reporter_from_gene(gene_id)
+    has_parent_platform_query = { "has_parent": {
+                                        "parent_type": "platform",
+                                        "query": {
+                                            "bool": {
+                                                "must": {
+                                                    "term": {
+                                                        "species": species
+                                                    }
+                                                },
+                                                "minimum_should_match": 1,
+                                                "should": [
+                                                    {
+                                                        "terms": {
+                                                            "reporters": reporters
+                                                        }
+                                                    },
+                                                    {
+                                                        "filtered": {
+                                                            "filter": {
+                                                                "missing": {
+                                                                    "field": "reporters"
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    }
+                                }
     if ds_id:
-        # check if ds_id is valid for the given gene
-        reporters = _get_reporter_from_gene(gene_id)
-        if reporters is None:
-            return None
+
         body = {"fields": [], "size": 1}
         body['query'] = {"filtered": {"filter": {"bool": {
             "must": [{"term": {"geo_gse_id": ds_id.lower()}},  # string is indexed in lower case at ES
-                     {"has_parent": {"parent_type": "platform", "query":
-                                     {"terms": {"reporters": reporters}}}}]}}
+                     has_parent_platform_query ]}}
         }}
         data = json.dumps(body)
         r = requests.post(settings.ES_URLS['SCH'], data=data).json()
@@ -739,27 +764,21 @@ def _get_default_ds(gene_id, species=None):
             # found a default ds_id from ES query result
             return ds_id
         else:
-            # take a valid ds_id from the ES
-            body = {"fields": ["geo_gse_id"], "size": 1}
-            body['query'] = {
-                "has_parent": {
-                    "parent_type": "platform",
-                    "query": {
-                        "terms": {
-                            "reporters": reporters
-                        }
-                    }
-                }
+            ds_id = None
+
+    if not ds_id:
+        # take a valid ds_id from the ES
+        body = {"fields": ["geo_gse_id"], "size": 1}
+        body['query'] = has_parent_platform_query
+        body["sort"] = [{
+            "is_default": {
+                "order": "desc"
             }
-            body["sort"] = [{
-                "is_default": {
-                    "order": "desc"
-                }
-            }]
-            data = json.dumps(body)
-            r = requests.post(settings.ES_URLS['SCH'], data=data).json()
-            if r["hits"]["total"] > 0:
-                return r["hits"]["hits"][0]["fields"]["geo_gse_id"][0]
+        }]
+        data = json.dumps(body)
+        r = requests.post(settings.ES_URLS['SCH'], data=data).json()
+        if r["hits"]["total"] > 0:
+            return r["hits"]["hits"][0]["fields"]["geo_gse_id"][0]
 
 
 @require_http_methods(["GET"])
