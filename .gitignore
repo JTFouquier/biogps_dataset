@@ -1,5 +1,9 @@
 # Byte-compiled / optimized / DLL files
+<<<<<<< HEAD
 # copied from github: https://github.com/github/gitignore/blob/master/Python.gitignore
+=======
+# copied from https://github.com/github/gitignore/blob/master/Python.gitignore
+>>>>>>> jennifer_local_ds_load
 __pycache__/
 *.py[cod]
 *$py.class

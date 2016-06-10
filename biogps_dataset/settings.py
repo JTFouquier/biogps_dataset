@@ -139,6 +139,18 @@ DEFAULT_DATASET_MAPPING = {
     9823: 'BDS_00012',
 }
 
+TAXONOMY_MAPPING = {
+9606: "human",
+10090:"mouse",
+10116: "rat",
+7227: "fruitfly",
+6239: "nematode",
+7955: "zebrafish",
+3702: "thale-cress",
+8364: "frog",
+9823: "pig",
+}
+
 # DEFAULT_DS_TOKEN = ['GSE952', 'GSE10246']
 # [ds.id for ds in BiogpsDataset.objects.all() if ds.metadata['default']]
 # DEFAULT_DS_ID = [6, 8, 9, 10, 11, 12, 13, 14, 3, 4, 5, 1, 2428, 2, 2427, 2430, 7]
