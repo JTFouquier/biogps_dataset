@@ -35,13 +35,15 @@ def to_int(s):
 
 def adopt_dataset(ds_id):
     try:
-        _id = int(ds_id)
+        ds_id = int(ds_id)
         is_pk = True
     except ValueError:
         is_pk = False
+    if ds_id in ['BDS_00016', 10021]:
+        return None    # exclude balwin dataset for now
     try:
         if is_pk:
-            return models.BiogpsDataset.objects.get(pk=_id)
+            return models.BiogpsDataset.objects.get(pk=ds_id)
         else:
             return models.BiogpsDataset.objects.get(geo_gse_id=ds_id)
     except ObjectDoesNotExist:
@@ -159,6 +161,7 @@ def dataset_list(request):
     page = int(page)
     page_by = int(page_by)
     qs = models.BiogpsDataset.objects.all()
+    qs = qs.exclude(id__in=[10020, 10021])   # exclude sheepatlas and balwin datasets for now.
     if order == 'pop':
         qs = qs.order_by('-pop_total')
     elif order == 'new':
@@ -231,10 +234,18 @@ def _get_reporter_from_gene(gene):
     data_json = mg.getgene(gene, fields=rep_fields) or {}
     reporters = []
     for field in rep_fields:
+        field = field.split('.')[0]
         if field in data_json:
             _rep = data_json[field]
-            if field == 'reporter':
-                _rep = _get_flat_list(_rep.values())
+            if field in ['reporter', 'refseq', 'ensembl']:
+                # these are nested field
+                if isinstance(_rep, list):
+                    _rep = [x.values() for x in _rep]
+                else:
+                    _rep = _rep.values()
+                _rep = _get_flat_list(_rep)
+                if field == 'refseq':
+                    _rep = [x.split('.')[0] for x in _rep]
             reporters.append(_rep)
     reporters = [str(x) for x in _get_flat_list(reporters)]
 
