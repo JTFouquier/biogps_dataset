@@ -183,14 +183,15 @@ POPULAR_FACTORS = ['TREATMENT', 'GENOTYPE', 'CELL TYPE', 'AGE', 'CELL LINE', 'OR
 
 MAX_SAMPLE_4_CORRELATION = 400   # 200
 
+ES_INDEX_NAME = "biogps_ds_2"
 
 ES_URLS = {
-    'BGPS': "http://localhost:9200/biogps_ds/",
-    'PF_C': "http://localhost:9200/biogps_ds/platform/_mapping",
-    'DS_C': "http://localhost:9200/biogps_ds/dataset/_mapping",
-    'PF': "http://localhost:9200/biogps_ds/platform/",
-    'DS': "http://localhost:9200/biogps_ds/dataset/",
-    'SCH': "http://localhost:9200/biogps_ds/dataset/_search",
+    'BGPS': "http://localhost:9200/{}/".format(ES_INDEX_NAME),
+    'PF_C': "http://localhost:9200/{}/platform/_mapping".format(ES_INDEX_NAME),
+    'DS_C': "http://localhost:9200/{}/dataset/_mapping".format(ES_INDEX_NAME),
+    'PF': "http://localhost:9200/{}/platform/".format(ES_INDEX_NAME),
+    'DS': "http://localhost:9200/{}/dataset/".format(ES_INDEX_NAME),
+    'SCH': "http://localhost:9200/{}/dataset/_search".format(ES_INDEX_NAME),
 }
 
 # DEFAULT_DS_TOKEN = ['GSE952', 'GSE10246']
