@@ -70,6 +70,14 @@ class Command(BaseCommand):
     option_list = option_list + (make_option("-p", "--seq_platform_id", action="store",
                                              type="string", dest="seq_platform_id",
                                              help='Appropriate platform ID.', ),)
+    
+    option_list = option_list + (make_option("-s", "--factors_separator", action="store",
+                                             type="string", dest="factors_separator", default='\t',
+                                             help="Separator for factors row, default: '\t'", ),)
+    
+    option_list = option_list + (make_option("-c", "--factors_column", action="store",
+                                             type="int", dest="factors_column", default=3,
+                                             help='Column of factors file to group on.', ),)
 
     def handle(self, *args, **options):
 
@@ -117,6 +125,40 @@ class Command(BaseCommand):
             print('STEP 1: END\n')
             return metadata_dict
 
+        def create_factors_metadata_json_rewrite(factors_file, group_col=3, separator='\t'):
+            """ Rewrite of function below to allow more flexible grouping of factors """
+            print('STEP 2: START')
+            print('STEP 2: "create factors" for meta, using factors file from user')
+            color_count = 1
+            colors = {}
+            factor_list = []
+            with open(factors_file, 'r') as factors_handle:
+                for line_num, line in enumerate(factors_handle):
+                    # get header
+                    if line_num == 0:
+                        header_dict = dict(enumerate(line.strip('\n').split(separator)))
+                        continue
+                    factor_data = {}
+                    for (col_number, col_val) in enumerate(line.strip('\n').split(separator)):
+                        if col_number == group_col - 1:
+                            # setdefault...
+                            if col_val not in colors:
+                                color_count += 1
+                                colors[col_val] = color_count
+                            this_color = colors[col_val]
+                            this_con = col_val
+                        factor_data[header_dict[col_number]] = col_val
+                    factor_list.append({
+                        this_con: {
+                            "factorvalue": factor_data,
+                            "order_idx": this_color,
+                            "color_idx": this_color,
+                            "title": this_con
+                        }
+                    })
+            print('STEP 2: END\n')
+            return factor_list
+                            
         def create_factors_metadata_json(factors_file):
             """Create the "factors" section which has information or "comments"
             about the samples.
@@ -266,7 +308,8 @@ class Command(BaseCommand):
             print('STEP 4: END')
 
         metadata_dict = parse_info_sheet(options['info_sheet'])
-        factors = create_factors_metadata_json(options['factors_file'])
+        factors = create_factors_metadata_json_rewrite(options['factors_file'], group_col=options['factors_column'], 
+                        separator=options['factors_separator'])
         metadata = fill_in_metadata(metadata_dict, factors)
         create_biogps_dataset(options['rnaseq_data_fixed_reporters'], metadata_dict,
                               metadata, options['seq_platform_id'])
