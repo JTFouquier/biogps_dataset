@@ -250,47 +250,43 @@ class Command(BaseCommand):
             for d in factor_data['factors']:
                 final_factors.append(list(d.values())[0]['factorvalue'])
 
-            #if models.BiogpsDataset.objects.filter(name=metadata_dict['name']):
-            #    print('STEP 4: Dataset already created, script terminated. To rerun'
-            #          'dataset load, delete the dataset first in shell_plus')
-
-            #    return
-
-            #else:
-            #    models.BiogpsDataset.objects.create(name=metadata_dict['name'],
-            #                                        summary=metadata_dict['summary'],
-            #                                        ownerprofile_id=metadata_dict['owner'],
-            #                                        platform=models.BiogpsDatasetPlatform.objects.get(id=seq_platform_id),
-            #                                        geo_gds_id=metadata_dict['geo_gds_id'],
-            #                                        geo_gse_id=metadata_dict['geo_gse_id'],
-            #                                        geo_id_plat=metadata_dict['geo_gpl_id'],
-            #                                        metadata=metadata,
-            #                                        species=metadata_dict['species'],
-            #                                        sample_count=sample_count,
-            #                                        factor_count=len(final_factors[0]),
-            #                                        factors=final_factors,
-            #                                        pop_total=0
-            #                                        )
-            dataset = models.BiogpsDataset.objects.get_or_create(name=metadata_dict['name'],
-                            summary=metadata_dict['summary'],
-                            ownerprofile_id=metadata_dict['owner'],
-                            platform=models.BiogpsDatasetPlatform.objects.get(id=seq_platform_id),
-                            geo_gds_id=metadata_dict['geo_gds_id'],
-                            geo_gse_id=metadata_dict['geo_gse_id'],
-                            geo_id_plat=metadata_dict['geo_gpl_id'],
-                            metadata=metadata,
-                            species=metadata_dict['species'],
-                            sample_count=sample_count,
-                            factor_count=len(final_factors[0]),
-                            factors=final_factors,
-                            pop_total=0
-                            )
-            if not dataset[1]:
+            if models.BiogpsDataset.objects.filter(name=metadata_dict['name']):
                 print('STEP 4: Dataset already created, script terminated. To rerun'
                       'dataset load, delete the dataset first in shell_plus')
+
                 return
-            dataset = dataset[0]
-            #models.BiogpsDataset.objects.get(geo_gse_id=metadata_dict['geo_gse_id'])
+
+            else:
+                models.BiogpsDataset.objects.create(name=metadata_dict['name'],
+                                                    summary=metadata_dict['summary'],
+                                                    ownerprofile_id=metadata_dict['owner'],
+                                                    platform=models.BiogpsDatasetPlatform.objects.get(id=seq_platform_id),
+                                                    geo_gds_id=metadata_dict['geo_gds_id'],
+                                                    geo_gse_id=metadata_dict['geo_gse_id'],
+                                                    geo_id_plat=metadata_dict['geo_gpl_id'],
+                                                    metadata=metadata,
+                                                    species=metadata_dict['species'],
+                                                    sample_count=sample_count,
+                                                    factor_count=len(final_factors[0]),
+                                                    factors=final_factors,
+                                                    pop_total=0
+                                                    )
+            """dataset = models.BiogpsDataset.objects.update_or_create(name=metadata_dict['name'],
+                            defaults={'summary': metadata_dict['summary'],
+                                      'ownerprofile_id': metadata_dict['owner'],
+                                      'platform': models.BiogpsDatasetPlatform.objects.get(id=seq_platform_id),
+                                      'geo_gds_id': metadata_dict['geo_gds_id'],
+                                      'geo_gse_id': metadata_dict['geo_gse_id'],
+                                      'geo_id_plat': metadata_dict['geo_gpl_id'],
+                                      'metadata': metadata,
+                                      'species': metadata_dict['species'],
+                                      'sample_count': sample_count,
+                                      'factor_count': len(final_factors[0]),
+                                      'factors': final_factors,
+                                      'pop_total': 0})
+            """
+            #dataset = dataset[0]
+            dataset = models.BiogpsDataset.objects.get(geo_gse_id=metadata_dict['geo_gse_id'])
             # For logging purposes:
             print('STEP 4: dataset instance: ' + str(dataset))
             print('STEP 4: dataset.id: ' + str(dataset.id))
