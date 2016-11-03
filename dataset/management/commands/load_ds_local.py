@@ -147,7 +147,8 @@ class Command(BaseCommand):
                                 colors[col_val] = color_count
                             this_color = colors[col_val]
                             this_con = col_val
-                        factor_data[header_dict[col_number]] = col_val
+                        else:
+                            factor_data[header_dict[col_number]] = col_val
                     factor_list.append({
                         this_con: {
                             "factorvalue": factor_data,

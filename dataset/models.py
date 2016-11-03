@@ -206,11 +206,11 @@ class BiogpsDataset(models.Model):
         return out
 
 
-class BiogpsDatasetPopularity(models.Model):
-    dataset = models.ForeignKey(BiogpsDataset, related_name='dataset_pop')
-    total = models.IntegerField(default=0)
-    month = models.IntegerField(default=0)
-    week = models.IntegerField(default=0)
+#class BiogpsDatasetPopularity(models.Model):
+#    dataset = models.ForeignKey(BiogpsDataset, related_name='dataset_pop')
+#    total = models.IntegerField(default=0)
+#    month = models.IntegerField(default=0)
+#    week = models.IntegerField(default=0)
 
 
 class BiogpsDatasetData(models.Model):
