@@ -438,18 +438,55 @@ def dataset_chart(request, ds_id, reporter_id):
     return response
 
 
-def _es_search(rpt, q=None, dft=False, start=0, size=8):
+def _es_search(rpt, q=None, dft=False, start=0, size=8, taxid=None):
     """
         filter by "default" field and "platform" and query by keywords
         if specified
     """
     body = {"from": start, "size": size}
+
+    # this is the query on platform used in "has_parent" query.
+    plt_query = {
+        "bool": {
+            "should": [
+                {
+                    "terms": {
+                        "reporters": rpt
+                    }
+                },
+                {
+                    "constant_score": {
+                        "filter": {
+                            "missing": {
+                                "field": "reporters"
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+    }
+    if taxid:
+        plt_query = {
+            "bool": {
+                "must": [
+                    {
+                        "term": {
+                            "species": taxid
+                        }
+                    },
+                    plt_query
+                ]
+            }
+        }
+
     # setup filter, filter is faster that query
-    # (TODO) make this compatible with RNAseq datasets
     body['query'] = {"filtered": {"filter": {"bool": {
         "must": [{"term": {"is_default": dft}},
-                 {"has_parent": {"parent_type": "platform", "query":
-                                 {"terms": {"reporters": rpt}}}}]}}
+                 # {"has_parent": {"parent_type": "platform", "query":
+                 #                 {"terms": {"reporters": rpt}}}}]}}
+                 {"has_parent": {"parent_type": "platform", "query": plt_query}}
+                ]}}
     }}
     # set query if query word is not None
     if q is not None:
@@ -733,7 +770,7 @@ def _get_default_ds(gene_id, species=None):
     species = settings.TAXONOMY_MAPPING.get(species, species)
     # check if ds_id is valid for the given gene
     reporters = _get_reporter_from_gene(gene_id)
-    has_parent_platform_query = { "has_parent": {
+    has_parent_platform_query = {"has_parent": {
                                         "parent_type": "platform",
                                         "query": {
                                             "bool": {
@@ -768,7 +805,7 @@ def _get_default_ds(gene_id, species=None):
         body = {"fields": [], "size": 1}
         body['query'] = {"filtered": {"filter": {"bool": {
             "must": [{"term": {"geo_gse_id": ds_id.lower()}},  # string is indexed in lower case at ES
-                     has_parent_platform_query ]}}
+                     has_parent_platform_query]}}
         }}
         data = json.dumps(body)
         r = requests.post(settings.ES_URLS['SCH'], data=data).json()
