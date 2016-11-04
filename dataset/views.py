@@ -23,7 +23,6 @@ from dataset.util import general_json_response, GENERAL_ERRORS
 import mygene
 from django.core.exceptions import ObjectDoesNotExist
 from .util import ComplexEncoder
-from .models import BiogpsDataset
 
 
 def to_int(s):
@@ -481,13 +480,20 @@ def _es_search(rpt, q=None, dft=False, start=0, size=8, taxid=None):
         }
 
     # setup filter, filter is faster that query
-    body['query'] = {"filtered": {"filter": {"bool": {
-        "must": [{"term": {"is_default": dft}},
-                 # {"has_parent": {"parent_type": "platform", "query":
-                 #                 {"terms": {"reporters": rpt}}}}]}}
-                 {"has_parent": {"parent_type": "platform", "query": plt_query}}
-                ]}}
-    }}
+    body['query'] = {
+        "filtered": {
+            "filter": {
+                "bool": {
+                    "must": [
+                        {"term": {"is_default": dft}},
+                        # {"has_parent": {"parent_type": "platform", "query":
+                        #                 {"terms": {"reporters": rpt}}}}]}}
+                        {"has_parent": {"parent_type": "platform", "query": plt_query}}
+                    ]
+                }
+            }
+        }
+    }
     # set query if query word is not None
     if q is not None:
         body["query"]["filtered"]["query"] = {
@@ -770,36 +776,37 @@ def _get_default_ds(gene_id, species=None):
     species = settings.TAXONOMY_MAPPING.get(species, species)
     # check if ds_id is valid for the given gene
     reporters = _get_reporter_from_gene(gene_id)
-    has_parent_platform_query = {"has_parent": {
-                                        "parent_type": "platform",
-                                        "query": {
-                                            "bool": {
-                                                "must": {
-                                                    "term": {
-                                                        "species": species
-                                                    }
-                                                },
-                                                "minimum_should_match": 1,
-                                                "should": [
-                                                    {
-                                                        "terms": {
-                                                            "reporters": reporters
-                                                        }
-                                                    },
-                                                    {
-                                                        "filtered": {
-                                                            "filter": {
-                                                                "missing": {
-                                                                    "field": "reporters"
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                ]
-                                            }
-                                        }
+    has_parent_platform_query = {
+        "has_parent": {
+            "parent_type": "platform",
+            "query": {
+                "bool": {
+                    "must": {
+                        "term": {
+                            "species": species
+                        }
+                    },
+                    "minimum_should_match": 1,
+                    "should": [
+                        {
+                            "terms": {
+                                "reporters": reporters
+                            }
+                        },
+                        {
+                            "filtered": {
+                                "filter": {
+                                    "missing": {
+                                        "field": "reporters"
                                     }
                                 }
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    }
     if ds_id:
 
         body = {"fields": [], "size": 1}
