@@ -770,7 +770,7 @@ def _get_default_ds(gene_id, species=None):
         mg = mygene.MyGeneInfo()
         data_json = mg.getgene(gene_id, fields='taxid')
         if data_json is None or 'taxid' not in data_json:
-            return None
+            return
         species = data_json['taxid']
     ds_id = settings.DEFAULT_DATASET_MAPPING.get(species, None)
     species = settings.TAXONOMY_MAPPING.get(species, species)
@@ -816,10 +816,7 @@ def _get_default_ds(gene_id, species=None):
         }}
         data = json.dumps(body)
         r = requests.post(settings.ES_URLS['SCH'], data=data).json()
-        if r["hits"]["total"] > 0:
-            # found a default ds_id from ES query result
-            return ds_id
-        else:
+        if r["hits"]["total"] == 0:
             ds_id = None
 
     if not ds_id:
@@ -834,7 +831,15 @@ def _get_default_ds(gene_id, species=None):
         data = json.dumps(body)
         r = requests.post(settings.ES_URLS['SCH'], data=data).json()
         if r["hits"]["total"] > 0:
-            return r["hits"]["hits"][0]["fields"]["geo_gse_id"][0]
+            ds_id = r["hits"]["hits"][0]["fields"]["geo_gse_id"][0]
+
+    if ds_id:
+        #now double-check to make sure this dataset contains data in BiogpsDatasetData model
+        ds = adopt_dataset(ds_id)
+        if ds:
+            ret = get_dataset_data(ds, gene_id=gene_id)
+            if ret["data"]:
+                return ds_id
 
 
 @require_http_methods(["GET"])
