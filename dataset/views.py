@@ -226,11 +226,12 @@ def alwayslist(value, tuple_as_single=False):
         return [value]
 
 
-def _get_reporter_from_gene(gene):
+def _get_reporter_from_gene(gene, with_taxid=False):
     mg = mygene.MyGeneInfo()
     # these are the fields reporters are taken from
     rep_fields = ['entrezgene', 'reporter', 'refseq.rna', 'ensembl.gene']
-    data_json = mg.getgene(gene, fields=rep_fields) or {}
+    _fields = rep_fields + ['taxid'] if with_taxid else rep_fields
+    data_json = mg.getgene(gene, fields=_fields) or {}
     reporters = []
     for field in rep_fields:
         field = field.split('.')[0]
@@ -256,7 +257,7 @@ def _get_reporter_from_gene(gene):
         if str(gene) in d:
             reporters += alwayslist(d[str(gene)])
         d.close()
-    return reporters
+    return (reporters, data_json['taxid']) if with_taxid else reporters
 
 
 def get_dataset_data(ds, gene_id=None, reporter_id=None):
@@ -466,12 +467,13 @@ def _es_search(rpt, q=None, dft=False, start=0, size=8, taxid=None):
         }
     }
     if taxid:
+        species = settings.TAXONOMY_MAPPING.get(taxid, taxid)
         plt_query = {
             "bool": {
                 "must": [
                     {
                         "term": {
-                            "species": taxid
+                            "species": species
                         }
                     },
                     plt_query
@@ -516,14 +518,14 @@ def dataset_search(request):
 
     if gene is None:
         gene = settings.DEFAULT_GENE_ID
-    reporters = _get_reporter_from_gene(gene)
+    reporters, taxid = _get_reporter_from_gene(gene, with_taxid=True)
     if reporters is None:
         return general_json_response(
             code=GENERAL_ERRORS.ERROR_NOT_FOUND, detail='no matched\
              data for gene %s.' % gene)
     page = int(page)
     page_by = int(page_by)
-    search_res = _es_search(reporters, query, False, (page-1)*page_by, page_by)
+    search_res = _es_search(reporters, query, False, (page-1)*page_by, page_by, taxid=taxid)
     count = search_res["hits"]["total"]
     total_page = int(math.ceil(float(count) / float(page_by)))
     res = []
@@ -542,13 +544,13 @@ def dataset_search_default(request):
     gene = request.GET.get("gene", None)
     if gene is None:
         gene = settings.DEFAULT_GENE_ID
-    reporters = _get_reporter_from_gene(gene)
+    reporters, taxid = _get_reporter_from_gene(gene, with_taxid=True)
     if reporters is None:
         return general_json_response(
             code=GENERAL_ERRORS.ERROR_NOT_FOUND, detail='no\
             matched data for gene %s.' % gene)
     # retrive all results
-    search_res = _es_search(reporters, query, True, 0, 9999)
+    search_res = _es_search(reporters, query, True, 0, 9999, taxid=taxid)
     res = []
     for e in search_res["hits"]["hits"]:
         _e = e["_source"]
@@ -564,13 +566,13 @@ def dataset_search_all(request):
     gene = request.GET.get("gene", None)
     if gene is None:
         gene = settings.DEFAULT_GENE_ID
-    reporters = _get_reporter_from_gene(gene)
+    reporters, taxid = _get_reporter_from_gene(gene, with_taxid=True)
     if reporters is None:
         return general_json_response(
             code=GENERAL_ERRORS.ERROR_NOT_FOUND, detail='no\
             matched data for gene %s.' % gene)
     # retrive all default results(9999)
-    search_res = _es_search(reporters, query, True, 0, 9999)
+    search_res = _es_search(reporters, query, True, 0, 9999, taxid=taxid)
     res_dft = []
     for e in search_res["hits"]["hits"]:
         _e = e["_source"]
@@ -581,7 +583,7 @@ def dataset_search_all(request):
     # retrive fist page non-default ds
     page_by = request.GET.get("page_by", 8)
     page_by = int(page_by)
-    search_res = _es_search(reporters, query, False, 0, page_by)
+    search_res = _es_search(reporters, query, False, 0, page_by, taxid=taxid)
     count = search_res["hits"]["total"]
     total_page = int(math.ceil(float(count) / float(page_by)))
     res = []
