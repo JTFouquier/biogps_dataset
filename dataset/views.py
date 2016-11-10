@@ -149,6 +149,8 @@ def _contruct_meta(ds):
            'geo_gpl_id': geo_gpl_id, 'species': [ds.species]
            }
     ret.update(preset)
+    if 'sample_geneid' in ds.metadata:
+        ret['sample_geneid'] = ds.metadata['sample_geneid']
     return ret
 
 
@@ -671,6 +673,9 @@ def dataset_info_4_biogps(request, ds_id):
             + oj['geo_gse_id'] + '/samples/'
         oj['source'] = 'http://www.ebi.ac.uk/arrayexpress/experiments/'\
                        + oj['geo_gse_id']
+    if 'sample_geneid' in ds.metadata:
+        oj['sample_geneid'] = ds.metadata['sample_geneid']
+
     factors = []
     if oj['factors'] is not None:
         for e in oj['factors']:
