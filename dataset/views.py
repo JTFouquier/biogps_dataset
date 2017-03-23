@@ -253,7 +253,7 @@ def _get_reporter_from_gene(gene, with_taxid=False):
 
     # temporarily add miRNA reporters via flat file; remove when miRNA reporters are directly
     # returned by mygene.info
-    g2mirna_file = '/opt/biogps/gene2mirna_20120911.db'
+    g2mirna_file = '/opt/biogps/gene2mirna_20170316.db'
     if os.path.exists(g2mirna_file):
         d = shelve.open(g2mirna_file, 'r')
         if str(gene) in d:
