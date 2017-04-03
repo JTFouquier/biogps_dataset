@@ -330,9 +330,11 @@ def prepare_chart_data(val_list, factors):
     else:
         res[-1]['dev'] = 0
     for e in res:
-        # remove ' 1' surfix in element name
-        if e['name'].endswith(' 1'):
-            e['name'] = e['name'][:-2]
+        # remove ' 1' surfix in element name only for samples starting with GSM, to match the biogps view
+        if e['name'].startswith('GSM'):
+            e['name'] = e['name'].rstrip(' 1')
+        else:
+            e['name'] = e['name'].rstrip(' ')
     return res
 
 
@@ -681,7 +683,10 @@ def dataset_info_4_biogps(request, ds_id):
         for e in oj['factors']:
             i = oj['factors'].index(e)
             k = list(ds.metadata['factors'][i])[0]
-            k = k.rstrip(' 1')
+            if k.startswith('GSM'):
+                k = k.rstrip(' 1')
+            else:
+                k = k.rstrip(' ')
             factors.append({k: e})
     oj['factors'] = factors
 #     ret = _contruct_meta(ds)
