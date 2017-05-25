@@ -253,7 +253,7 @@ def _get_reporter_from_gene(gene, with_taxid=False):
 
     # temporarily add miRNA reporters via flat file; remove when miRNA reporters are directly
     # returned by mygene.info
-    g2mirna_file = '/opt/biogps/gene2mirna_20170316.db'
+    g2mirna_file = '/opt/biogps/gene2mirna_20170404.db'
     if os.path.exists(g2mirna_file):
         d = shelve.open(g2mirna_file, 'r')
         if str(gene) in d:
@@ -868,7 +868,7 @@ def dataset_default(request):
     species = data_json['taxid']
 
     default_ds_id = _get_default_ds(gene_id, species=species)
-    if default_ds_id:
+    if 1: # default_ds_id:   ### a temp fix to always return gene/taxid even dataset is None
         return general_json_response(detail={'gene': to_int(gene_id),
                                              'dataset': default_ds_id,
                                              'taxid': species})
