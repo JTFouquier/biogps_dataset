@@ -183,7 +183,7 @@ POPULAR_FACTORS = ['TREATMENT', 'GENOTYPE', 'CELL TYPE', 'AGE', 'CELL LINE', 'OR
 
 MAX_SAMPLE_4_CORRELATION = 400   # 200
 
-ES_INDEX_NAME = "biogps_ds_2"
+ES_INDEX_NAME = "biogps_ds"
 
 ES_URLS = {
     'BGPS': "http://localhost:9200/{}/".format(ES_INDEX_NAME),

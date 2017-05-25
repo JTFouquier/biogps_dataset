@@ -1021,7 +1021,7 @@
                                         if (!dsID){
                                             // then cookie based on taxID
                                             dsID = DC_026887848.getDsFromCookie(DC_026887848.taxID);
-                                            if (!dsID){
+                                            if (!dsID && dataJson.details.dataset){
                                                 // finally, use the server-side default
                                                 dsID = dataJson.details.dataset;
                                             }
@@ -1227,8 +1227,8 @@
                                 {
                                     var key = Object.keys(dataJson.details[j])[0];
                                     var shorten = key;
-                                    if (key.length>12)
-                                        shorten = key.substring(0,12)+'...';
+                                    //if (key.length>12)
+                                    //    shorten = key.substring(0,12)+'...';
                                     if(i=0){
                                         $('#label_names').append('<option id="'+key+'" style="background-color:lightgray">'+shorten+'</option>');
                                     }else{
