@@ -102,12 +102,15 @@ class BiogpsDataset(models.Model):
     # serialize object data for es index setup
     def es_index_serialize(self):
         from tagging.models import Tag
-        return {"name": self.name, "id": self.id, "slug": self.slug,
+        d =    {"name": self.name, "id": self.id, "slug": self.slug,
                 "summary": self.summary, "geo_gse_id": self.geo_gse_id,
                 "sample_count": self.sample_count, "factor_count":
                 self.factor_count, "species": self.platform.species, "tags":
                 list(Tag.objects.get_for_object(self).values_list
                      ("name", flat=True)), 'is_default': self.is_default}
+        if 'sample_geneid' in self.metadata:
+            d['sample_geneid'] = self.metadata['sample_geneid']
+        return d
 
     @property
     def name_wrapped(self):
