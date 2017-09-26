@@ -38,8 +38,8 @@ def adopt_dataset(ds_id):
         is_pk = True
     except ValueError:
         is_pk = False
-    if ds_id in ['BDS_00016', 10021]:
-        return None    # exclude balwin dataset for now
+    #if ds_id in ['BDS_00016', 10021]:
+    #    return None    # exclude balwin dataset for now
     try:
         if is_pk:
             return models.BiogpsDataset.objects.get(pk=ds_id)
@@ -677,6 +677,8 @@ def dataset_info_4_biogps(request, ds_id):
                        + oj['geo_gse_id']
     if 'sample_geneid' in ds.metadata:
         oj['sample_geneid'] = ds.metadata['sample_geneid']
+    if ds.metadata.get('pubmed_id', None):
+        oj['pubmed_id'] = ds.metadata['pubmed_id']
 
     factors = []
     if oj['factors'] is not None:
