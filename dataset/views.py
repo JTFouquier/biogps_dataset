@@ -878,7 +878,7 @@ def dataset_default(request):
         return general_json_response(
             GENERAL_ERRORS.ERROR_BAD_ARGS, "Cannot get default dataset with gene id: %s. Check settings file for correct default datasets" % gene_id)
 
-def calc_correlation(rep, mat, min_corr):
+def calc_correlation(rep, mat, min_corr, species=None):
     import numpy as np
 
     def pearsonr(v, m):
@@ -913,13 +913,14 @@ def calc_correlation(rep, mat, min_corr):
     rep_cor = {mat.reporters[i[1]]: i[0] for i in corrs}
     # query mygene to get symbol from reporter
     mg = mygene.MyGeneInfo()
-    res = mg.querymany(list(rep_cor), scopes='reporter, entrezgene, ensemblgene', fields='symbol', species='human,mouse,rat,pig')
+    species = species or 'human,mouse,rat,pig'
+    res = mg.querymany(list(rep_cor), scopes='reporter, entrezgene, ensembl.gene', fields='symbol', species=species)
     result = []
     for i in res:
         if 'notfound' in i:
             gene_id, symbol = '', ''
         else:
-            gene_id, symbol = i['_id'], i['symbol']
+            gene_id, symbol = i['_id'], i.get('symbol', '')
         result.append({'id': gene_id, 'reporter': i['query'],
                        'symbol': symbol, 'value':
                        round(rep_cor[i['query']], 4)})
@@ -960,7 +961,8 @@ def dataset_correlation(request, ds_id, reporter_id, min_corr):
 
     # Get position of reporter
     if reporter_id in _matrix.reporters:
-        result = calc_correlation(reporter_id, _matrix, min_corr)
+        species = getattr(ds, 'species', None)
+        result = calc_correlation(reporter_id, _matrix, min_corr, species=species)
         ret_type = request.GET.get('type', None)
         if ret_type is None:
             return HttpResponse(json.dumps(result, cls=ComplexEncoder),
