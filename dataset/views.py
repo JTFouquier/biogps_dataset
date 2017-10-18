@@ -622,8 +622,18 @@ def dataset_search_4_biogps(request):
         filter["filter"]["bool"]["must"].append({"term": {"species": species}})
     filtered_query = {"query": {"filtered": filter}}
     if q is not None:
-        query = {"query": {
-            "multi_match": {"query": q, "fields": ["summary", "name"]}}}
+        # query = {"query": {
+        #     "multi_match": {"query": q, "fields": ["summary", "name"]}}}
+        query = {
+            "query": {
+                "bool": {
+                    "should": [
+                        {"query_string": {"query": 'geo_gse_id:"{}"'.format(q), "boost": 2}},
+                        {"multi_match": {"query": q, "fields": ["summary", "name"]}}
+                    ]
+                }
+            }
+        }
         filtered_query["query"]["filtered"].update(query)
     if agg is not None:
         filtered_query.update({"aggs":
