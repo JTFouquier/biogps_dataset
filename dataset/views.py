@@ -136,14 +136,16 @@ def _contruct_meta(ds):
     # 'display_params':
     #          {'color': ['color_idx'], 'sort': ['order_idx'],
     #           'aggregate': ['title']}
-    if type(ds.metadata['geo_gpl_id']) is dict:
-        geo_gpl_id = ds.metadata['geo_gpl_id']['accession']
-    else:
-        geo_gpl_id = ds.metadata['geo_gpl_id']
+    geo_gpl_id = None
+    if 'geo_gpl_id' in ds.metadata:
+        if type(ds.metadata['geo_gpl_id']) is dict:
+            geo_gpl_id = ds.metadata['geo_gpl_id']['accession']
+        else:
+            geo_gpl_id = ds.metadata['geo_gpl_id']
     ret = {'id': ds.id, 'name_wrapped': ds.name, 'name': ds.name,
            'owner': ds.ownerprofile_id, 'lastmodified':
            ds.lastmodified.strftime('%Y-%m-%d %H:%M:%S'),
-           'pubmed_id': ds.metadata['pubmed_id'], 'summary': ds.summary,
+           'pubmed_id': ds.metadata.get('pubmed_id', ''), 'summary': ds.summary,
            'geo_gse_id': ds.geo_gse_id, 'created':
            ds.created.strftime('%Y-%m-%d %H:%M:%S'),
            'geo_gpl_id': geo_gpl_id, 'species': [ds.species]
