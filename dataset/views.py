@@ -258,9 +258,9 @@ def _get_reporter_from_gene(gene, with_taxid=False):
             if field in ['reporter', 'refseq', 'ensembl']:
                 # these are nested field
                 if isinstance(_rep, list):
-                    _rep = [x.values() for x in _rep]
+                    _rep = [list(x.values()) for x in _rep]
                 else:
-                    _rep = _rep.values()
+                    _rep = list(_rep.values())
                 _rep = _get_flat_list(_rep)
                 if field == 'refseq':
                     _rep = [x.split('.')[0] for x in _rep]
