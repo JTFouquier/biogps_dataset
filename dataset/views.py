@@ -63,6 +63,19 @@ def get_sample_name_list(ds, from_factor=None):
     return names
 
 
+def _get_ds_factors(ds):
+    """
+        return factors in the order of ds.factors, ds.metadata['factors'] or []
+    """
+    # set to ds.factors if provided
+    factors = ds.factors or []
+    # otherwise, taking from ds.metadata if factorvalue is provided
+    if not factors and 'factors' in ds.metadata:
+        if 'factorvalue' in list(ds.metadata['factors'][0].values())[0]:
+            factors = [list(e.values())[0]['factorvalue'] for e in ds.metadata['factors']]
+    return factors
+
+
 def get_ds_factors_keys(ds, group=None, collapse=False, naming=None):
     """
         return an array of samples' info(factor value,
@@ -73,7 +86,8 @@ def get_ds_factors_keys(ds, group=None, collapse=False, naming=None):
     # tag = []
     fvs = []
     if group is not None:
-        for j, f in enumerate(ds.factors):
+        # for j, f in enumerate(ds.factors):
+        for j, f in enumerate(_get_ds_factors(ds)):
             order_idx = color_idx = None
             # exception!
             if group not in f:
@@ -1007,12 +1021,13 @@ def dataset_factors(request, ds_id):
     if ds is None:
         return general_json_response(GENERAL_ERRORS.ERROR_NOT_FOUND,
                                      "dataset with this id not found")
+    ds_factors = _get_ds_factors(ds)
     # no factor value
-    if ds.factor_count == 0 or ds.factors is None:
+    if ds.factor_count == 0 or ds_factors is None:
         return general_json_response(code=GENERAL_ERRORS.ERROR_NOT_FOUND)
 
     factor_keys = {}
-    for fv in ds.factors:
+    for fv in ds_factors:
         for f in fv:
             if f in list(factor_keys):
                 factor_keys[f].add(fv[f])
