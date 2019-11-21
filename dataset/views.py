@@ -693,7 +693,7 @@ def dataset_info_4_biogps(request, ds_id):
         oj['pubmed_id'] = ds.metadata['pubmed_id']
 
     factors = []
-    if oj['factors'] is not None:
+    if oj['factors']:
         for e in oj['factors']:
             i = oj['factors'].index(e)
             k = list(ds.metadata['factors'][i])[0]
@@ -702,6 +702,12 @@ def dataset_info_4_biogps(request, ds_id):
             else:
                 k = k.rstrip(' ')
             factors.append({k: e})
+    elif 'factors' in ds.metadata:
+        # get factors from metadata['factors']
+        for e in ds.metadata['factors']:
+            k = list(e)[0]
+            if 'factorvalue' in e[k]:
+                factors.append({k: e[k]['factorvalue']})
     oj['factors'] = factors
 #     ret = _contruct_meta(ds)
 #     fa = get_ds_factors_keys(ds)
@@ -882,7 +888,7 @@ def dataset_default(request):
     species = data_json['taxid']
 
     default_ds_id = _get_default_ds(gene_id, species=species)
-    if 1: # default_ds_id:   ### a temp fix to always return gene/taxid even dataset is None
+    if 1:  # default_ds_id:   ### a temp fix to always return gene/taxid even dataset is None
         return general_json_response(detail={'gene': to_int(gene_id),
                                              'dataset': default_ds_id,
                                              'taxid': species})
