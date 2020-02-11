@@ -1,7 +1,7 @@
 #sudo apt-get install libpq-dev, psycopg2 rely on this
 psycopg2==2.6
 
-Django==1.8.2
+Django==1.11.28
 django-extensions==1.5.5
 django-grappelli==2.6.5
 django-jsonfield==0.9.13
